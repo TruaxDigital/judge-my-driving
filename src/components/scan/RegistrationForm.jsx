@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,7 +41,7 @@ export default function RegistrationForm({ sticker, onRegistered }) {
 
   // Check if user is already logged in
   const [isLoggedIn, setIsLoggedIn] = useState(null);
-  React.useEffect(() => {
+  useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
       setIsLoggedIn(authed);
       if (authed && localStorage.getItem('jmd_register_sticker') === sticker.unique_code) {
