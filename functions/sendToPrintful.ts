@@ -37,10 +37,19 @@ Deno.serve(async (req) => {
     if (stickers.length === 0) return Response.json({ error: 'Sticker not found' }, { status: 404 });
     const sticker = stickers[0];
 
-    const qrUrl = `https://app.judgemydriving.com/scan/${sticker.unique_code}`;
+    // Step 1: Ensure we have a composed sticker image (QR + branded template)
+    let composedImageUrl = sticker.composed_image_url;
+    if (!composedImageUrl) {
+      console.log('No composed image found, generating now...');
+      const composeRes = await base44.functions.invoke('composeStickerImage', { sticker_id });
+      if (!composeRes?.data?.success) {
+        throw new Error('Failed to compose sticker image: ' + (composeRes?.data?.error || 'unknown error'));
+      }
+      composedImageUrl = composeRes.data.file_url;
+      console.log('Composed image generated:', composedImageUrl);
+    }
 
-    // Step 1: Upload the QR code image URL to Printful file library
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=1200x1200&margin=20&data=${encodeURIComponent(qrUrl)}`;
+    const qrUrl = `https://app.judgemydriving.com/scan/${sticker.unique_code}`;
 
     const fileResult = await printfulRequest('POST', '/files', {
       type: 'default',
