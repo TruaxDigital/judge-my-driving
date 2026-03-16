@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, Map, Tag, Settings, 
-  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck
+  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck, CreditCard
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
@@ -16,6 +16,7 @@ const navItems = [
   { path: '/Analytics', label: 'Analytics', icon: BarChart2 },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
+  { path: '/Pricing', label: 'Plans', icon: CreditCard },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
 
