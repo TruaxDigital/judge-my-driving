@@ -13,6 +13,7 @@ import MapView from './pages/MapView';
 import Stickers from './pages/Stickers';
 import Settings from './pages/Settings';
 import DashboardLayout from './components/dashboard/DashboardLayout';
+import PreviewScan from './pages/PreviewScan';
 
 const PublicRoutes = () => {
   return (
@@ -62,6 +63,7 @@ const AuthenticatedApp = () => {
         <Route path="/MapView" element={<MapView />} />
         <Route path="/Stickers" element={<Stickers />} />
         <Route path="/Settings" element={<Settings />} />
+        <Route path="/PreviewScan" element={<PreviewScan />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
