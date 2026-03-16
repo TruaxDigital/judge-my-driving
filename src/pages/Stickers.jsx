@@ -132,6 +132,9 @@ export default function Stickers() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setQrSticker(sticker)}>
+                  <QrCode className="w-4 h-4 mr-1" /> QR Code
+                </Button>
                 <a href={`/scan/${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="sm" className="rounded-lg">
                     <ExternalLink className="w-4 h-4 mr-1" /> Preview
