@@ -14,8 +14,23 @@ import Stickers from './pages/Stickers';
 import Settings from './pages/Settings';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 
+const PublicRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/scan/:code" element={<ScanSticker />} />
+      <Route path="*" element={null} />
+    </Routes>
+  );
+};
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  // Check if we're on a public scan route
+  const isScanRoute = window.location.pathname.startsWith('/scan/');
+  if (isScanRoute) {
+    return <PublicRoutes />;
+  }
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -41,7 +56,6 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/Dashboard" replace />} />
-      <Route path="/scan/:code" element={<ScanSticker />} />
       <Route element={<DashboardLayout />}>
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/FeedbackFeed" element={<FeedbackFeed />} />
