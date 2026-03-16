@@ -88,5 +88,13 @@ module.exports = {
   		}
   	}
   },
+  safelist: [
+    'font-inter',
+    'bg-green-500/10', 'border-green-500/20', 'text-green-600',
+    'bg-yellow-500/10', 'border-yellow-500/20', 'text-yellow-600',
+    'bg-red-500/10', 'border-red-500/20', 'text-red-600',
+    'bg-blue-500/10', 'border-blue-500/20', 'text-blue-600',
+    'bg-zinc-500/10', 'text-zinc-500', 'border-zinc-500/20',
+  ],
   plugins: [require("tailwindcss-animate")],
 }
