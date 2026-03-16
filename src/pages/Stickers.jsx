@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck } from 'lucide-react';
+import QRCodeModal from '../components/stickers/QRCodeModal';
 import { cn } from '@/lib/utils';
 
 export default function Stickers() {
