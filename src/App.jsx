@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import PreviewScan from './pages/PreviewScan';
 import Analytics from './pages/Analytics';
+import Reporting from './pages/Reporting';
 
 const PublicRoutes = () => {
   return (
@@ -66,6 +67,7 @@ const AuthenticatedApp = () => {
         <Route path="/Settings" element={<Settings />} />
         <Route path="/PreviewScan" element={<PreviewScan />} />
         <Route path="/Analytics" element={<Analytics />} />
+        <Route path="/Reporting" element={<Reporting />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
