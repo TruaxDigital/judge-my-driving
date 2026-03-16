@@ -5,7 +5,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import { Navigate } from 'react-router-dom';
+import ScanSticker from './pages/ScanSticker';
+import Dashboard from './pages/Dashboard';
+import FeedbackFeed from './pages/FeedbackFeed';
+import MapView from './pages/MapView';
+import Stickers from './pages/Stickers';
+import Settings from './pages/Settings';
+import DashboardLayout from './components/dashboard/DashboardLayout';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +40,15 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Navigate to="/Dashboard" replace />} />
+      <Route path="/scan/:code" element={<ScanSticker />} />
+      <Route element={<DashboardLayout />}>
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/FeedbackFeed" element={<FeedbackFeed />} />
+        <Route path="/MapView" element={<MapView />} />
+        <Route path="/Stickers" element={<Stickers />} />
+        <Route path="/Settings" element={<Settings />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
