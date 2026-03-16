@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, Save, User } from 'lucide-react';
+import { Loader2, Save, User, CreditCard, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { isInIframe } from '@/lib/utils';
+import moment from 'moment';
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -95,17 +97,40 @@ export default function Settings() {
 
       <Card className="rounded-2xl">
         <CardHeader>
-          <CardTitle>Order More Stickers</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" /> Subscription
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm mb-4">
-            Need more stickers? Visit our store to order additional Judge My Driving stickers.
-          </p>
-          <a href="https://judgemydriving.com" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="rounded-xl">
-              Visit Store
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Plan</span>
+            <span className="font-medium capitalize">{user?.plan_tier?.replace(/_/g, ' ') || 'No plan'}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Status</span>
+            <span className={`font-medium capitalize ${user?.subscription_status === 'active' ? 'text-green-600' : user?.subscription_status === 'past_due' ? 'text-red-600' : 'text-muted-foreground'}`}>
+              {user?.subscription_status || '—'}
+            </span>
+          </div>
+          {user?.subscription_end_date && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Renews</span>
+              <span className="font-medium">{moment(user.subscription_end_date).format('MMM D, YYYY')}</span>
+            </div>
+          )}
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              onClick={async () => {
+                if (isInIframe()) { alert('Please open the published app to manage billing.'); return; }
+                const res = await base44.functions.invoke('createPortalSession', {});
+                if (res.data?.url) window.location.href = res.data.url;
+              }}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" /> Manage Billing
             </Button>
-          </a>
+          </div>
         </CardContent>
       </Card>
     </div>
