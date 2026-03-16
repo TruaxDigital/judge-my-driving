@@ -18,6 +18,7 @@ import Analytics from './pages/Analytics';
 import Reporting from './pages/Reporting';
 import FleetDashboard from './pages/FleetDashboard';
 import Pricing from './pages/Pricing';
+import Leaderboard from './pages/Leaderboard';
 
 const PublicRoutes = () => {
   return (
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
         <Route path="/Reporting" element={<Reporting />} />
         <Route path="/FleetDashboard" element={<FleetDashboard />} />
         <Route path="/Pricing" element={<Pricing />} />
+        <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
