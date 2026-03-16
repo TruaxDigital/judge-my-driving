@@ -49,12 +49,11 @@ Deno.serve(async (req) => {
       console.log('Composed image generated:', composedImageUrl);
     }
 
-    const qrUrl = `https://app.judgemydriving.com/scan/${sticker.unique_code}`;
-
+    // Step 2: Upload composed image to Printful file library
     const fileResult = await printfulRequest('POST', '/files', {
       type: 'default',
-      url: qrImageUrl,
-      filename: `jmd-qr-${sticker.unique_code}.png`,
+      url: composedImageUrl,
+      filename: `jmd-sticker-${sticker.unique_code}.png`,
     });
 
     console.log('File uploaded to Printful:', fileResult.id);
