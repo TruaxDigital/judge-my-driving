@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Star, MessageSquare, Tag, TrendingUp, Loader2 } from 'lucide-react';
 import StatCard from '../components/dashboard/StatCard';
 import FeedbackCard from '../components/dashboard/FeedbackCard';
+import SubscriptionBanner from '../components/dashboard/SubscriptionBanner';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
@@ -68,6 +69,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <SubscriptionBanner status={user?.subscription_status} />
+
       <div>
         <h1 className="text-3xl font-bold text-foreground tracking-tight">
           Welcome back{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
