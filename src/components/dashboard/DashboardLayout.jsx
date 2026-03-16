@@ -16,6 +16,7 @@ const navItems = [
   { path: '/Analytics', label: 'Analytics', icon: BarChart2 },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
+  { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
   { path: '/Pricing', label: 'Plans', icon: CreditCard },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
