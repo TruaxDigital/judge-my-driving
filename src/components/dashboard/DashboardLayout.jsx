@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, Map, Tag, Settings, 
-  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText
+  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/FeedbackFeed', label: 'Feedback', icon: MessageSquare },
   { path: '/MapView', label: 'Map', icon: Map },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2 },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
