@@ -202,6 +202,9 @@ export default function Stickers() {
         </DialogContent>
       </Dialog>
 
+      {/* QR Code Modal */}
+      <QRCodeModal sticker={qrSticker} open={!!qrSticker} onClose={() => setQrSticker(null)} />
+
       {/* Rename Dialog */}
       <Dialog open={!!editDialog} onOpenChange={() => setEditDialog(null)}>
         <DialogContent>
