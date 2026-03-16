@@ -4,8 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Loader2, Truck, User, Users, Star, Mail } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { isInIframe } from '@/lib/utils';
+import { cn, isInIframe } from '@/lib/utils';
 
 const PLANS = [
   {
