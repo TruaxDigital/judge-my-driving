@@ -7,4 +7,4 @@ export function cn(...inputs) {
 
 
 export const isIframe = window.self !== window.top;
-export const isInIframe = () => window.self !== window.top;
+export function isInIframe() { return window.self !== window.top; }
