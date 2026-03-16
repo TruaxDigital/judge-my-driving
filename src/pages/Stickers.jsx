@@ -17,6 +17,7 @@ export default function Stickers() {
   const [claimDialog, setClaimDialog] = useState(false);
   const [claimCode, setClaimCode] = useState('');
   const [claimError, setClaimError] = useState('');
+  const [qrSticker, setQrSticker] = useState(null);
 
   const { data: stickers = [], isLoading } = useQuery({
     queryKey: ['my-stickers'],
