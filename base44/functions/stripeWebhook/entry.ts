@@ -78,9 +78,11 @@ Deno.serve(async (req) => {
         const subId = session.subscription;
         const subscription = await stripe.subscriptions.retrieve(subId);
 
+        const isFleetPlan = ['starter_fleet', 'professional_fleet', 'enterprise_fleet'].includes(planTier);
         await base44.asServiceRole.entities.User.update(userId, {
           plan_tier: planTier,
           plan: PLAN_TYPE[planTier] || 'personal',
+          role: isFleetPlan ? 'fleet_admin' : 'user',
           stripe_subscription_id: subId,
           subscription_status: 'active',
           subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),

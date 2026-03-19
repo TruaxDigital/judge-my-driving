@@ -5,14 +5,15 @@ import {
   LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck, CreditCard, Trophy
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 
-const navItems = [
+const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
   { path: '/FeedbackFeed', label: 'Feedback', icon: MessageSquare },
   { path: '/MapView', label: 'Map', icon: Map },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
-  { path: '/FleetDashboard', label: 'Fleet', icon: Truck },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, roles: ['fleet_admin', 'admin'] },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2 },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
