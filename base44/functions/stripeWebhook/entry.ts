@@ -169,6 +169,19 @@ Deno.serve(async (req) => {
             subscription_end_date: new Date(sub.current_period_end * 1000).toISOString(),
           });
           console.log(`Subscription renewed for user ${users[0].id}`);
+          // Sync to HubSpot on renewal
+          try {
+            const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: users[0].id });
+            await base44.asServiceRole.functions.invoke('syncToHubSpot', {
+              email: users[0].email,
+              full_name: users[0].full_name || '',
+              plan_tier: users[0].plan_tier,
+              last_purchase_date: new Date().toISOString().split('T')[0],
+              total_stickers: stickers.length,
+            });
+          } catch (hsErr) {
+            console.error('HubSpot sync failed (renewal):', hsErr.message);
+          }
         }
       }
     }
