@@ -7,9 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Star, MessageSquare, ShieldAlert, Pencil, Power, ChevronDown, ChevronRight, Users, Truck, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Loader2, Star, MessageSquare, ShieldAlert, Pencil, Power, ChevronDown, ChevronRight, Truck, AlertTriangle, BarChart2, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import moment from 'moment';
 import FleetUpgradeBanner from '../components/fleet/FleetUpgradeBanner';
+import FleetStatCards from '../components/fleet/FleetStatCards';
+import FleetDriverLeaderboard from '../components/fleet/FleetDriverLeaderboard';
+import FleetFeedbackThemes from '../components/fleet/FleetFeedbackThemes';
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-600 border-green-500/20',
@@ -18,12 +22,21 @@ const statusColors = {
   deactivated: 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20',
 };
 
+const DATE_RANGES = [
+  { label: '7 days', value: 7 },
+  { label: '30 days', value: 30 },
+  { label: '90 days', value: 90 },
+  { label: 'All time', value: null },
+];
+
 export default function FleetDashboard() {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'vehicles'
   const [expandedGroups, setExpandedGroups] = useState({});
   const [editDialog, setEditDialog] = useState(null);
   const [editData, setEditData] = useState({});
   const [groupFilter, setGroupFilter] = useState('all');
+  const [dateRange, setDateRange] = useState(30);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['me'],
@@ -38,8 +51,8 @@ export default function FleetDashboard() {
     },
   });
 
-  const { data: feedback = [], isLoading: feedbackLoading } = useQuery({
-    queryKey: ['fleet-feedback', stickers],
+  const { data: allFeedback = [], isLoading: feedbackLoading } = useQuery({
+    queryKey: ['fleet-feedback', stickers.map(s => s.id).join(',')],
     queryFn: async () => {
       if (stickers.length === 0) return [];
       const all = [];
@@ -62,7 +75,14 @@ export default function FleetDashboard() {
 
   const isLoading = userLoading || stickersLoading || feedbackLoading;
 
-  // Groups derived from stickers
+  // Date-filtered feedback
+  const feedback = useMemo(() => {
+    if (!dateRange) return allFeedback;
+    const cutoff = moment().subtract(dateRange, 'days').toISOString();
+    return allFeedback.filter(f => f.created_date >= cutoff);
+  }, [allFeedback, dateRange]);
+
+  // Groups for vehicle tab
   const groups = useMemo(() => {
     const groupMap = {};
     for (const s of stickers) {
@@ -75,19 +95,35 @@ export default function FleetDashboard() {
 
   const allGroups = Object.keys(groups);
 
-  // Fleet-level stats
-  const totalVehicles = stickers.length;
-  const activeVehicles = stickers.filter(s => s.status === 'active').length;
-  const totalFeedback = feedback.length;
-  const avgRating = totalFeedback > 0
-    ? (feedback.reduce((s, f) => s + f.rating, 0) / totalFeedback).toFixed(1)
+  // Driver rows for analytics
+  const driverRows = useMemo(() => {
+    return stickers.map(s => {
+      const fb = feedback.filter(f => f._stickerId === s.id);
+      const avg = fb.length > 0
+        ? parseFloat((fb.reduce((acc, f) => acc + f.rating, 0) / fb.length).toFixed(1))
+        : 0;
+      return {
+        stickerId: s.id,
+        name: s.driver_label || s.driver_name || 'Unnamed Vehicle',
+        vehicleId: s.vehicle_id || '',
+        group: s.fleet_group || '',
+        avgRating: avg,
+        totalReviews: fb.length,
+        safetyCount: fb.filter(f => f.safety_flag).length,
+      };
+    });
+  }, [stickers, feedback]);
+
+  // Fleet stats
+  const totalScans = feedback.length;
+  const reviewedDrivers = driverRows.filter(d => d.totalReviews > 0);
+  const fleetAvg = reviewedDrivers.length > 0
+    ? (reviewedDrivers.reduce((s, d) => s + d.avgRating, 0) / reviewedDrivers.length).toFixed(1)
     : '—';
-  const safetyFlags = feedback.filter(f => f.safety_flag).length;
+  const safetyIncidents = feedback.filter(f => f.safety_flag).length;
 
-  const getFeedbackForSticker = (id) => feedback.filter(f => f._stickerId === id);
-
+  const getFeedbackForSticker = (id) => allFeedback.filter(f => f._stickerId === id);
   const toggleGroup = (g) => setExpandedGroups(prev => ({ ...prev, [g]: !prev[g] }));
-
   const filteredGroups = groupFilter === 'all' ? allGroups : [groupFilter];
 
   if (isLoading) {
@@ -99,143 +135,176 @@ export default function FleetDashboard() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Fleet Dashboard</h1>
-        <p className="text-muted-foreground mt-1">{user?.company_name || 'Your fleet'} — {totalVehicles} vehicles</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Fleet Dashboard</h1>
+          <p className="text-muted-foreground mt-1">{user?.company_name || 'Your fleet'} — {stickers.length} vehicles</p>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex items-center bg-muted rounded-xl p-1 gap-1">
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'analytics' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+          >
+            <BarChart2 className="w-4 h-4" /> Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('vehicles')}
+            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'vehicles' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+          >
+            <List className="w-4 h-4" /> Vehicles
+          </button>
+        </div>
       </div>
 
-      {/* Fleet stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Vehicles', value: totalVehicles, icon: Truck, color: 'text-primary' },
-          { label: 'Active', value: activeVehicles, icon: Users, color: 'text-green-500' },
-          { label: 'Avg Rating', value: avgRating, icon: TrendingUp, color: 'text-primary' },
-          { label: 'Safety Flags', value: safetyFlags, icon: ShieldAlert, color: safetyFlags > 0 ? 'text-red-500' : 'text-muted-foreground' },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-card border border-border rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">{label}</p>
-              <Icon className={cn('w-5 h-5', color)} />
-            </div>
-            <p className="text-3xl font-bold text-foreground">{value}</p>
+      {/* ── ANALYTICS TAB ── */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-8">
+          {/* Date range filter */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-muted-foreground">Date range:</span>
+            {DATE_RANGES.map(r => (
+              <button
+                key={r.label}
+                onClick={() => setDateRange(r.value)}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
+                  dateRange === r.value
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card text-foreground border-border hover:bg-muted'
+                )}
+              >
+                {r.label}
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Group filter */}
-      {allGroups.length > 1 && (
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Filter by group:</span>
-          <Select value={groupFilter} onValueChange={setGroupFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Groups</SelectItem>
-              {allGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          {/* Stat cards */}
+          <FleetStatCards
+            totalDrivers={stickers.length}
+            totalScans={totalScans}
+            avgRating={fleetAvg}
+            safetyIncidents={safetyIncidents}
+          />
+
+          {/* Leaderboard */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Driver Leaderboard</h2>
+            <FleetDriverLeaderboard drivers={driverRows} />
+          </div>
+
+          {/* Feedback themes */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Feedback Themes</h2>
+            <FleetFeedbackThemes feedback={feedback} />
+          </div>
         </div>
       )}
 
-      {/* Vehicle groups */}
-      <div className="space-y-4">
-        {filteredGroups.map(groupName => {
-          const groupStickers = groups[groupName] || [];
-          const isOpen = expandedGroups[groupName] !== false; // default open
-          const groupFb = groupStickers.flatMap(s => getFeedbackForSticker(s.id));
-          const groupAvg = groupFb.length > 0
-            ? (groupFb.reduce((s, f) => s + f.rating, 0) / groupFb.length).toFixed(1)
-            : '—';
-
-          return (
-            <div key={groupName} className="bg-card border border-border rounded-2xl overflow-hidden">
-              {/* Group header */}
-              <button
-                className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted/50 transition-colors"
-                onClick={() => toggleGroup(groupName)}
-              >
-                <div className="flex items-center gap-3">
-                  {isOpen ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-                  <span className="font-semibold text-foreground">{groupName}</span>
-                  <Badge variant="outline" className="text-xs">{groupStickers.length} vehicles</Badge>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {groupFb.length}</span>
-                  <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5" /> {groupAvg}</span>
-                </div>
-              </button>
-
-              {/* Vehicle rows */}
-              {isOpen && (
-                <div className="border-t border-border divide-y divide-border">
-                  {groupStickers.map(sticker => {
-                    const fb = getFeedbackForSticker(sticker.id);
-                    const avg = fb.length > 0
-                      ? (fb.reduce((s, f) => s + f.rating, 0) / fb.length).toFixed(1)
-                      : '—';
-                    const safety = fb.filter(f => f.safety_flag).length;
-
-                    return (
-                      <div key={sticker.id} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/30 transition-colors">
-                        <div className="flex-1 min-w-0 space-y-0.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-foreground text-sm">
-                              {sticker.driver_label || 'Unnamed Vehicle'}
-                            </span>
-                            {sticker.driver_name && (
-                              <span className="text-xs text-muted-foreground">· {sticker.driver_name}</span>
-                            )}
-                            {sticker.vehicle_id && (
-                              <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{sticker.vehicle_id}</span>
-                            )}
-                            <Badge variant="outline" className={cn('border text-xs', statusColors[sticker.status])}>
-                              {sticker.status}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="font-mono">{sticker.unique_code}</span>
-                            <span>{fb.length} reviews</span>
-                            <span className="flex items-center gap-1"><Star className="w-3 h-3" />{avg}</span>
-                            {safety > 0 && (
-                              <span className="flex items-center gap-1 text-red-500">
-                                <AlertTriangle className="w-3 h-3" />{safety} safety
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Button
-                            variant="outline" size="sm" className="rounded-lg h-8"
-                            onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', fleet_group: sticker.fleet_group || '', vehicle_id: sticker.vehicle_id || '' }); setEditDialog(sticker); }}
-                          >
-                            <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
-                          </Button>
-                          <Button
-                            variant="outline" size="sm" className="rounded-lg h-8"
-                            onClick={() => updateMutation.mutate({ id: sticker.id, data: { status: sticker.status === 'active' ? 'deactivated' : 'active' } })}
-                          >
-                            <Power className="w-3.5 h-3.5 mr-1" />
-                            {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+      {/* ── VEHICLES TAB ── */}
+      {activeTab === 'vehicles' && (
+        <div className="space-y-4">
+          {/* Group filter */}
+          {allGroups.length > 1 && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">Filter by group:</span>
+              <Select value={groupFilter} onValueChange={setGroupFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Groups</SelectItem>
+                  {allGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
-          );
-        })}
+          )}
 
-        {stickers.length === 0 && (
-          <div className="bg-card border border-border rounded-2xl p-12 text-center">
-            <Truck className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No vehicles yet. Claim stickers from the Stickers page to start managing your fleet.</p>
-          </div>
-        )}
-      </div>
+          {filteredGroups.map(groupName => {
+            const groupStickers = groups[groupName] || [];
+            const isOpen = expandedGroups[groupName] !== false;
+            const groupFb = groupStickers.flatMap(s => getFeedbackForSticker(s.id));
+            const groupAvg = groupFb.length > 0
+              ? (groupFb.reduce((s, f) => s + f.rating, 0) / groupFb.length).toFixed(1)
+              : '—';
+
+            return (
+              <div key={groupName} className="bg-card border border-border rounded-2xl overflow-hidden">
+                <button
+                  className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted/50 transition-colors"
+                  onClick={() => toggleGroup(groupName)}
+                >
+                  <div className="flex items-center gap-3">
+                    {isOpen ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+                    <span className="font-semibold text-foreground">{groupName}</span>
+                    <Badge variant="outline" className="text-xs">{groupStickers.length} vehicles</Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {groupFb.length}</span>
+                    <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5" /> {groupAvg}</span>
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div className="border-t border-border divide-y divide-border">
+                    {groupStickers.map(sticker => {
+                      const fb = getFeedbackForSticker(sticker.id);
+                      const avg = fb.length > 0
+                        ? (fb.reduce((s, f) => s + f.rating, 0) / fb.length).toFixed(1)
+                        : '—';
+                      const safety = fb.filter(f => f.safety_flag).length;
+
+                      return (
+                        <div key={sticker.id} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/30 transition-colors">
+                          <div className="flex-1 min-w-0 space-y-0.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-foreground text-sm">{sticker.driver_label || 'Unnamed Vehicle'}</span>
+                              {sticker.driver_name && <span className="text-xs text-muted-foreground">· {sticker.driver_name}</span>}
+                              {sticker.vehicle_id && <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{sticker.vehicle_id}</span>}
+                              <Badge variant="outline" className={cn('border text-xs', statusColors[sticker.status])}>{sticker.status}</Badge>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span className="font-mono">{sticker.unique_code}</span>
+                              <span>{fb.length} reviews</span>
+                              <span className="flex items-center gap-1"><Star className="w-3 h-3" />{avg}</span>
+                              {safety > 0 && <span className="flex items-center gap-1 text-red-500"><AlertTriangle className="w-3 h-3" />{safety} safety</span>}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="outline" size="sm" className="rounded-lg h-8"
+                              onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', fleet_group: sticker.fleet_group || '', vehicle_id: sticker.vehicle_id || '' }); setEditDialog(sticker); }}
+                            >
+                              <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              variant="outline" size="sm" className="rounded-lg h-8"
+                              onClick={() => updateMutation.mutate({ id: sticker.id, data: { status: sticker.status === 'active' ? 'deactivated' : 'active' } })}
+                            >
+                              <Power className="w-3.5 h-3.5 mr-1" />
+                              {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {stickers.length === 0 && (
+            <div className="bg-card border border-border rounded-2xl p-12 text-center">
+              <Truck className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-muted-foreground">No vehicles yet. Claim stickers from the Stickers page to start managing your fleet.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit vehicle dialog */}
       <Dialog open={!!editDialog} onOpenChange={() => setEditDialog(null)}>
