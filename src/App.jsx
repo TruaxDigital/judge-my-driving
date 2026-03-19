@@ -16,7 +16,7 @@ import DashboardLayout from './components/dashboard/DashboardLayout';
 import PreviewScan from './pages/PreviewScan';
 import Analytics from './pages/Analytics';
 import Reporting from './pages/Reporting';
-import FleetDashboard from './pages/FleetDashboard';
+import FleetDashboard from './pages/FleetDashboard.jsx';
 import Pricing from './pages/Pricing';
 import Leaderboard from './pages/Leaderboard';
 
