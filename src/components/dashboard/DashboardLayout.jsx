@@ -18,6 +18,7 @@ const allNavItems = [
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
+  { path: '/Support', label: 'Support', icon: HelpCircle },
   { path: '/Pricing', label: 'Plans', icon: CreditCard },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
