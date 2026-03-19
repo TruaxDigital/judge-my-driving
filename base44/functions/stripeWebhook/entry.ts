@@ -130,6 +130,21 @@ Deno.serve(async (req) => {
       if (meta.type === 'addon_sticker') {
         await createStickers(base44, userId, userEmail, 1);
         console.log(`Add-on sticker created for user ${userId}`);
+        // Sync to HubSpot
+        try {
+          const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+          const user = users[0];
+          const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
+          await base44.asServiceRole.functions.invoke('syncToHubSpot', {
+            email: userEmail,
+            full_name: user?.full_name || '',
+            plan_tier: user?.plan_tier,
+            last_purchase_date: new Date().toISOString().split('T')[0],
+            total_stickers: stickers.length,
+          });
+        } catch (hsErr) {
+          console.error('HubSpot sync failed (addon_sticker):', hsErr.message);
+        }
       }
 
       if (meta.type === 'replacement_sticker') {
