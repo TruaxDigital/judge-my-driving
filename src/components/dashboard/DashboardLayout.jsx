@@ -26,6 +26,16 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
+  const navItems = allNavItems.filter(item => {
+    if (!item.roles) return true;
+    return item.roles.includes(user?.role);
+  });
+
   const handleLogout = () => {
     base44.auth.logout();
   };
