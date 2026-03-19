@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, Map, Tag, Settings, 
-  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck, CreditCard, Trophy
+  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
