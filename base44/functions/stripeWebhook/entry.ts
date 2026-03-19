@@ -90,6 +90,22 @@ Deno.serve(async (req) => {
         const count = PLAN_STICKER_COUNT[planTier] || 1;
         await createStickers(base44, userId, userEmail, count);
 
+        // Sync to HubSpot
+        try {
+          const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+          const user = users[0];
+          const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
+          await base44.asServiceRole.functions.invoke('syncToHubSpot', {
+            email: userEmail,
+            full_name: user?.full_name || '',
+            plan_tier: planTier,
+            last_purchase_date: new Date().toISOString().split('T')[0],
+            total_stickers: stickers.length,
+          });
+        } catch (hsErr) {
+          console.error('HubSpot sync failed (new_subscription):', hsErr.message);
+        }
+
         // Welcome email
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: userEmail,
