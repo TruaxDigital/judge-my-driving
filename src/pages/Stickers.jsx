@@ -24,6 +24,7 @@ export default function Stickers() {
   const [designDialog, setDesignDialog] = useState(null);
   const [selectedDesign, setSelectedDesign] = useState('default');
   const [replacementSticker, setReplacementSticker] = useState(null);
+  const [claimWizardOpen, setClaimWizardOpen] = useState(false);
 
   const { data: stickers = [], isLoading } = useQuery({
     queryKey: ['my-stickers'],
@@ -32,6 +33,19 @@ export default function Stickers() {
       return base44.entities.Sticker.filter({ owner_id: u.id }, '-created_date');
     },
   });
+
+  // Auto-open claim wizard after a new subscription purchase
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('sub_success') === 'true' && !isLoading && stickers.length > 0) {
+      setClaimWizardOpen(true);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [isLoading, stickers.length]);
+
+  // Stickers that haven't been sent to Printful yet (no printful_order_id)
+  const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
 
   const claimMutation = useMutation({
     mutationFn: async () => {
