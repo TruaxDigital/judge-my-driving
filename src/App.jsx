@@ -36,8 +36,14 @@ const AuthenticatedApp = () => {
 
   // Check if we're on a public scan route
   const isScanRoute = window.location.pathname.startsWith('/scan/');
-  if (isScanRoute) {
-    return <PublicRoutes />;
+  const isGetStartedRoute = window.location.pathname.startsWith('/get-started');
+  if (isScanRoute || isGetStartedRoute) {
+    return (
+      <Routes>
+        <Route path="/scan/:code" element={<ScanSticker />} />
+        <Route path="/get-started" element={<GetStarted />} />
+      </Routes>
+    );
   }
 
   // Show loading spinner while checking app public settings or auth
