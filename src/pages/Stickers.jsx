@@ -10,6 +10,7 @@ import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, Scan
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
 import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
+import ClaimStickerWizard from '../components/stickers/ClaimStickerWizard';
 import { cn } from '@/lib/utils';
 
 export default function Stickers() {
