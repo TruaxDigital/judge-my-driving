@@ -111,19 +111,22 @@ Deno.serve(async (req) => {
         // Welcome email
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: userEmail,
-          subject: 'Welcome to Judge My Driving!',
+          subject: 'Welcome to Judge My Driving! Claim your sticker(s)',
           body: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
             <h2 style="color: #FACC15;">Welcome to Judge My Driving!</h2>
-            <p>Your <strong>${planTier.replace('_', ' ')}</strong> plan is now active.</p>
-            <p>We're printing your sticker(s) and will ship them shortly. When they arrive, scan the QR code on the sticker to register it and start receiving feedback.</p>
-            <h3>Quick Start:</h3>
+            <p>Your <strong>${planTier.replace(/_/g, ' ')}</strong> plan is now active.</p>
+            <p>Your sticker${count > 1 ? 's are' : ' is'} ready to be claimed! Visit your Stickers page to choose a design and enter your shipping address — we'll print and ship ${count > 1 ? 'them' : 'it'} to you right away.</p>
+            <p style="text-align: center; margin: 24px 0;">
+              <a href="https://app.judgemydriving.com/Stickers?sub_success=true" style="background: #FACC15; color: #111; font-weight: bold; padding: 12px 28px; border-radius: 8px; text-decoration: none;">
+                Claim Your Sticker${count > 1 ? 's' : ''} →
+              </a>
+            </p>
+            <h3>After your sticker arrives:</h3>
             <ol>
-              <li>Receive your sticker in the mail</li>
-              <li>Scan the QR code to register it</li>
-              <li>Stick it on your vehicle</li>
+              <li>Peel and stick it on your vehicle</li>
+              <li>Scan the QR code to activate it</li>
               <li>Check your dashboard for feedback</li>
             </ol>
-            <p><a href="https://app.judgemydriving.com/Dashboard" style="color: #FACC15;">Go to your dashboard →</a></p>
           </div>`,
         });
         console.log(`New subscription created for user ${userId}, plan: ${planTier}, ${count} stickers created`);
