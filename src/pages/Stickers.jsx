@@ -109,6 +109,23 @@ export default function Stickers() {
         </Button>
       </div>
 
+      {/* Banner for unclaimed stickers */}
+      {unclaimedStickers.length > 0 && (
+        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-foreground text-sm">
+              🎉 You have {unclaimedStickers.length} sticker{unclaimedStickers.length > 1 ? 's' : ''} ready to claim!
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Choose a design and provide your shipping address and we'll print & ship {unclaimedStickers.length > 1 ? 'them' : 'it'} to you.
+            </p>
+          </div>
+          <Button size="sm" className="rounded-xl shrink-0" onClick={() => setClaimWizardOpen(true)}>
+            Claim Now
+          </Button>
+        </div>
+      )}
+
       {stickers.length === 0 ? (
         <div className="bg-card border border-border rounded-2xl p-12 text-center space-y-4">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto">
