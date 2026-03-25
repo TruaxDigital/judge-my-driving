@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { plan_tier, mode, success_url, cancel_url } = body;
+    const { plan_tier, mode, success_url, cancel_url, discount_code } = body;
 
     // Addon sticker purchase (one-time)
     if (mode === 'addon') {

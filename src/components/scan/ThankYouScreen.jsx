@@ -17,11 +17,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <Gift className="w-8 h-8 text-primary mx-auto" />
           <p className="text-white font-medium">Want feedback on your own driving?</p>
           <p className="text-zinc-400 text-sm">Get a Judge My Driving sticker for your vehicle.</p>
-          <a
-            href="https://judgemydriving.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://app.judgemydriving.com/get-started">
             <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl h-12">
               Get Your Sticker
             </Button>
@@ -42,15 +38,12 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <p className="text-zinc-400 text-lg">Your feedback has been submitted.</p>
         </div>
         <div className="bg-zinc-800/60 border border-zinc-700 rounded-2xl p-6 space-y-4">
+          <Gift className="w-8 h-8 text-primary mx-auto" />
           <p className="text-white font-medium">Want your own sticker?</p>
-          <p className="text-zinc-400 text-sm">Use code <span className="text-primary font-bold">DRIVE20</span> for 20% off.</p>
-          <a
-            href="https://judgemydriving.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <p className="text-zinc-400 text-sm">Thanks for your feedback — enjoy <span className="text-primary font-bold">20% off</span> your first order.</p>
+          <a href="https://app.judgemydriving.com/get-started?discount=DRIVE20">
             <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl h-12">
-              Shop Now — 20% Off
+              Get 20% Off — Claim Now
             </Button>
           </a>
         </div>
