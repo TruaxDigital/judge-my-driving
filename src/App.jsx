@@ -20,6 +20,7 @@ import FleetDashboard from './pages/FleetDashboard';
 import Pricing from './pages/Pricing';
 import Leaderboard from './pages/Leaderboard';
 import Support from './pages/Support';
+import GetStarted from './pages/GetStarted';
 
 const PublicRoutes = () => {
   return (

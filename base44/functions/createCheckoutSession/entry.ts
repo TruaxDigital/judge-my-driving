@@ -92,12 +92,29 @@ Deno.serve(async (req) => {
       await base44.auth.updateMe({ stripe_customer_id: customerId });
     }
 
+    // Look up Stripe coupon for discount code
+    let discounts = undefined;
+    if (discount_code) {
+      try {
+        const coupons = await stripe.promotionCodes.list({ code: discount_code, active: true, limit: 1 });
+        if (coupons.data.length > 0) {
+          discounts = [{ promotion_code: coupons.data[0].id }];
+          console.log(`Applying promotion code: ${discount_code}`);
+        } else {
+          console.log(`Promotion code not found or inactive: ${discount_code}`);
+        }
+      } catch (e) {
+        console.error('Error looking up promotion code:', e.message);
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success_url || `${req.headers.get('origin')}/Dashboard?sub_success=true`,
-      cancel_url: cancel_url || `${req.headers.get('origin')}/Pricing`,
+      success_url: success_url || `${req.headers.get('origin')}/Stickers?sub_success=true`,
+      cancel_url: cancel_url || `${req.headers.get('origin')}/get-started`,
+      ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         user_id: user.id,
