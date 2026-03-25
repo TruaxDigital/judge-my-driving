@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck } from 'lucide-react';
+import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck, Palette, RefreshCw } from 'lucide-react';
 import QRCodeModal from '../components/stickers/QRCodeModal';
+import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
+import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
 import { cn } from '@/lib/utils';
 
 export default function Stickers() {
@@ -18,6 +20,9 @@ export default function Stickers() {
   const [claimCode, setClaimCode] = useState('');
   const [claimError, setClaimError] = useState('');
   const [qrSticker, setQrSticker] = useState(null);
+  const [designDialog, setDesignDialog] = useState(null);
+  const [selectedDesign, setSelectedDesign] = useState('default');
+  const [replacementSticker, setReplacementSticker] = useState(null);
 
   const { data: stickers = [], isLoading } = useQuery({
     queryKey: ['my-stickers'],
@@ -58,6 +63,7 @@ export default function Stickers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       setEditDialog(null);
+      setDesignDialog(null);
     },
   });
 
@@ -106,60 +112,84 @@ export default function Stickers() {
       ) : (
         <div className="grid gap-4">
           {stickers.map(sticker => (
-            <div key={sticker.id} className="bg-card border border-border rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex-1 min-w-0 space-y-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h3 className="font-semibold text-foreground text-lg">
-                    {sticker.driver_label || 'Unnamed Vehicle'}
-                  </h3>
-                  <Badge variant="outline" className={cn("border text-xs", statusColors[sticker.status])}>
-                    {sticker.status}
-                  </Badge>
+            <div key={sticker.id} className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="font-semibold text-foreground text-lg">
+                      {sticker.driver_label || 'Unnamed Vehicle'}
+                    </h3>
+                    <Badge variant="outline" className={cn("border text-xs", statusColors[sticker.status])}>
+                      {sticker.status}
+                    </Badge>
+                    {sticker.design_id && sticker.design_id !== 'default' && (
+                      <Badge variant="outline" className="text-xs border-primary/30 text-primary/80">
+                        <Palette className="w-3 h-3 mr-1" />
+                        {sticker.design_id.replace(/_/g, ' ')}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5 font-mono">
+                      <QrCode className="w-4 h-4" />
+                      {sticker.unique_code}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <MessageSquare className="w-4 h-4" />
+                      {sticker.feedback_count || 0} reviews
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Star className="w-4 h-4" />
+                      {sticker.average_rating || '—'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5 font-mono">
-                    <QrCode className="w-4 h-4" />
-                    {sticker.unique_code}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <MessageSquare className="w-4 h-4" />
-                    {sticker.feedback_count || 0} reviews
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4" />
-                    {sticker.average_rating || '—'}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setQrSticker(sticker)}>
-                  <QrCode className="w-4 h-4 mr-1" /> QR Code
-                </Button>
-                <a href={`/scan/${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="rounded-lg">
-                    <ExternalLink className="w-4 h-4 mr-1" /> Preview
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setQrSticker(sticker)}>
+                    <QrCode className="w-4 h-4 mr-1" /> QR Code
                   </Button>
-                </a>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg"
-                  onClick={() => { setEditLabel(sticker.driver_label || ''); setEditDialog(sticker); }}
-                >
-                  <Pencil className="w-4 h-4 mr-1" /> Rename
-                </Button>
-                <Button
-                  variant={sticker.status === 'active' ? 'outline' : 'default'}
-                  size="sm"
-                  className="rounded-lg"
-                  onClick={() => updateMutation.mutate({
-                    id: sticker.id,
-                    data: { status: sticker.status === 'active' ? 'deactivated' : 'active' }
-                  })}
-                >
-                  <Power className="w-4 h-4 mr-1" />
-                  {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
-                </Button>
+                  <a href={`/scan/${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="sm" className="rounded-lg">
+                      <ExternalLink className="w-4 h-4 mr-1" /> Preview
+                    </Button>
+                  </a>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    onClick={() => { setSelectedDesign(sticker.design_id || 'default'); setDesignDialog(sticker); }}
+                  >
+                    <Palette className="w-4 h-4 mr-1" /> Design
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    onClick={() => { setEditLabel(sticker.driver_label || ''); setEditDialog(sticker); }}
+                  >
+                    <Pencil className="w-4 h-4 mr-1" /> Rename
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg text-muted-foreground hover:text-foreground"
+                    onClick={() => setReplacementSticker(sticker)}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-1" /> Replace
+                  </Button>
+                  <Button
+                    variant={sticker.status === 'active' ? 'outline' : 'default'}
+                    size="sm"
+                    className="rounded-lg"
+                    onClick={() => updateMutation.mutate({
+                      id: sticker.id,
+                      data: { status: sticker.status === 'active' ? 'deactivated' : 'active' }
+                    })}
+                  >
+                    <Power className="w-4 h-4 mr-1" />
+                    {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
@@ -233,6 +263,37 @@ export default function Stickers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Design Picker Dialog */}
+      <Dialog open={!!designDialog} onOpenChange={() => setDesignDialog(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Choose Sticker Design</DialogTitle>
+            <DialogDescription>
+              Select a design for <strong>{designDialog?.driver_label || designDialog?.unique_code}</strong>. This determines which template will be printed on your sticker.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 max-h-[60vh] overflow-y-auto pr-1">
+            <StickerDesignPicker value={selectedDesign} onChange={setSelectedDesign} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDesignDialog(null)}>Cancel</Button>
+            <Button
+              onClick={() => updateMutation.mutate({ id: designDialog.id, data: { design_id: selectedDesign } })}
+              disabled={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Design'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Replacement Sticker Dialog */}
+      <ReplacementStickerDialog
+        sticker={replacementSticker}
+        open={!!replacementSticker}
+        onClose={() => setReplacementSticker(null)}
+      />
     </div>
   );
 }

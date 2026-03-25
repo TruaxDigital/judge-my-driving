@@ -54,9 +54,9 @@ Deno.serve(async (req) => {
       return Response.json({ url: session.url });
     }
 
-    // Replacement sticker ($5)
+    // Replacement sticker ($29)
     if (mode === 'replacement') {
-      const { sticker_id } = await req.json().catch(() => ({}));
+      const { sticker_id } = body;
       let customerId = user.stripe_customer_id;
       if (!customerId) {
         const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'payment',
-        line_items: [{ price_data: { currency: 'usd', unit_amount: 500, product_data: { name: 'Replacement Sticker' } }, quantity: 1 }],
+        line_items: [{ price_data: { currency: 'usd', unit_amount: 2900, product_data: { name: 'Replacement Sticker (Same QR Code)' } }, quantity: 1 }],
         success_url: success_url || `${req.headers.get('origin')}/Stickers?replacement_success=true`,
         cancel_url: cancel_url || `${req.headers.get('origin')}/Stickers`,
         metadata: {
