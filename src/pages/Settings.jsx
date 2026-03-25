@@ -20,6 +20,7 @@ export default function Settings() {
   });
 
   const [notificationPref, setNotificationPref] = useState('');
+  const [freeReplacementStatus, setFreeReplacementStatus] = useState(null); // null | 'loading' | 'sent' | 'error'
 
   React.useEffect(() => {
     if (user) {

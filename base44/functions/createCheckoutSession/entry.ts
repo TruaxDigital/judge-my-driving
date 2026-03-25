@@ -23,7 +23,8 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { plan_tier, mode, success_url, cancel_url } = await req.json();
+    const body = await req.json();
+    const { plan_tier, mode, success_url, cancel_url } = body;
 
     // Addon sticker purchase (one-time)
     if (mode === 'addon') {
