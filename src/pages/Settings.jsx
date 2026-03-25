@@ -119,6 +119,51 @@ export default function Settings() {
               <span className="font-medium">{moment(user.subscription_end_date).format('MMM D, YYYY')}</span>
             </div>
           )}
+          {user?.subscription_status === 'active' && (
+            <div className="border border-border rounded-xl p-4 space-y-2">
+              <div className="flex items-start gap-3">
+                <Gift className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm text-foreground">Free Replacement Sticker</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    As an active subscriber, you can request one free replacement sticker per renewal year. We'll send a new one with the same QR code.
+                  </p>
+                </div>
+              </div>
+              {freeReplacementStatus === 'sent' ? (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <CheckCircle2 className="w-4 h-4" /> Request submitted! We'll ship your replacement shortly.
+                </div>
+              ) : freeReplacementStatus === 'error' ? (
+                <div className="flex items-center gap-2 text-sm text-destructive">
+                  <AlertCircle className="w-4 h-4" /> Something went wrong. Please contact support.
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  disabled={freeReplacementStatus === 'loading'}
+                  onClick={async () => {
+                    setFreeReplacementStatus('loading');
+                    try {
+                      await base44.integrations.Core.SendEmail({
+                        to: 'support@judgemydriving.com',
+                        subject: `Free Replacement Sticker Request — ${user.email}`,
+                        body: `User ${user.full_name} (${user.email}, plan: ${user.plan_tier}) has requested a free replacement sticker. User ID: ${user.id}`,
+                      });
+                      setFreeReplacementStatus('sent');
+                    } catch {
+                      setFreeReplacementStatus('error');
+                    }
+                  }}
+                >
+                  {freeReplacementStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
+                  Request Free Replacement
+                </Button>
+              )}
+            </div>
+          )}
           <div className="flex gap-3 pt-2">
             <Button
               variant="outline"

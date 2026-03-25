@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
 
     // Addon sticker purchase (one-time)
     if (mode === 'addon') {
-      const addonPrice = ADDON_PRICES[user.plan_tier];
+      const addonPrice = ADDON_PRICES[body.plan_tier || user.plan_tier];
       if (!addonPrice) return Response.json({ error: 'Invalid plan for addon' }, { status: 400 });
 
       // Create or retrieve customer
