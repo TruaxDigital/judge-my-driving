@@ -326,6 +326,14 @@ export default function Stickers() {
         open={!!replacementSticker}
         onClose={() => setReplacementSticker(null)}
       />
+
+      {/* Claim Sticker Wizard */}
+      <ClaimStickerWizard
+        stickers={unclaimedStickers}
+        open={claimWizardOpen}
+        onClose={() => setClaimWizardOpen(false)}
+        onComplete={() => queryClient.invalidateQueries({ queryKey: ['my-stickers'] })}
+      />
     </div>
   );
 }
