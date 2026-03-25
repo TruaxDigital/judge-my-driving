@@ -174,7 +174,7 @@ export default function Stickers() {
                     className="rounded-lg"
                     onClick={() => { setSelectedDesign(sticker.design_id || 'default'); setDesignDialog(sticker); }}
                   >
-                    <Palette className="w-4 h-4 mr-1" /> Design
+                    <Palette className="w-4 h-4 mr-1" /> {sticker.printful_order_id ? 'Design' : 'Claim'}
                   </Button>
                   <Button
                     variant="outline"
