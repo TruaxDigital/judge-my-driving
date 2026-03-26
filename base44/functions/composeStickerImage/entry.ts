@@ -216,10 +216,9 @@ Deno.serve(async (req) => {
     const pngBuffer = pngData.asPng();
 
     // 6. Upload PNG to Base44 file storage
-    // Convert Uint8Array to base64 data URL for UploadFile
-    const base64 = btoa(String.fromCharCode(...pngBuffer));
-    const dataUrl = `data:image/png;base64,${base64}`;
-    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: dataUrl });
+    // Build a proper File object from the PNG bytes
+    const pngFile = new File([pngBuffer], `jmd-sticker-${sticker.unique_code}.png`, { type: 'image/png' });
+    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: pngFile });
     const fileUrl = uploadResult.file_url;
 
     console.log(`Composed image uploaded: ${fileUrl}`);

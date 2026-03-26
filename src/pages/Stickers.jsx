@@ -268,7 +268,7 @@ export default function Stickers() {
       <QRCodeModal sticker={qrSticker} open={!!qrSticker} onClose={() => setQrSticker(null)} />
 
       {/* Rename Dialog */}
-      <Dialog open={!!editDialog} onOpenChange={() => setEditDialog(null)}>
+      <Dialog open={!!editDialog} onOpenChange={(open) => { if (!open) setEditDialog(null); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Rename Sticker</DialogTitle>
@@ -297,7 +297,7 @@ export default function Stickers() {
       </Dialog>
 
       {/* Design Picker Dialog */}
-      <Dialog open={!!designDialog} onOpenChange={() => setDesignDialog(null)}>
+      <Dialog open={!!designDialog} onOpenChange={(open) => { if (!open) setDesignDialog(null); }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Choose Sticker Design</DialogTitle>
