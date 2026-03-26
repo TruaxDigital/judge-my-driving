@@ -8,37 +8,37 @@ import { cn, isInIframe } from '@/lib/utils';
 const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
 
 const FEATURED_DESIGNS = [
-  { id: 'tell_my_boss', url: `${GITHUB_BASE}/How's%20My%20Driving.%20Tell%20My%20Boss.svg`, label: "Tell My Boss" },
-  { id: 'new_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "New Driver" },
-  { id: 'on_the_clock', url: `${GITHUB_BASE}/On%20the%20Clock,%20On%20the%20Record.svg`, label: "On the Clock" },
-  { id: 'rate_this_driver', url: `${GITHUB_BASE}/Rate%20this%20Driver.svg`, label: "Rate This Driver" },
-];
+{ id: 'tell_my_boss', url: `${GITHUB_BASE}/How's%20My%20Driving.%20Tell%20My%20Boss.svg`, label: "Tell My Boss" },
+{ id: 'new_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "New Driver" },
+{ id: 'on_the_clock', url: `${GITHUB_BASE}/On%20the%20Clock,%20On%20the%20Record.svg`, label: "On the Clock" },
+{ id: 'rate_this_driver', url: `${GITHUB_BASE}/Rate%20this%20Driver.svg`, label: "Rate This Driver" }];
+
 
 const PLANS = [
-  {
-    id: 'individual',
-    name: 'Individual',
-    price: 49,
-    icon: User,
-    description: 'Perfect for personal accountability',
-    features: ['1 sticker included', 'Instant email alerts', 'Feedback map & dashboard', '1 year feedback history'],
-  },
-  {
-    id: 'family',
-    name: 'Family',
-    price: 99,
-    icon: Users,
-    description: 'Great for households with multiple drivers',
-    features: ['3 stickers included', 'All alert types', 'Unlimited feedback history', 'Personal dashboard'],
-    popular: true,
-  },
-];
+{
+  id: 'individual',
+  name: 'Individual',
+  price: 49,
+  icon: User,
+  description: 'Perfect for personal accountability',
+  features: ['1 sticker included', 'Instant email alerts', 'Feedback map & dashboard', '1 year feedback history']
+},
+{
+  id: 'family',
+  name: 'Family',
+  price: 99,
+  icon: Users,
+  description: 'Great for households with multiple drivers',
+  features: ['3 stickers included', 'All alert types', 'Unlimited feedback history', 'Personal dashboard'],
+  popular: true
+}];
+
 
 const TRUST_ITEMS = [
-  { icon: Bell, text: 'Instant alerts when someone rates your driving' },
-  { icon: ShieldCheck, text: 'Anonymous feedback — privacy first' },
-  { icon: Zap, text: 'Ships in 3–5 days, sticks to any vehicle' },
-];
+{ icon: Bell, text: 'Instant alerts when someone rates your driving' },
+{ icon: ShieldCheck, text: 'Anonymous feedback — privacy first' },
+{ icon: Zap, text: 'Ships in 3–5 days, sticks to any vehicle' }];
+
 
 export default function GetStarted() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -72,7 +72,7 @@ export default function GetStarted() {
     const res = await base44.functions.invoke('createCheckoutSession', {
       plan_tier: selectedPlan,
       mode: 'subscription',
-      discount_code: hasDiscount ? discountCode : undefined,
+      discount_code: hasDiscount ? discountCode : undefined
     });
     if (res.data?.url) {
       window.location.href = res.data.url;
@@ -86,8 +86,8 @@ export default function GetStarted() {
     return (
       <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -104,8 +104,8 @@ export default function GetStarted() {
           <h1 className="text-3xl font-extrabold text-white leading-tight">
             Turn your car into a <span className="text-primary">feedback machine</span>
           </h1>
-          <p className="text-zinc-400 text-sm">
-            Scan. Rate. Improve. Real-time feedback from everyone who shares the road with you.
+          <p className="text-zinc-400 text-sm">Scan. Rate. Improve. Real-time feedback from everyone who shares the road with you or a loved one.
+
           </p>
         </div>
 
@@ -113,44 +113,44 @@ export default function GetStarted() {
         <div className="mb-8">
           <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
           <div className="grid grid-cols-4 gap-2">
-            {FEATURED_DESIGNS.map(d => (
-              <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
+            {FEATURED_DESIGNS.map((d) =>
+            <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
                 <img
-                  src={d.url}
-                  alt={d.label}
-                  className="w-full h-16 object-cover"
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
+                src={d.url}
+                alt={d.label}
+                className="w-full h-16 object-cover"
+                onError={(e) => {e.target.style.display = 'none';}} />
+              
                 <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
         {/* Trust signals */}
         <div className="flex flex-col gap-2 mb-8">
-          {TRUST_ITEMS.map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-2.5">
+          {TRUST_ITEMS.map(({ icon: Icon, text }) =>
+          <div key={text} className="flex items-center gap-2.5">
               <Icon className="w-4 h-4 text-primary shrink-0" />
               <p className="text-zinc-300 text-sm">{text}</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Discount Banner */}
-        {hasDiscount && (
-          <div className="bg-primary/15 border border-primary/40 rounded-2xl p-4 flex items-center gap-3 mb-6">
+        {hasDiscount &&
+        <div className="bg-primary/15 border border-primary/40 rounded-2xl p-4 flex items-center gap-3 mb-6">
             <Gift className="w-6 h-6 text-primary shrink-0" />
             <div>
               <p className="text-white font-semibold text-sm">You've unlocked 20% off!</p>
               <p className="text-zinc-400 text-xs mt-0.5">Discount applied automatically at checkout.</p>
             </div>
           </div>
-        )}
+        }
 
         {/* Plan Selector */}
         <div className="space-y-3 mb-6">
-          {PLANS.map(plan => {
+          {PLANS.map((plan) => {
             const Icon = plan.icon;
             const isSelected = selectedPlan === plan.id;
             const displayPrice = hasDiscount ? Math.round(plan.price * 0.8) : plan.price;
@@ -161,11 +161,11 @@ export default function GetStarted() {
                 onClick={() => setSelectedPlan(plan.id)}
                 className={cn(
                   'w-full text-left rounded-2xl border-2 p-5 transition-all',
-                  isSelected
-                    ? 'border-primary bg-primary/10'
-                    : 'border-zinc-700 bg-zinc-800/60 hover:border-zinc-500'
-                )}
-              >
+                  isSelected ?
+                  'border-primary bg-primary/10' :
+                  'border-zinc-700 bg-zinc-800/60 hover:border-zinc-500'
+                )}>
+                
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className={cn(
@@ -177,33 +177,33 @@ export default function GetStarted() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-white font-semibold">{plan.name}</span>
-                        {plan.popular && (
-                          <Badge className="bg-primary/20 text-primary border-primary/30 border text-xs px-2 py-0">
+                        {plan.popular &&
+                        <Badge className="bg-primary/20 text-primary border-primary/30 border text-xs px-2 py-0">
                             <Star className="w-2.5 h-2.5 mr-1" />Most Popular
                           </Badge>
-                        )}
+                        }
                       </div>
                       <p className="text-zinc-400 text-xs mt-0.5">{plan.description}</p>
                       <ul className="mt-2 space-y-1">
-                        {plan.features.map(f => (
-                          <li key={f} className="flex items-center gap-1.5 text-xs text-zinc-300">
+                        {plan.features.map((f) =>
+                        <li key={f} className="flex items-center gap-1.5 text-xs text-zinc-300">
                             <CheckCircle className="w-3 h-3 text-primary shrink-0" />
                             {f}
                           </li>
-                        ))}
+                        )}
                       </ul>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {hasDiscount && (
-                      <p className="text-zinc-500 text-xs line-through">${plan.price}/yr</p>
-                    )}
+                    {hasDiscount &&
+                    <p className="text-zinc-500 text-xs line-through">${plan.price}/yr</p>
+                    }
                     <p className="text-white font-extrabold text-xl">${displayPrice}</p>
                     <p className="text-zinc-400 text-xs">/yr</p>
                   </div>
                 </div>
-              </button>
-            );
+              </button>);
+
           })}
         </div>
 
@@ -218,33 +218,33 @@ export default function GetStarted() {
         <Button
           onClick={handleContinue}
           className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900 text-base"
-          disabled={loading}
-        >
-          {loading
-            ? <Loader2 className="w-4 h-4 animate-spin" />
-            : !isAuthed
-              ? 'Create Account & Subscribe'
-              : hasDiscount
-                ? '🎉 Subscribe with 20% Off'
-                : 'Subscribe Now →'}
+          disabled={loading}>
+          
+          {loading ?
+          <Loader2 className="w-4 h-4 animate-spin" /> :
+          !isAuthed ?
+          'Create Account & Subscribe' :
+          hasDiscount ?
+          '🎉 Subscribe with 20% Off' :
+          'Subscribe Now →'}
         </Button>
 
-        {!isAuthed && (
-          <p className="text-center text-zinc-500 text-sm mt-4">
+        {!isAuthed &&
+        <p className="text-center text-zinc-500 text-sm mt-4">
             Already have an account?{' '}
             <button
-              className="text-primary underline"
-              onClick={() => base44.auth.redirectToLogin('/Pricing')}
-            >
+            className="text-primary underline"
+            onClick={() => base44.auth.redirectToLogin('/Pricing')}>
+            
               Sign in
             </button>
           </p>
-        )}
+        }
 
         <div className="text-center mt-10 pt-6 border-t border-zinc-800">
           <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} Judge My Driving. Privacy-first feedback.</p>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
