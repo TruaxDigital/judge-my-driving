@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, MessageSquare, Map, Tag, Settings, 
-  LogOut, Menu, X, ChevronRight, Smartphone, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle
+  LayoutDashboard, Map, Tag, Settings, 
+  LogOut, Menu, X, ChevronRight, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -14,8 +14,7 @@ const allNavItems = [
   { path: '/Stickers', label: 'Stickers', icon: Tag },
   { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
-  { path: '/Reporting', label: 'Reports', icon: FileText, plans: ['individual', 'family', 'starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
-  { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
+  { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
   { path: '/Support', label: 'Support', icon: HelpCircle },
   { path: '/Pricing', label: 'Plans', icon: CreditCard },

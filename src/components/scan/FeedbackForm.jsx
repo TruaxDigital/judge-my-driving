@@ -7,6 +7,7 @@ import StarRating from './StarRating';
 import { base44 } from '@/api/base44Client';
 
 export default function FeedbackForm({ sticker, onSubmitted }) {
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === '1';
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [safetyFlag, setSafetyFlag] = useState(false);
@@ -53,6 +54,7 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
       latitude: location?.latitude,
       longitude: location?.longitude,
       location_name: locationName || undefined,
+      is_preview: isPreview || undefined,
     });
 
     if (res.data?.error) {

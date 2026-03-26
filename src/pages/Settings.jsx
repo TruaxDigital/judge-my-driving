@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, Save, User, CreditCard, ExternalLink, Gift, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Save, User, CreditCard, ExternalLink, Gift, AlertCircle, CheckCircle2, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 import { isInIframe } from '@/lib/utils';
 import moment from 'moment';
@@ -99,6 +99,28 @@ export default function Settings() {
       <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
+            <Smartphone className="w-5 h-5" /> Reporter View
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Preview exactly what someone sees when they scan your sticker's QR code. Feedback submitted in this view is not recorded.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button
+            variant="outline"
+            className="rounded-xl"
+            onClick={() => window.open('/PreviewScan', '_blank')}
+          >
+            <Smartphone className="w-4 h-4 mr-2" /> Open Reporter View
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
             <CreditCard className="w-5 h-5" /> Subscription
           </CardTitle>
         </CardHeader>
@@ -164,7 +186,7 @@ export default function Settings() {
               )}
             </div>
           )}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-2 flex-wrap">
             <Button
               variant="outline"
               className="rounded-xl"

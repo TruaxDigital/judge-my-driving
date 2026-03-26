@@ -18,7 +18,7 @@ export default function PreviewScan() {
 
   const activeStickers = stickers.filter(s => s.status === 'active');
   const previewCode = selectedCode || activeStickers[0]?.unique_code;
-  const previewUrl = previewCode ? `/scan/${previewCode}` : null;
+  const previewUrl = previewCode ? `/scan/${previewCode}?preview=1` : null;
 
   return (
     <div className="space-y-6">
@@ -89,7 +89,7 @@ export default function PreviewScan() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center max-w-xs">
-            This preview is live — submitting feedback here will actually record it. Use "Open on real device" to test on your phone.
+            Feedback submitted here is not recorded. Use "Open on real device" to test on your phone.
           </p>
         </div>
       )}

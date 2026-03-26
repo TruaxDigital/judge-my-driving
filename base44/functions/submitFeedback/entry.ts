@@ -3,10 +3,15 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { sticker_id, sticker_code, rating, comment, safety_flag, latitude, longitude, location_name } = await req.json();
+    const { sticker_id, sticker_code, rating, comment, safety_flag, latitude, longitude, location_name, is_preview } = await req.json();
 
     if (!sticker_id || !rating) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // If this is a preview/test submission, don't save anything or send emails
+    if (is_preview) {
+      return Response.json({ success: true, preview: true });
     }
 
     // Create feedback using service role (public action - no auth needed)
