@@ -53,7 +53,7 @@ const AUDIENCE = [
   {
     emoji: '🚚',
     label: 'Fleets',
-    body: 'Real-time driver accountability without the cost of GPS tracking or dashcams. Bulk pricing available.',
+    body: 'Real-time driver accountability without the cost of GPS tracking or dashcams. Live analytics, leaderboards, and reporting included. Bulk pricing available.',
   },
 ];
 
@@ -168,6 +168,9 @@ export default function GetStarted() {
             </div>
           ))}
         </div>
+
+        {/* Pricing Label */}
+        <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Simple Annual Pricing</p>
 
         {/* Discount Banner */}
         {hasDiscount &&
