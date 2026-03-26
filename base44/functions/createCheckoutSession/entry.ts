@@ -1,13 +1,13 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe@14.21.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 const PRICE_MAP = {
-  individual:         'price_1TBiCjAJkvIkgpmwjgl60Rp8',
-  family:             'price_1TBiCjAJkvIkgpmw5Ym9jacB',
-  starter_fleet:      'price_1TBiCjAJkvIkgpmw5yVpaOdE',
-  professional_fleet: 'price_1TBiCjAJkvIkgpmw0l1X27y9',
+  individual:         'price_1TEytxPRtZZpxDXapf6My9d1',
+  family:             'price_1TEytwPRtZZpxDXaABsJ4zGy',
+  starter_fleet:      'price_1TEytwPRtZZpxDXavnYLui15',
+  professional_fleet: 'price_1TEytvPRtZZpxDXaUKUtslV0',
 };
 
 const ADDON_PRICES = {
@@ -31,7 +31,6 @@ Deno.serve(async (req) => {
       const addonPrice = ADDON_PRICES[body.plan_tier || user.plan_tier];
       if (!addonPrice) return Response.json({ error: 'Invalid plan for addon' }, { status: 400 });
 
-      // Create or retrieve customer
       let customerId = user.stripe_customer_id;
       if (!customerId) {
         const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
