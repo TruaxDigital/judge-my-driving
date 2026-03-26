@@ -14,7 +14,7 @@ const allNavItems = [
   { path: '/Stickers', label: 'Stickers', icon: Tag },
   { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
-  { path: '/Reporting', label: 'Reports', icon: FileText, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
+  { path: '/Reporting', label: 'Reports', icon: FileText, plans: ['individual', 'family', 'starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
   { path: '/Support', label: 'Support', icon: HelpCircle },
