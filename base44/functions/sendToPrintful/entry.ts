@@ -74,6 +74,9 @@ Deno.serve(async (req) => {
         {
           variant_id: STICKER_VARIANT_ID,
           quantity: 1,
+          options: [
+            { id: 'stitch_color', value: 'white' },
+          ],
           files: [
             {
               type: 'default',
