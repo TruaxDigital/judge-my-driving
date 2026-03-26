@@ -130,6 +130,13 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
           'Submit Feedback'
         )}
       </Button>
+
+      <p className="text-center text-zinc-500 text-xs leading-relaxed pt-2">
+        🚗 <strong className="text-zinc-400">Pull over before you post.</strong> Using a mobile device while driving is illegal. Stop in a safe location or ask a passenger to submit this review. By tapping Submit, you confirm you are not operating a vehicle.{' '}
+        <a href="/liability" target="_blank" rel="noopener noreferrer" className="text-zinc-400 underline underline-offset-2">
+          Driver safety is our number one priority.
+        </a>
+      </p>
     </div>
   );
 }

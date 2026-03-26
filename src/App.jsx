@@ -20,6 +20,7 @@ import Pricing from './pages/Pricing';
 import Leaderboard from './pages/Leaderboard';
 import Support from './pages/Support';
 import GetStarted from './pages/GetStarted';
+import Liability from './pages/Liability';
 
 const PublicRoutes = () => {
   return (
@@ -36,11 +37,13 @@ const AuthenticatedApp = () => {
   // Check if we're on a public scan route
   const isScanRoute = window.location.pathname.startsWith('/scan/');
   const isGetStartedRoute = window.location.pathname.startsWith('/get-started');
-  if (isScanRoute || isGetStartedRoute) {
+  const isLiabilityRoute = window.location.pathname.startsWith('/liability');
+  if (isScanRoute || isGetStartedRoute || isLiabilityRoute) {
     return (
       <Routes>
         <Route path="/scan/:code" element={<ScanSticker />} />
         <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/liability" element={<Liability />} />
       </Routes>
     );
   }
@@ -83,6 +86,7 @@ const AuthenticatedApp = () => {
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />
+      <Route path="/liability" element={<Liability />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

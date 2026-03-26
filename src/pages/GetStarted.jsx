@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle, Gift, User, Users, Star, ShieldCheck, Zap, Bell } from 'lucide-react';
 import { cn, isInIframe } from '@/lib/utils';
+import DesignCatalogModal from '@/components/GetStarted/DesignCatalogModal';
 
 const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
 
@@ -64,6 +65,7 @@ export default function GetStarted() {
   const hasDiscount = discountCode === 'DRIVE20';
 
   const [selectedPlan, setSelectedPlan] = useState('individual');
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAuthed, setIsAuthed] = useState(false);
@@ -138,12 +140,19 @@ export default function GetStarted() {
                 alt={d.label}
                 className="w-full h-16 object-cover"
                 onError={(e) => {e.target.style.display = 'none';}} />
-              
                 <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
               </div>
             )}
           </div>
+          <button
+            onClick={() => setCatalogOpen(true)}
+            className="mt-3 w-full text-center text-xs text-primary underline underline-offset-2"
+          >
+            See all designs →
+          </button>
         </div>
+
+        <DesignCatalogModal open={catalogOpen} onClose={() => setCatalogOpen(false)} />
 
         {/* Trust signals */}
         <div className="flex flex-col gap-2 mb-8">
