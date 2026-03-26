@@ -216,8 +216,10 @@ Deno.serve(async (req) => {
     const pngBuffer = pngData.asPng();
 
     // 6. Upload PNG to Base44 file storage
-    const blob = new Blob([pngBuffer], { type: 'image/png' });
-    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: blob });
+    // Convert Uint8Array to base64 data URL for UploadFile
+    const base64 = btoa(String.fromCharCode(...pngBuffer));
+    const dataUrl = `data:image/png;base64,${base64}`;
+    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: dataUrl });
     const fileUrl = uploadResult.file_url;
 
     console.log(`Composed image uploaded: ${fileUrl}`);
