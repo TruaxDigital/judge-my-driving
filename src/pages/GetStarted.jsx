@@ -35,9 +35,27 @@ const PLANS = [
 
 
 const TRUST_ITEMS = [
-{ icon: Bell, text: 'Instant alerts when someone rates your driving' },
-{ icon: ShieldCheck, text: 'Anonymous feedback — privacy first' },
-{ icon: Zap, text: 'Ships in 3–5 days, sticks to any vehicle' }];
+{ icon: Bell, text: 'Instant email alerts every time someone rates the driver' },
+{ icon: ShieldCheck, text: 'Anonymous for the reviewer, transparent for you' },
+{ icon: Zap, text: 'Ships in 3–5 days. Sticks to any vehicle. Works immediately.' }];
+
+const AUDIENCE = [
+  {
+    emoji: '🧑‍🎓',
+    label: 'Teen Drivers',
+    body: "Your kid just got their license. You can't ride along every time. This sticker gives other drivers a way to tell you how they're doing.",
+  },
+  {
+    emoji: '👴',
+    label: 'Senior Drivers',
+    body: "Tough conversation, simple solution. Get honest feedback on a parent's driving without awkward confrontations.",
+  },
+  {
+    emoji: '🚚',
+    label: 'Fleets',
+    body: 'Real-time driver accountability without the cost of GPS tracking or dashcams. Bulk pricing available.',
+  },
+];
 
 
 export default function GetStarted() {
@@ -100,18 +118,18 @@ export default function GetStarted() {
         </div>
 
         {/* Hero */}
-        <div className="text-center space-y-2 mb-8">
+        <div className="text-center space-y-3 mb-8">
           <h1 className="text-3xl font-extrabold text-white leading-tight">
-            Turn your car into a <span className="text-primary">feedback machine</span>
+            Know how they're driving <span className="text-primary">before something goes wrong</span>
           </h1>
-          <p className="text-zinc-400 text-sm">Scan. Rate. Improve. Real-time feedback from everyone who shares the road with you or a loved one.
-
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            Real-time feedback from other drivers, delivered straight to your inbox. For teen drivers, senior drivers, fleets, and anyone who wants accountability on the road.
           </p>
         </div>
 
         {/* Sticker Previews */}
         <div className="mb-8">
-          <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
+          <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">CHOOSE FROM 15+ DESIGNS</p>
           <div className="grid grid-cols-4 gap-2">
             {FEATURED_DESIGNS.map((d) =>
             <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
@@ -135,6 +153,20 @@ export default function GetStarted() {
               <p className="text-zinc-300 text-sm">{text}</p>
             </div>
           )}
+        </div>
+
+        {/* Audience Section */}
+        <div className="mb-8 space-y-3">
+          <p className="text-xs text-zinc-500 uppercase tracking-widest text-center">Who it's for</p>
+          {AUDIENCE.map(({ emoji, label, body }) => (
+            <div key={label} className="bg-zinc-800/60 border border-zinc-700 rounded-2xl p-4 flex gap-3 items-start">
+              <span className="text-2xl shrink-0">{emoji}</span>
+              <div>
+                <p className="text-white font-semibold text-sm">{label}</p>
+                <p className="text-zinc-400 text-xs mt-1 leading-relaxed">{body}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Discount Banner */}
