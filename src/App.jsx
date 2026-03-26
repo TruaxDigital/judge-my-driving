@@ -7,8 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { Navigate } from 'react-router-dom';
 import ScanSticker from './pages/ScanSticker';
-import Dashboard from './pages/Dashboard';
-import FeedbackFeed from './pages/FeedbackFeed';
+import Dashboard from './pages/Dashboard.jsx';
 import MapView from './pages/MapView';
 import Stickers from './pages/Stickers';
 import Settings from './pages/Settings';
@@ -72,7 +71,6 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Navigate to="/Dashboard" replace />} />
       <Route element={<DashboardLayout />}>
         <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/FeedbackFeed" element={<FeedbackFeed />} />
         <Route path="/MapView" element={<MapView />} />
         <Route path="/Stickers" element={<Stickers />} />
         <Route path="/Settings" element={<Settings />} />

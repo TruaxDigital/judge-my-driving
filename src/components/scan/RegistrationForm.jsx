@@ -23,16 +23,18 @@ export default function RegistrationForm({ sticker, onRegistered }) {
 
   const handleClaimWithAuth = async () => {
     setSubmitting(true);
-    const user = await base44.auth.me();
     const label = driverLabel || localStorage.getItem('jmd_register_label') || 'My Vehicle';
     
-    await base44.entities.Sticker.update(sticker.id, {
-      owner_id: user.id,
-      owner_email: user.email,
+    const res = await base44.functions.invoke('claimSticker', {
+      sticker_id: sticker.id,
       driver_label: label,
-      is_registered: true,
-      status: 'active',
     });
+
+    if (res.data?.error) {
+      console.error('Claim error:', res.data.error);
+      setSubmitting(false);
+      return;
+    }
 
     localStorage.removeItem('jmd_register_label');
     localStorage.removeItem('jmd_register_sticker');

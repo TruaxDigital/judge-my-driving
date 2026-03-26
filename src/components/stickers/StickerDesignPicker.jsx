@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 
 const DESIGNS = [
-  { id: 'default', label: 'Default' },
   { id: 'company_vehicle', label: 'Company Vehicle' },
   { id: 'decades_behind_wheel', label: 'Decades Behind the Wheel' },
   { id: 'experienced_driver', label: 'Experienced Driver' },

@@ -5,7 +5,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { MapPin, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 import StarRating from './StarRating';
 import { base44 } from '@/api/base44Client';
-import moment from 'moment';
 
 export default function FeedbackForm({ sticker, onSubmitted }) {
   const [rating, setRating] = useState(0);
@@ -45,7 +44,7 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
     if (rating === 0) return;
     setSubmitting(true);
     
-    const feedbackData = {
+    const res = await base44.functions.invoke('submitFeedback', {
       sticker_id: sticker.id,
       sticker_code: sticker.unique_code,
       rating,
@@ -54,37 +53,10 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
       latitude: location?.latitude,
       longitude: location?.longitude,
       location_name: locationName || undefined,
-    };
-
-    const feedback = await base44.entities.Feedback.create(feedbackData);
-
-    // Update sticker feedback count and average
-    const allFeedback = await base44.entities.Feedback.filter({ sticker_id: sticker.id });
-    const totalCount = allFeedback.length;
-    const avgRating = allFeedback.reduce((sum, f) => sum + f.rating, 0) / totalCount;
-    await base44.entities.Sticker.update(sticker.id, {
-      feedback_count: totalCount,
-      average_rating: Math.round(avgRating * 10) / 10,
     });
 
-    // Send email notification to sticker owner
-    if (sticker.owner_email) {
-      const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-      await base44.integrations.Core.SendEmail({
-        to: sticker.owner_email,
-        subject: `New driving feedback for ${sticker.driver_label || 'your vehicle'}`,
-        body: `
-          <div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #FACC15;">New Feedback Received</h2>
-            <p style="font-size: 24px;">${stars}</p>
-            <p><strong>Rating:</strong> ${rating}/5</p>
-            ${comment ? `<p><strong>Comment:</strong> ${comment}</p>` : ''}
-            ${locationName ? `<p><strong>Location:</strong> ${locationName}</p>` : ''}
-            <p><strong>Time:</strong> ${moment().format('MMM D, YYYY h:mm A')}</p>
-            ${safetyFlag ? '<p style="color: red;"><strong>⚠️ Safety concern reported</strong></p>' : ''}
-          </div>
-        `,
-      });
+    if (res.data?.error) {
+      console.error('Feedback submission error:', res.data.error);
     }
 
     onSubmitted(rating, safetyFlag);
@@ -132,7 +104,7 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-2 bg-zinc-800/50 px-3 py-2 rounded-lg">
           <Clock className="w-4 h-4 text-zinc-400" />
-          <span className="text-xs text-zinc-400">{moment().format('h:mm A')}</span>
+          <span className="text-xs text-zinc-400">{new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
         </div>
         {locationLoading ? (
           <div className="flex items-center gap-2 bg-zinc-800/50 px-3 py-2 rounded-lg">

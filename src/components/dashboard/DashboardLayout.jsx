@@ -10,12 +10,11 @@ import { cn } from '@/lib/utils';
 
 const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
-  { path: '/FeedbackFeed', label: 'Feedback', icon: MessageSquare },
   { path: '/MapView', label: 'Map', icon: Map },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
-  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, roles: ['fleet_admin', 'admin'] },
-  { path: '/Analytics', label: 'Analytics', icon: BarChart2 },
-  { path: '/Reporting', label: 'Reports', icon: FileText },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
+  { path: '/Analytics', label: 'Analytics', icon: BarChart2, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
+  { path: '/Reporting', label: 'Reports', icon: FileText, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
   { path: '/PreviewScan', label: 'Reporter View', icon: Smartphone },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
   { path: '/Support', label: 'Support', icon: HelpCircle },
@@ -33,8 +32,9 @@ export default function DashboardLayout() {
   });
 
   const navItems = allNavItems.filter(item => {
-    if (!item.roles) return true;
-    return item.roles.includes(user?.role);
+    if (item.roles && !item.roles.includes(user?.role)) return false;
+    if (item.plans && !item.plans.includes(user?.plan_tier)) return false;
+    return true;
   });
 
   const handleLogout = () => {

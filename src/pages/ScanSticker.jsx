@@ -17,7 +17,7 @@ export default function ScanSticker() {
   useEffect(() => {
     const loadSticker = async () => {
       const pathParts = window.location.pathname.split('/');
-      const code = pathParts[pathParts.length - 1];
+      const code = pathParts[pathParts.length - 1]?.toUpperCase();
       
       if (!code) {
         setError('No sticker code provided');
@@ -25,15 +25,21 @@ export default function ScanSticker() {
         return;
       }
 
-      const stickers = await base44.entities.Sticker.filter({ unique_code: code });
-      
-      if (stickers.length === 0) {
-        setError('Sticker not found');
+      let s = null;
+      try {
+        const res = await base44.functions.invoke('getStickerByCode', { code });
+        if (res.data?.error || !res.data?.sticker) {
+          setError(res.data?.error || 'Sticker not found');
+          setLoading(false);
+          return;
+        }
+        s = res.data.sticker;
+      } catch (err) {
+        setError('Could not load sticker. Please try again.');
         setLoading(false);
         return;
       }
-
-      const s = stickers[0];
+      
       setSticker(s);
 
       if (s.status === 'deactivated') {
