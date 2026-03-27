@@ -43,6 +43,15 @@ Deno.serve(async (req) => {
       location_name: location_name || undefined,
     });
 
+    // Trigger geolocation reverse geocoding (async, non-blocking)
+    if (latitude !== undefined && longitude !== undefined) {
+      base44.asServiceRole.functions.invoke('geocodeScanLocation', {
+        feedback_id: feedback.id,
+        latitude,
+        longitude
+      }).catch(err => console.warn('[submitFeedback] geocodeScanLocation failed:', err.message));
+    }
+
     // Update sticker stats
     const allFeedback = await base44.asServiceRole.entities.Feedback.filter({ sticker_id });
     const totalCount = allFeedback.length;
