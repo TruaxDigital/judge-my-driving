@@ -26,10 +26,9 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { plan_tier, mode, success_url, cancel_url, discount_code } = body;
 
-    // Addon sticker purchase (one-time)
+    // Addon sticker purchase (one-time) — new QR code, not a replacement
     if (mode === 'addon') {
-      const addonPrice = ADDON_PRICES[body.plan_tier || user.plan_tier];
-      if (!addonPrice) return Response.json({ error: 'Invalid plan for addon' }, { status: 400 });
+      const addonPrice = ADDON_PRICES[body.plan_tier || user.plan_tier] || 1999; // default $19.99 for all account levels
 
       let customerId = user.stripe_customer_id;
       if (!customerId) {
@@ -41,7 +40,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'payment',
-        line_items: [{ price_data: { currency: 'usd', unit_amount: addonPrice, product_data: { name: 'Add-on Sticker' } }, quantity: 1 }],
+        line_items: [{ price_data: { currency: 'usd', unit_amount: addonPrice, product_data: { name: 'Additional Sticker (New QR Code)' } }, quantity: 1 }],
         success_url: success_url || `${req.headers.get('origin')}/Stickers?addon_success=true`,
         cancel_url: cancel_url || `${req.headers.get('origin')}/Stickers`,
         metadata: {

@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck, Palette, RefreshCw } from 'lucide-react';
+import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck, Palette, RefreshCw, PlusCircle } from 'lucide-react';
 import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
 import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
 import ClaimStickerWizard from '../components/stickers/ClaimStickerWizard';
-import { cn } from '@/lib/utils';
+import { cn, isInIframe } from '@/lib/utils';
 
 export default function Stickers() {
   const queryClient = useQueryClient();
@@ -27,6 +27,7 @@ export default function Stickers() {
   const [replacementSticker, setReplacementSticker] = useState(null);
   const [claimWizardOpen, setClaimWizardOpen] = useState(false);
   const [provisioning, setProvisioning] = useState(false);
+  const [addonLoading, setAddonLoading] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -50,6 +51,23 @@ export default function Stickers() {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [isLoading, stickers.length]);
+
+  const handleOrderMore = async () => {
+    if (isInIframe()) {
+      alert('Checkout is only available from the published app. Please open the app directly.');
+      return;
+    }
+    setAddonLoading(true);
+    const res = await base44.functions.invoke('createCheckoutSession', {
+      mode: 'addon',
+    });
+    if (res.data?.url) {
+      window.location.href = res.data.url;
+    } else {
+      alert('Could not start checkout. Please try again.');
+    }
+    setAddonLoading(false);
+  };
 
   const handleOpenWizardWithProvisioning = async () => {
     if (pendingCredits > 0 && unclaimedStickers.length === 0) {
@@ -124,9 +142,15 @@ export default function Stickers() {
           <h1 className="text-3xl font-bold text-foreground tracking-tight">My Stickers</h1>
           <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
         </div>
-        <Button onClick={() => { setClaimCode(''); setClaimError(''); setClaimDialog(true); }} className="rounded-xl">
-          <ScanLine className="w-4 h-4 mr-2" /> Claim a Sticker
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
+            {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+            Order New Sticker
+          </Button>
+          <Button onClick={() => { setClaimCode(''); setClaimError(''); setClaimDialog(true); }} className="rounded-xl">
+            <ScanLine className="w-4 h-4 mr-2" /> Claim a Sticker
+          </Button>
+        </div>
       </div>
 
       {/* Banner for credit holders with no sticker records yet */}

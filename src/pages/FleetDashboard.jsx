@@ -162,22 +162,36 @@ export default function FleetDashboard() {
 
       {activeTab === 'analytics' && (
         <div className="space-y-8">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground">Date range:</span>
-            {DATE_RANGES.map(r => (
-              <button
-                key={r.label}
-                onClick={() => setDateRange(r.value)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
-                  dateRange === r.value
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-card text-foreground border-border hover:bg-muted'
-                )}
-              >
-                {r.label}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Date range:</span>
+              {DATE_RANGES.map(r => (
+                <button
+                  key={r.label}
+                  onClick={() => setDateRange(r.value)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
+                    dateRange === r.value
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card text-foreground border-border hover:bg-muted'
+                  )}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            {allGroups.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Fleet group:</span>
+                <Select value={groupFilter} onValueChange={setGroupFilter}>
+                  <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Groups</SelectItem>
+                    {allGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <FleetStatCards totalDrivers={stickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} />
           <div>
@@ -264,7 +278,7 @@ export default function FleetDashboard() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <Button variant="outline" size="sm" className="rounded-lg h-8"
-                              onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', fleet_group: sticker.fleet_group || '', vehicle_id: sticker.vehicle_id || '', start_date: sticker.start_date || '' }); setEditDialog(sticker); }}>
+                              onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', driver_email: sticker.driver_email || '', vehicle_id: sticker.vehicle_id || '', fleet_group: sticker.fleet_group || '', start_date: sticker.start_date || '', send_monthly_report: sticker.send_monthly_report || false }); setEditDialog(sticker); }}>
                               <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
                             </Button>
                             <Button variant="outline" size="sm" className="rounded-lg h-8"
@@ -301,6 +315,7 @@ export default function FleetDashboard() {
             {[
               { key: 'driver_label', label: 'Vehicle Nickname', placeholder: 'e.g. Truck #5, Route 7 Van' },
               { key: 'driver_name', label: 'Driver Name', placeholder: 'e.g. John Smith' },
+              { key: 'driver_email', label: 'Driver Email', placeholder: 'e.g. john@company.com' },
               { key: 'vehicle_id', label: 'Vehicle ID / Plate', placeholder: 'e.g. VAN-014, ABC1234' },
               { key: 'fleet_group', label: 'Fleet Group', placeholder: 'e.g. Route 7, Sales Team' },
               { key: 'start_date', label: 'Start Date (for 90-day onboarding tracking)', placeholder: 'YYYY-MM-DD' },
@@ -310,6 +325,19 @@ export default function FleetDashboard() {
                 <Input placeholder={placeholder} value={editData[key] || ''} onChange={(e) => setEditData(prev => ({ ...prev, [key]: e.target.value }))} />
               </div>
             ))}
+            <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3 bg-muted/30">
+              <div>
+                <p className="text-sm font-medium text-foreground">Monthly Driving Report</p>
+                <p className="text-xs text-muted-foreground">Email a monthly summary to this driver</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditData(prev => ({ ...prev, send_monthly_report: !prev.send_monthly_report }))}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${editData.send_monthly_report ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${editData.send_monthly_report ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialog(null)}>Cancel</Button>

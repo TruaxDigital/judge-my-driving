@@ -1,11 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, TrendingUp, BarChart2, Clock } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import moment from 'moment';
 
 export default function Analytics() {
+  const [groupFilter, setGroupFilter] = useState('all');
+
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
   const { data: stickers = [] } = useQuery({
     queryKey: ['my-stickers'],
     queryFn: async () => {
@@ -14,6 +22,18 @@ export default function Analytics() {
     },
   });
 
+  const isFleet = ['fleet_admin', 'admin'].includes(user?.role) || user?.plan === 'fleet';
+
+  const fleetGroups = useMemo(() => {
+    const groups = [...new Set(stickers.map(s => s.fleet_group).filter(Boolean))];
+    return groups;
+  }, [stickers]);
+
+  const filteredStickers = useMemo(() => {
+    if (!isFleet || groupFilter === 'all') return stickers;
+    return stickers.filter(s => s.fleet_group === groupFilter);
+  }, [stickers, groupFilter, isFleet]);
+
   const { data: feedback = [], isLoading } = useQuery({
     queryKey: ['all-feedback', stickers],
     queryFn: async () => {
@@ -21,31 +41,37 @@ export default function Analytics() {
       const all = [];
       for (const s of stickers) {
         const fb = await base44.entities.Feedback.filter({ sticker_id: s.id });
-        all.push(...fb);
+        all.push(...fb.map(f => ({ ...f, _stickerId: s.id })));
       }
       return all.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
     },
     enabled: stickers.length > 0,
   });
 
+  const filteredFeedback = useMemo(() => {
+    if (!isFleet || groupFilter === 'all') return feedback;
+    const ids = new Set(filteredStickers.map(s => s.id));
+    return feedback.filter(f => ids.has(f._stickerId));
+  }, [feedback, filteredStickers, groupFilter, isFleet]);
+
   // Feedback frequency over last 30 days
   const frequencyData = useMemo(() => {
     const days = [];
     for (let i = 29; i >= 0; i--) {
       const day = moment().subtract(i, 'days');
-      const count = feedback.filter(f => moment(f.created_date).isSame(day, 'day')).length;
+      const count = filteredFeedback.filter(f => moment(f.created_date).isSame(day, 'day')).length;
       days.push({ date: day.format('MMM D'), count });
     }
     return days;
-  }, [feedback]);
+  }, [filteredFeedback]);
 
   // Rating distribution
   const distributionData = useMemo(() => {
     return [1, 2, 3, 4, 5].map(star => ({
       star: `${star}★`,
-      count: feedback.filter(f => f.rating === star).length,
+      count: filteredFeedback.filter(f => f.rating === star).length,
     }));
-  }, [feedback]);
+  }, [filteredFeedback]);
 
   // Peak times by hour of day
   const peakTimesData = useMemo(() => {
@@ -60,9 +86,9 @@ export default function Analytics() {
     ];
     return slots.map(slot => ({
       label: slot.label,
-      count: feedback.filter(f => slot.hours.includes(moment(f.created_date).hour())).length,
+      count: filteredFeedback.filter(f => slot.hours.includes(moment(f.created_date).hour())).length,
     }));
-  }, [feedback]);
+  }, [filteredFeedback]);
 
   const peakSlot = peakTimesData.reduce((max, s) => s.count > max.count ? s : max, peakTimesData[0] || { label: '—', count: 0 });
 
@@ -78,15 +104,34 @@ export default function Analytics() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground mt-1">Understand your feedback patterns over time.</p>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h1>
+          <p className="text-muted-foreground mt-1">Understand your feedback patterns over time.</p>
+        </div>
+        {isFleet && fleetGroups.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground shrink-0">Fleet group:</span>
+            <Select value={groupFilter} onValueChange={setGroupFilter}>
+              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Groups</SelectItem>
+                {fleetGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
-      {feedback.length === 0 ? (
+      {filteredFeedback.length === 0 && feedback.length === 0 ? (
         <div className="bg-card border border-border rounded-2xl p-12 text-center">
           <BarChart2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
           <p className="text-muted-foreground">No feedback yet — analytics will appear once you start receiving ratings.</p>
+        </div>
+      ) : filteredFeedback.length === 0 ? (
+        <div className="bg-card border border-border rounded-2xl p-12 text-center">
+          <BarChart2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-muted-foreground">No feedback for this fleet group yet.</p>
         </div>
       ) : (
         <div className="space-y-6">

@@ -22,6 +22,15 @@
       "type": "string",
       "description": "Full name of the assigned driver (fleet use)"
     },
+    "driver_email": {
+      "type": "string",
+      "description": "Email address of the driver (for monthly reports)"
+    },
+    "send_monthly_report": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to send a monthly driving report to the driver email"
+    },
     "fleet_group": {
       "type": "string",
       "description": "Fleet group or route name (e.g. Route 7, Sales Team)"
