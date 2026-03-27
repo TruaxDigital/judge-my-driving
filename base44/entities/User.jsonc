@@ -27,7 +27,7 @@
         "family",
         "starter_fleet",
         "professional_fleet",
-        "enterprise_fleet"
+        "enterprise"
       ],
       "description": "Subscription plan tier"
     },
@@ -59,14 +59,5 @@
       "format": "date",
       "description": "When the current subscription period ends"
     }
-  },
-  "required": [
-    "company_id",
-    "company_name",
-    "plan_tier",
-    "subscription_status",
-    "stripe_customer_id",
-    "stripe_subscription_id",
-    "subscription_end_date"
-  ]
+  }
 }
