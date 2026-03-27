@@ -38,7 +38,7 @@ export default function Leaderboard() {
     queryFn: () => base44.auth.me(),
   });
 
-  // Fetch pre-calculated leaderboard from cache
+  // Fetch pre-calculated leaderboard from cache (for public view)
   const { data: leaderboardCache = null, isLoading: cacheLoading } = useQuery({
     queryKey: ['leaderboard-cache', selectedScope, selectedTimePeriod],
     queryFn: async () => {
@@ -48,19 +48,38 @@ export default function Leaderboard() {
       });
       return results.length > 0 ? results[0] : null;
     },
+    enabled: view === 'public',
+  });
+
+  // Fetch user's own stickers (for my vehicles view)
+  const { data: myStickers = [], isLoading: myStickersLoading } = useQuery({
+    queryKey: ['my-leaderboard-stickers'],
+    queryFn: async () => {
+      const u = await base44.auth.me();
+      return base44.entities.Sticker.filter({ owner_id: u.id }, '-average_rating');
+    },
+    enabled: view === 'mine',
   });
 
   // Get rankings from cache
   const rankings = leaderboardCache?.rankings || [];
 
-  // Filter for user's own vehicles in the rankings
-  const myRank = view === 'mine' ? null : rankings.findIndex(r => r.driver_id === user?.id) + 1;
+  // Format my stickers as ranking entries
+  const myRankings = myStickers.map(s => ({
+    rank: null,
+    driver_id: s.id,
+    display_name: s.driver_label || s.unique_code,
+    location: s.home_state || 'Unknown',
+    avg_rating: s.average_rating || 0,
+    scan_count: s.feedback_count || 0,
+  }));
 
-  const displayRankings = view === 'mine' 
-    ? rankings.filter(r => r.driver_id === user?.id)
-    : rankings;
+  // Find user's best rank in public leaderboard
+  const myRank = view === 'public' ? rankings.findIndex(r => r.driver_id === user?.id) + 1 : null;
 
-  const isLoading = cacheLoading;
+  const displayRankings = view === 'mine' ? myRankings : rankings;
+
+  const isLoading = view === 'public' ? cacheLoading : myStickersLoading;
 
   return (
     <div className="space-y-6">
