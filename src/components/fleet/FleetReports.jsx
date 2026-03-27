@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import { cn } from '@/lib/utils';
-import html2canvas from 'html2canvas';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -347,35 +346,31 @@ export default function FleetReports({ stickers, allFeedback, user }) {
               <p className="text-center text-xs text-muted-foreground">For outstanding safe driving performance</p>
               <p className="text-center text-xs text-muted-foreground">{moment().format('MMMM YYYY')}</p>
             </div>
-            <Button variant="outline" size="sm" className="rounded-xl" onClick={async () => {
+            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => {
               const cert = document.getElementById('certificate-card');
-              const canvas = await html2canvas(cert, { 
-                backgroundColor: '#ffffff',
-                scale: 2,
-                useCORS: true,
-                logging: false
-              });
-              const imgData = canvas.toDataURL('image/png');
-              const printWindow = window.open('', '', 'width=900,height=1100');
+              const printWindow = window.open('', '', 'width=800,height=600');
               printWindow.document.write(`
                 <html>
                   <head>
                     <title>Certificate of Safe Driving</title>
                     <style>
-                      * { margin: 0; padding: 0; box-sizing: border-box; }
-                      body { padding: 20px; font-family: system-ui, -apple-system, sans-serif; background: white; }
-                      @page { size: landscape; margin: 0.25in; }
-                      img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-                      @media print { body { padding: 0; } }
+                      body { margin: 0; padding: 20px; font-family: system-ui, -apple-system, sans-serif; background: white; }
+                      .cert { width: 100%; max-width: 700px; margin: 0 auto; padding: 40px; border: 2px solid #f5c000; border-radius: 12px; text-align: center; background: white; }
+                      .cert h2 { margin: 0 0 20px 0; font-size: 24px; color: #333; }
+                      .cert .emoji { font-size: 48px; margin-bottom: 20px; }
+                      .cert p { margin: 8px 0; color: #555; font-size: 14px; }
+                      .cert p.name { font-size: 20px; font-weight: 600; color: #333; }
+                      .cert p.title { font-size: 16px; font-weight: 600; margin: 20px 0 10px 0; }
+                      @media print { body { padding: 0; } .cert { border-width: 1px; } }
                     </style>
                   </head>
                   <body>
-                    <img src="${imgData}" alt="Certificate of Safe Driving" />
+                    ${cert.innerHTML}
                   </body>
                 </html>
               `);
               printWindow.document.close();
-              setTimeout(() => printWindow.print(), 250);
+              printWindow.print();
             }}>
               <FileText className="w-4 h-4 mr-2" /> Print Certificate
             </Button>
