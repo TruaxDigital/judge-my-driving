@@ -29,8 +29,8 @@ const PLANS = [
   name: 'Family',
   price: 99,
   icon: Users,
-  description: 'Great for households with multiple drivers',
-  features: ['3 stickers included', 'All alert types', 'Unlimited feedback history', 'Personal dashboard'],
+  description: 'Family gamification dashboard for multiple drivers',
+  features: ['3 stickers included', 'All alert types', 'Unlimited feedback history', 'Family gamification dashboard'],
   popular: true
 }];
 
