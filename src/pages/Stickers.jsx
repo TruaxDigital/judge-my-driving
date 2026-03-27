@@ -22,6 +22,7 @@ export default function Stickers() {
   const [selectedDesign, setSelectedDesign] = useState('default');
   const [replacementSticker, setReplacementSticker] = useState(null);
   const [addonLoading, setAddonLoading] = useState(false);
+  const [claimLoading, setClaimLoading] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -67,6 +68,18 @@ export default function Stickers() {
       alert(res.data?.error || 'Could not process upgrade. Please try again.');
     }
     setAddonLoading(false);
+  };
+
+  const handleClaimSticker = async () => {
+    setClaimLoading(true);
+    try {
+      await base44.functions.invoke('provisionMyStickers', {});
+      queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    } catch (err) {
+      alert('Failed to claim sticker. Please try again.');
+    }
+    setClaimLoading(false);
   };
 
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
@@ -135,6 +148,28 @@ export default function Stickers() {
           )}
         </div>
       </div>
+
+      {/* Banner for claiming stickers with available credits */}
+      {(user?.sticker_credits || 0) > 0 && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-foreground text-sm">
+              ✨ You have {user.sticker_credits} sticker credit{user.sticker_credits > 1 ? 's' : ''} available!
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Claim and order a new sticker now.
+            </p>
+          </div>
+          <Button 
+            onClick={handleClaimSticker} 
+            disabled={claimLoading} 
+            className="rounded-xl bg-yellow-400 hover:bg-yellow-500 text-yellow-950 font-semibold whitespace-nowrap shrink-0"
+          >
+            {claimLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+            Claim Sticker
+          </Button>
+        </div>
+      )}
 
       {/* Banner for unclaimed stickers (not yet sent to Printful) */}
       {unclaimedStickers.length > 0 && (
