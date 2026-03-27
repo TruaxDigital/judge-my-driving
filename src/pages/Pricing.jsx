@@ -164,7 +164,7 @@ export default function Pricing() {
         </div>
 
         {/* Enterprise */}
-        <div className="mt-6 bg-card border border-border rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-6 bg-card border border-border rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Truck className="w-5 h-5 text-primary" />
