@@ -390,11 +390,9 @@ export default function FleetReports({ stickers, allFeedback, user }) {
             <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-widest">Judge My Driving Score</p>
                   <p className="text-2xl font-bold text-foreground">⭐ {fleetWideAvg} / 5</p>
-                  <p className="text-sm text-muted-foreground">Fleet-wide average across all {stickers.length} vehicle{stickers.length !== 1 ? 's' : ''} · {totalFb.length} total reviews</p>
-                  <p className="text-xs text-muted-foreground font-mono bg-white/60 rounded px-2 py-1 inline-block">
-                    "Our drivers are rated {fleetWideAvg}/5 — Judge My Driving"
-                  </p>
+                  <p className="text-sm text-muted-foreground">Fleet-wide average · {stickers.length} vehicle{stickers.length !== 1 ? 's' : ''} · {totalFb.length} reviews</p>
                 </div>
                 <button
                   onClick={() => setEmbedDialog({
