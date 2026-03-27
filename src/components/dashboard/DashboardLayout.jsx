@@ -12,7 +12,7 @@ const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
   { path: '/MapView', label: 'Map', icon: Map },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
-  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
