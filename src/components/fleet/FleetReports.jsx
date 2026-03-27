@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import {
   Mail, TrendingUp, TrendingDown, Minus, FileText, UserPlus,
-  Trophy, Flame, Globe, Loader2, CheckCircle, Star, ShieldAlert, AlertTriangle, Code, Copy, Check
+  Trophy, Flame, Globe, Loader2, CheckCircle, Star, ShieldAlert, AlertTriangle, Code, Copy, Check, Download
 } from 'lucide-react';
 import moment from 'moment';
 import { cn } from '@/lib/utils';
@@ -95,11 +95,33 @@ export default function FleetReports({ stickers, allFeedback, user }) {
   const [reportPeriod, setReportPeriod] = useState('monthly');
   const [embedDialog, setEmbedDialog] = useState(null); // { code, title }
   const [copied, setCopied] = useState(false);
+  const [generatingCertificate, setGeneratingCertificate] = useState(false);
 
   const handleCopy = (code) => {
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handlePrintCertificate = async (driver) => {
+    setGeneratingCertificate(true);
+    try {
+      const res = await base44.functions.invoke('generateCertificate', {
+        driver_name: driver.sticker.driver_name || driver.name,
+        avg_rating: driver.avg,
+        current_month: moment().format('MMMM YYYY')
+      });
+      if (res.data?.image_url) {
+        window.open(res.data.image_url, '_blank');
+      } else {
+        alert('Failed to generate certificate.');
+      }
+    } catch (err) {
+      console.error('Error generating certificate:', err);
+      alert('Error generating certificate. Please try again.');
+    } finally {
+      setGeneratingCertificate(false);
+    }
   };
 
   // Driver improvement tracking
@@ -346,8 +368,19 @@ export default function FleetReports({ stickers, allFeedback, user }) {
               <p className="text-center text-xs text-muted-foreground">For outstanding safe driving performance</p>
               <p className="text-center text-xs text-muted-foreground">{moment().format('MMMM YYYY')}</p>
             </div>
-            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => window.print()}>
-              <FileText className="w-4 h-4 mr-2" /> Print Certificate
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-xl" 
+              onClick={() => handlePrintCertificate(safestDriver)}
+              disabled={generatingCertificate}
+            >
+              {generatingCertificate ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              Print Certificate
             </Button>
           </div>
         ) : (
