@@ -87,13 +87,9 @@ export default function Stickers() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       setEditDialog(null);
-      if (designDialog) {
-        // After saving design, open QR modal for shipping
-        setQrSticker({ ...designDialog, design_id: selectedDesign });
-      }
       setDesignDialog(null);
     },
   });
