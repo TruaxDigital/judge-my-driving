@@ -169,11 +169,9 @@ export default function Settings() {
                   onClick={async () => {
                     setFreeReplacementStatus('loading');
                     try {
-                      await base44.integrations.Core.SendEmail({
-                        to: 'support@judgemydriving.com',
-                        subject: `Free Replacement Sticker Request — ${user.email}`,
-                        body: `User ${user.full_name} (${user.email}, plan: ${user.plan_tier}) has requested a free replacement sticker. User ID: ${user.id}`,
-                      });
+                      const newCredits = (user.sticker_credits || 0) + 1;
+                      await base44.auth.updateMe({ sticker_credits: newCredits });
+                      queryClient.invalidateQueries({ queryKey: ['me'] });
                       setFreeReplacementStatus('sent');
                     } catch {
                       setFreeReplacementStatus('error');

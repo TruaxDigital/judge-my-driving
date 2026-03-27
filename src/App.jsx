@@ -39,12 +39,14 @@ const AuthenticatedApp = () => {
   const isScanRoute = window.location.pathname.startsWith('/scan/');
   const isGetStartedRoute = window.location.pathname.startsWith('/get-started');
   const isLiabilityRoute = window.location.pathname.startsWith('/liability');
-  if (isScanRoute || isGetStartedRoute || isLiabilityRoute) {
+  const isPricingRoute = window.location.pathname.startsWith('/Pricing') || window.location.pathname.startsWith('/pricing');
+  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute) {
     return (
       <Routes>
         <Route path="/scan/:code" element={<ScanSticker />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/liability" element={<Liability />} />
+        <Route path="/Pricing" element={<Pricing />} />
       </Routes>
     );
   }

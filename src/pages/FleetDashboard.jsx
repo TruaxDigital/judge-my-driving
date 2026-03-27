@@ -171,28 +171,28 @@ export default function FleetDashboard() {
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Fleet Dashboard</h1>
           <p className="text-muted-foreground mt-1">{user?.company_name || 'Your fleet'} — {stickers.length} vehicles</p>
         </div>
-        <div className="flex items-center bg-muted rounded-xl p-1 gap-1">
+        <div className="flex items-center bg-muted rounded-xl p-1 gap-1 overflow-x-auto">
           <button
             onClick={() => setActiveTab('analytics')}
-            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'analytics' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0', activeTab === 'analytics' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
           >
             <BarChart2 className="w-4 h-4" /> Analytics
           </button>
           <button
             onClick={() => setActiveTab('vehicles')}
-            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'vehicles' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0', activeTab === 'vehicles' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
           >
             <List className="w-4 h-4" /> Vehicles
           </button>
           <button
             onClick={() => setActiveTab('reports')}
-            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'reports' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0', activeTab === 'reports' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
           >
             <FileBarChart className="w-4 h-4" /> Reports
           </button>
           <button
             onClick={() => setActiveTab('insurance')}
-            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all relative', activeTab === 'insurance' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+            className={cn('flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 relative', activeTab === 'insurance' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
           >
             <ShieldAlert className="w-4 h-4" /> Insurance
             {unresolvedIncidents > 0 && (
