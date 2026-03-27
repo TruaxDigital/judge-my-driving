@@ -71,12 +71,15 @@ function buildEmbedCode({ label, avg, reviewCount, comments = [] }) {
     : '';
   return `<!-- Judge My Driving Scorecard Widget -->
 <div style="font-family:sans-serif;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px 24px;max-width:320px;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-    <img src="https://app.judgemydriving.com/jmd-logo.png" alt="Judge My Driving" style="height:28px" onerror="this.style.display='none'" />
-    <span style="font-weight:700;font-size:15px;color:#111">${label}</span>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    <img src="https://judgemydriving.com/jmd-logo.png" alt="Judge My Driving" style="height:32px" onerror="this.style.display='none'" />
+    <div>
+      <div style="font-size:10px;font-weight:600;color:#f5c000;text-transform:uppercase;letter-spacing:0.08em">Judge My Driving Score</div>
+      <div style="font-weight:700;font-size:14px;color:#111;line-height:1.2">${label}</div>
+    </div>
   </div>
-  <div style="font-size:28px;font-weight:800;color:#111">${avg} <span style="font-size:18px;color:#f5c000">${stars}</span></div>
-  <div style="font-size:13px;color:#666;margin-top:2px">Based on ${reviewCount} verified review${reviewCount !== 1 ? 's' : ''}</div>
+  <div style="font-size:30px;font-weight:800;color:#111;line-height:1">${avg} <span style="font-size:20px;color:#f5c000">${stars}</span></div>
+  <div style="font-size:13px;color:#666;margin-top:4px">Based on ${reviewCount} verified review${reviewCount !== 1 ? 's' : ''}</div>
   ${commentsHtml}
   <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;font-size:11px;color:#999">
     Powered by <a href="https://judgemydriving.com" target="_blank" style="color:#f5c000;font-weight:600;text-decoration:none">Judge My Driving</a> — Real feedback from real drivers on the road.
