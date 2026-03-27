@@ -21,6 +21,7 @@ import Leaderboard from './pages/Leaderboard';
 import Support from './pages/Support';
 import GetStarted from './pages/GetStarted';
 import Liability from './pages/Liability';
+import AdminUsers from './pages/AdminUsers';
 
 const PublicRoutes = () => {
   return (
@@ -83,6 +84,7 @@ const AuthenticatedApp = () => {
         <Route path="/FleetDashboard" element={<FleetDashboard />} />
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/Support" element={<Support />} />
+        <Route path="/AdminUsers" element={<AdminUsers />} />
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />

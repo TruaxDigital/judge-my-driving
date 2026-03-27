@@ -1,0 +1,78 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user",
+        "fleet_admin"
+      ],
+      "default": "user"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "fleet"
+      ],
+      "default": "personal"
+    },
+    "plan_tier": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "family",
+        "starter_fleet",
+        "professional_fleet",
+        "enterprise_fleet"
+      ],
+      "description": "Stripe subscription plan tier"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled",
+        "trialing",
+        "none"
+      ],
+      "default": "none"
+    },
+    "subscription_start_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "subscription_end_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "company_name": {
+      "type": "string",
+      "description": "Fleet company or organization name"
+    },
+    "notification_pref": {
+      "type": "string",
+      "enum": [
+        "instant",
+        "daily",
+        "weekly"
+      ],
+      "default": "instant"
+    },
+    "sticker_credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of sticker credits available to claim/print"
+    }
+  },
+  "required": []
+}

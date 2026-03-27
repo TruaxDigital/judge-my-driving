@@ -26,6 +26,11 @@ export default function Stickers() {
   const [replacementSticker, setReplacementSticker] = useState(null);
   const [claimWizardOpen, setClaimWizardOpen] = useState(false);
 
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
   const { data: stickers = [], isLoading } = useQuery({
     queryKey: ['my-stickers'],
     queryFn: async () => {
@@ -46,6 +51,9 @@ export default function Stickers() {
 
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
   const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
+
+  // Credits available but no sticker records exist yet for them
+  const pendingCredits = Math.max(0, (user?.sticker_credits || 0) - unclaimedStickers.length);
 
   const claimMutation = useMutation({
     mutationFn: async () => {
@@ -108,6 +116,20 @@ export default function Stickers() {
           <ScanLine className="w-4 h-4 mr-2" /> Claim a Sticker
         </Button>
       </div>
+
+      {/* Banner for credit holders with no sticker records yet */}
+      {pendingCredits > 0 && unclaimedStickers.length === 0 && (
+        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-foreground text-sm">
+              🎉 You have {pendingCredits} sticker credit{pendingCredits > 1 ? 's' : ''} available!
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Contact support or your account manager to get your stickers created.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Banner for unclaimed stickers */}
       {unclaimedStickers.length > 0 && (
