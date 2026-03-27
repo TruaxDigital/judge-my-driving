@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'payment',
-        line_items: [{ price_data: { currency: 'usd', unit_amount: 2900, product_data: { name: 'Replacement Sticker (Same QR Code)' } }, quantity: 1 }],
+        line_items: [{ price_data: { currency: 'usd', unit_amount: 1999, product_data: { name: 'Replacement Sticker (Same QR Code)' } }, quantity: 1 }],
         success_url: success_url || `${req.headers.get('origin')}/Stickers?replacement_success=true`,
         cancel_url: cancel_url || `${req.headers.get('origin')}/Stickers`,
         metadata: {

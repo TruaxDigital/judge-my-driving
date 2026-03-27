@@ -48,7 +48,7 @@ export default function ReplacementStickerDialog({ sticker, open, onClose }) {
           <div className="bg-muted rounded-xl p-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Replacement sticker</span>
-              <span className="font-semibold">$29.00</span>
+              <span className="font-semibold">$19.99</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
@@ -70,7 +70,7 @@ export default function ReplacementStickerDialog({ sticker, open, onClose }) {
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={handlePurchase} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Pay $29 & Order
+            Pay $19.99 & Order
           </Button>
         </DialogFooter>
       </DialogContent>
