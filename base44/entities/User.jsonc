@@ -9,15 +9,16 @@
         "user",
         "fleet_admin"
       ],
-      "default": "user"
+      "default": "user",
+      "description": "User role. fleet_admin can manage a fleet account alongside the owner."
     },
-    "plan": {
+    "company_id": {
       "type": "string",
-      "enum": [
-        "personal",
-        "fleet"
-      ],
-      "default": "personal"
+      "description": "Links this user to a specific fleet company/account. Multiple fleet_admin users can share the same company_id."
+    },
+    "company_name": {
+      "type": "string",
+      "description": "Name of the fleet company this user belongs to."
     },
     "plan_tier": {
       "type": "string",
@@ -26,15 +27,9 @@
         "family",
         "starter_fleet",
         "professional_fleet",
-        "enterprise_fleet"
+        "enterprise"
       ],
-      "description": "Stripe subscription plan tier"
-    },
-    "stripe_customer_id": {
-      "type": "string"
-    },
-    "stripe_subscription_id": {
-      "type": "string"
+      "description": "Subscription plan tier"
     },
     "subscription_status": {
       "type": "string",
@@ -42,37 +37,27 @@
         "active",
         "past_due",
         "canceled",
-        "trialing",
-        "none"
+        "trialing"
       ],
-      "default": "none"
+      "description": "Current Stripe subscription status"
     },
-    "subscription_start_date": {
+    "stripe_customer_id": {
       "type": "string",
-      "format": "date-time"
+      "description": "Stripe customer ID"
     },
-    "subscription_end_date": {
+    "stripe_subscription_id": {
       "type": "string",
-      "format": "date-time"
-    },
-    "company_name": {
-      "type": "string",
-      "description": "Fleet company or organization name"
-    },
-    "notification_pref": {
-      "type": "string",
-      "enum": [
-        "instant",
-        "daily",
-        "weekly"
-      ],
-      "default": "instant"
+      "description": "Stripe subscription ID"
     },
     "sticker_credits": {
       "type": "number",
       "default": 0,
-      "description": "Number of sticker credits available to claim/print"
+      "description": "Number of stickers the user is entitled to"
+    },
+    "subscription_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the current subscription period ends"
     }
-  },
-  "required": []
+  }
 }

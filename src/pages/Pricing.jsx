@@ -136,7 +136,7 @@ export default function Pricing() {
       {/* B2C */}
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Personal Plans</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {PLANS.filter(p => !p.fleet).map(plan => (
             <PlanCard
               key={plan.id}
@@ -153,7 +153,7 @@ export default function Pricing() {
       {/* Fleet */}
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Fleet Plans</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {PLANS.filter(p => p.fleet).map(plan => (
             <PlanCard
               key={plan.id}
@@ -227,7 +227,7 @@ function PlanCard({ plan, loading, current, onSubscribe, isAuthed }) {
         </div>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-2 flex-1">
         {plan.features.map(f => (
           <li key={f} className="flex items-center gap-2 text-sm text-foreground">
             <CheckCircle className="w-4 h-4 text-primary shrink-0" />
