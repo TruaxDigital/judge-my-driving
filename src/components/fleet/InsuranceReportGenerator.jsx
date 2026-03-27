@@ -93,8 +93,8 @@ export default function InsuranceReportGenerator() {
   };
 
   return (
-    <div className="max-w-lg space-y-6">
-      <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
+    <div className="flex flex-col md:flex-row gap-6 items-start">
+      <div className="flex-1 bg-card border border-border rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-3">
           <FileBarChart className="w-5 h-5 text-primary" />
           <div>
@@ -156,7 +156,7 @@ export default function InsuranceReportGenerator() {
         </Button>
       </div>
 
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-2">
+      <div className="md:w-72 shrink-0 bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-2">
         <p className="text-sm font-semibold text-foreground">What's included in the report?</p>
         <ul className="space-y-1 text-xs text-muted-foreground">
           <li>• <strong>Page 1:</strong> Executive summary with KPIs and narrative</li>
