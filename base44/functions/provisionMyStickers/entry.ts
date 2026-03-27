@@ -45,6 +45,12 @@ Deno.serve(async (req) => {
     stickersCreated++;
   }
 
+  // Decrement sticker_credits by the number created
+  if (stickersCreated > 0) {
+    const newCredits = Math.max(0, credits - stickersCreated);
+    await base44.auth.updateMe({ sticker_credits: newCredits });
+  }
+
   console.log(`[provisionMyStickers] Created ${stickersCreated} sticker(s) for ${user.email}`);
   return Response.json({ success: true, stickers_created: stickersCreated });
 });
