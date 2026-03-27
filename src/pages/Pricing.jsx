@@ -132,7 +132,7 @@ export default function Pricing() {
 
       {/* B2C */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Personal Plans</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4 px-1">Personal Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {PLANS.filter(p => !p.fleet).map(plan => (
             <PlanCard
@@ -149,7 +149,7 @@ export default function Pricing() {
 
       {/* Fleet */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Fleet Plans</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4 px-1">Fleet Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {PLANS.filter(p => p.fleet).map(plan => (
             <PlanCard
