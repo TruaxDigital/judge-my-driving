@@ -2,12 +2,13 @@ import React from 'react';
 import { Truck, MessageSquare, Star, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export default function FleetStatCards({ totalDrivers, totalScans, avgRating, safetyIncidents }) {
+export default function FleetStatCards({ totalDrivers, totalScans, avgRating, safetyIncidents, unresolvedIncidents }) {
   const stats = [
     { label: 'Total Drivers', value: totalDrivers, icon: Truck, color: 'text-primary' },
     { label: 'Total Scans', value: totalScans, icon: MessageSquare, color: 'text-blue-500' },
     { label: 'Fleet Avg Rating', value: avgRating, icon: Star, color: 'text-primary' },
     { label: 'Safety Incidents', value: safetyIncidents, icon: ShieldAlert, color: safetyIncidents > 0 ? 'text-red-500' : 'text-muted-foreground' },
+    { label: 'Unresolved Incidents', value: unresolvedIncidents ?? 0, icon: ShieldAlert, color: (unresolvedIncidents ?? 0) > 0 ? 'text-red-500' : 'text-green-500' },
   ];
 
   return (

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Star, MessageSquare, Pencil, Power, ChevronDown, ChevronRight, Truck, AlertTriangle, BarChart2, List, FileBarChart } from 'lucide-react';
+import { Loader2, Star, MessageSquare, Pencil, Power, ChevronDown, ChevronRight, Truck, AlertTriangle, BarChart2, List, FileBarChart, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 import FleetUpgradeBanner from '../components/fleet/FleetUpgradeBanner';
@@ -15,6 +15,8 @@ import FleetStatCards from '../components/fleet/FleetStatCards';
 import FleetDriverLeaderboard from '../components/fleet/FleetDriverLeaderboard';
 import FleetFeedbackThemes from '../components/fleet/FleetFeedbackThemes';
 import FleetReports from '../components/fleet/FleetReports';
+import CorrectiveActionPanel from '../components/fleet/CorrectiveActionPanel';
+import InsuranceReportGenerator from '../components/fleet/InsuranceReportGenerator';
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-600 border-green-500/20',
@@ -64,6 +66,14 @@ export default function FleetDashboard() {
       return all;
     },
     enabled: stickers.length > 0,
+  });
+
+  const { data: allCorrectiveActions = [] } = useQuery({
+    queryKey: ['all-corrective-actions'],
+    queryFn: async () => {
+      const u = await base44.auth.me();
+      return base44.entities.CorrectiveAction.filter({ fleet_id: u.id });
+    },
   });
 
   const updateMutation = useMutation({
@@ -131,6 +141,17 @@ export default function FleetDashboard() {
     : '—';
   const safetyIncidents = filteredFeedback.filter(f => f.safety_flag).length;
 
+  // Unresolved incidents: safety flags with no corrective action OR action not Resolved
+  const unresolvedIncidents = useMemo(() => {
+    const safetyFbIds = new Set(filteredFeedback.filter(f => f.safety_flag).map(f => f.id));
+    let count = 0;
+    for (const fbId of safetyFbIds) {
+      const action = allCorrectiveActions.find(a => a.incident_id === fbId);
+      if (!action || action.status !== 'Resolved') count++;
+    }
+    return count;
+  }, [filteredFeedback, allCorrectiveActions]);
+
   const getFeedbackForSticker = (id) => allFeedback.filter(f => f._stickerId === id);
   const toggleGroup = (g) => setExpandedGroups(prev => ({ ...prev, [g]: !prev[g] }));
   const filteredGroups = groupFilter === 'all' ? allGroups : [groupFilter];
@@ -169,6 +190,17 @@ export default function FleetDashboard() {
           >
             <FileBarChart className="w-4 h-4" /> Reports
           </button>
+          <button
+            onClick={() => setActiveTab('insurance')}
+            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all relative', activeTab === 'insurance' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+          >
+            <ShieldAlert className="w-4 h-4" /> Insurance
+            {unresolvedIncidents > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                {unresolvedIncidents}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -205,7 +237,7 @@ export default function FleetDashboard() {
               </div>
             )}
           </div>
-          <FleetStatCards totalDrivers={filteredStickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} />
+          <FleetStatCards totalDrivers={filteredStickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} unresolvedIncidents={unresolvedIncidents} />
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Driver Leaderboard</h2>
             <FleetDriverLeaderboard drivers={driverRows} />
@@ -219,6 +251,61 @@ export default function FleetDashboard() {
 
       {activeTab === 'reports' && (
         <FleetReports stickers={stickers} allFeedback={allFeedback} user={user} />
+      )}
+
+      {activeTab === 'insurance' && (
+        <div className="space-y-8">
+          {unresolvedIncidents > 0 && (
+            <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+              <p className="text-sm text-red-700 font-medium">
+                {unresolvedIncidents} safety incident{unresolvedIncidents > 1 ? 's' : ''} require corrective action before generating your insurance report.
+              </p>
+            </div>
+          )}
+
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Open Safety Incidents</h2>
+            {filteredFeedback.filter(f => f.safety_flag).length === 0 ? (
+              <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
+                No safety incidents in the selected period. 🎉
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredFeedback.filter(f => f.safety_flag).map(incident => {
+                  const sticker = stickers.find(s => s.id === incident._stickerId);
+                  const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
+                  return (
+                    <div key={incident.id} className={cn(
+                      'bg-card border rounded-2xl p-4',
+                      action?.status === 'Resolved' ? 'border-green-500/20' : 'border-red-500/20'
+                    )}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm text-foreground">
+                              {sticker?.driver_label || sticker?.driver_name || 'Unknown Vehicle'}
+                            </span>
+                            {sticker?.vehicle_id && <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{sticker.vehicle_id}</span>}
+                            <span className="text-xs text-muted-foreground">{incident.created_date?.slice(0, 10)}</span>
+                          </div>
+                          {incident.comment && <p className="text-xs text-muted-foreground mt-1">{incident.comment}</p>}
+                        </div>
+                        <div className={cn('shrink-0 w-2 h-2 rounded-full mt-1.5', action?.status === 'Resolved' ? 'bg-green-500' : 'bg-red-500')} />
+                      </div>
+                      <CorrectiveActionPanel incident={incident} fleetId={user?.id} userId={user?.id} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-border pt-8">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Generate Insurance Report</h2>
+            <InsuranceReportGenerator />
+          </div>
+        </div>
       )}
 
       {activeTab === 'vehicles' && (

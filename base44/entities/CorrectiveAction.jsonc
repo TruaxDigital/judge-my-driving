@@ -1,0 +1,75 @@
+{
+  "name": "CorrectiveAction",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Links to the Feedback record that was safety-flagged"
+    },
+    "driver_id": {
+      "type": "string",
+      "description": "Links to the Sticker (driver/vehicle) record"
+    },
+    "fleet_id": {
+      "type": "string",
+      "description": "User ID of the fleet owner"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "Coaching Session",
+        "Written Warning",
+        "Manager Ride-Along",
+        "Defensive Driving Refresher",
+        "Training Assignment",
+        "Suspension",
+        "Escalation",
+        "Other"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Free text description of what was done"
+    },
+    "action_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the corrective action was taken"
+    },
+    "assigned_by": {
+      "type": "string",
+      "description": "User ID of the fleet manager who took the action"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "In Progress",
+        "Resolved"
+      ],
+      "default": "Open"
+    },
+    "resolution_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional follow-up notes"
+    }
+  },
+  "required": [
+    "incident_id",
+    "driver_id",
+    "fleet_id",
+    "action_type",
+    "description",
+    "action_date",
+    "assigned_by",
+    "status"
+  ]
+}
