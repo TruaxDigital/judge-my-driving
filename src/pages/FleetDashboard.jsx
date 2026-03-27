@@ -46,6 +46,7 @@ export default function FleetDashboard() {
   const [editData, setEditData] = useState({});
   const [groupFilter, setGroupFilter] = useState('all');
   const [dateRange, setDateRange] = useState(30);
+  const [incidentFilter, setIncidentFilter] = useState('all');
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['me'],
@@ -271,14 +272,40 @@ export default function FleetDashboard() {
           )}
 
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">Open Safety Incidents</h2>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <h2 className="text-lg font-semibold text-foreground">Open Safety Incidents</h2>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                {[
+                  { label: 'All', value: 'all' },
+                  { label: 'Open', value: 'Open' },
+                  { label: 'In Progress', value: 'In Progress' },
+                  { label: 'Resolved', value: 'Resolved' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setIncidentFilter(opt.value)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-md text-xs font-medium transition-all',
+                      incidentFilter === opt.value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             {filteredFeedback.filter(f => f.safety_flag).length === 0 ? (
               <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
                 No safety incidents in the selected period. 🎉
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredFeedback.filter(f => f.safety_flag).map(incident => {
+                {filteredFeedback.filter(f => f.safety_flag).filter(incident => {
+                  if (incidentFilter === 'all') return true;
+                  const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
+                  const status = action?.status || 'Open';
+                  return status === incidentFilter;
+                }).map(incident => {
                   const sticker = stickers.find(s => s.id === incident._stickerId);
                   const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
                   return (
