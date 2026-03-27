@@ -88,23 +88,6 @@ Deno.serve(async (req) => {
       console.log(`Created HubSpot contact ${contactId} for ${email}`);
     }
 
-    // Notify Aaron by email
-    await base44.asServiceRole.integrations.Core.SendEmail({
-      to: 'aaron@judgemydriving.com',
-      subject: `New Enterprise Lead: ${firstName} ${lastName} — ${company}`,
-      body: `<div style="font-family: Inter, sans-serif; max-width: 500px;">
-        <h2 style="color: #FACC15;">New Enterprise Fleet Inquiry</h2>
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:6px 0;color:#888;width:120px">Name</td><td style="padding:6px 0;font-weight:600">${firstName} ${lastName}</td></tr>
-          <tr><td style="padding:6px 0;color:#888">Company</td><td style="padding:6px 0;font-weight:600">${company}</td></tr>
-          <tr><td style="padding:6px 0;color:#888">Fleet Size</td><td style="padding:6px 0;font-weight:600">${fleetSize || 'Not specified'}</td></tr>
-          <tr><td style="padding:6px 0;color:#888">Email</td><td style="padding:6px 0"><a href="mailto:${email}">${email}</a></td></tr>
-          <tr><td style="padding:6px 0;color:#888">Phone</td><td style="padding:6px 0">${phone || 'Not provided'}</td></tr>
-        </table>
-        ${contactId ? `<p style="margin-top:16px"><a href="https://app.hubspot.com/contacts/${contactId}" style="color:#FACC15">View in HubSpot →</a></p>` : ''}
-      </div>`,
-    });
-
     return Response.json({ success: true });
   } catch (err) {
     console.error('submitEnterpriseLead error:', err);
