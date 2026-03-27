@@ -98,22 +98,39 @@ export default function Stickers() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">My Stickers</h1>
-          <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">My Stickers</h1>
+            <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            {user?.plan_tier === 'individual' && (
+              <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl">
+                {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+                Upgrade to Add Vehicles
+              </Button>
+            )}
+            {(['family', 'starter_fleet', 'professional_fleet'].includes(user?.plan_tier) || user?.plan === 'fleet') && (
+              <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
+                {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+                Order More Stickers
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Mobile-only centered buttons */}
+        <div className="flex sm:hidden justify-center">
           {user?.plan_tier === 'individual' && (
-            <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl">
+            <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl w-full">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
               Upgrade to Add Vehicles
             </Button>
           )}
           {(['family', 'starter_fleet', 'professional_fleet'].includes(user?.plan_tier) || user?.plan === 'fleet') && (
-            <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
+            <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl w-full">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
-              Order Additional Vehicle Sticker
+              Order More Stickers
             </Button>
           )}
         </div>
