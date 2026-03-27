@@ -344,38 +344,75 @@ export default function FleetReports({ stickers, allFeedback, user }) {
         <p className="text-sm text-muted-foreground">
           Opted-in drivers appear on your public scorecard widget. Embed this on your website to show visitors your fleet's rating.
         </p>
-        {publicAvg && (
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-center space-y-1">
-            <p className="text-2xl font-bold text-foreground">⭐ {publicAvg} / 5</p>
-            <p className="text-sm text-muted-foreground">Average across {publicDrivers.length} opted-in driver{publicDrivers.length !== 1 ? 's' : ''}</p>
-            <p className="text-xs text-muted-foreground font-mono bg-muted rounded px-2 py-1 mt-2 inline-block">
-              "Our drivers are rated {publicAvg}/5"
-            </p>
-          </div>
-        )}
-        <div className="space-y-2">
+
+        {/* Fleet-wide metric — all stickers */}
+        {(() => {
+          const totalFb = allFeedback;
+          const fleetWideAvg = totalFb.length > 0
+            ? (totalFb.reduce((s, f) => s + f.rating, 0) / totalFb.length).toFixed(1)
+            : null;
+          const recentComments = [...totalFb]
+            .filter(f => f.comment && f.comment.trim().length > 0)
+            .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+            .slice(0, 3);
+          return fleetWideAvg ? (
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-3">
+              <div className="text-center space-y-1">
+                <p className="text-2xl font-bold text-foreground">⭐ {fleetWideAvg} / 5</p>
+                <p className="text-sm text-muted-foreground">Fleet-wide average across all {stickers.length} vehicle{stickers.length !== 1 ? 's' : ''} · {totalFb.length} total reviews</p>
+                <p className="text-xs text-muted-foreground font-mono bg-white/60 rounded px-2 py-1 mt-1 inline-block">
+                  "Our drivers are rated {fleetWideAvg}/5 — Judge My Driving"
+                </p>
+              </div>
+              {recentComments.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-primary/10">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Recent Reviews</p>
+                  {recentComments.map((f, i) => (
+                    <div key={i} className="bg-white/70 rounded-xl px-3 py-2 text-sm text-foreground italic">
+                      "{f.comment}"
+                      <span className="ml-2 not-italic text-xs text-muted-foreground">{'⭐'.repeat(Math.round(f.rating))}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null;
+        })()}
+
+        {/* Per-driver opt-in rows */}
+        <div className="space-y-3">
           {stickers.map(s => {
             const fb = allFeedback.filter(f => f._stickerId === s.id);
             const avg = fb.length > 0
               ? (fb.reduce((a, f) => a + f.rating, 0) / fb.length).toFixed(1)
               : null;
+            const recentComment = [...fb]
+              .filter(f => f.comment && f.comment.trim().length > 0)
+              .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))[0];
             return (
-              <div key={s.id} className="flex items-center justify-between bg-muted/30 rounded-xl px-4 py-2.5">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{s.driver_label || s.driver_name || 'Unnamed Vehicle'}</p>
-                  {avg && <p className="text-xs text-muted-foreground">{avg} avg · {fb.length} reviews</p>}
+              <div key={s.id} className="bg-muted/30 rounded-xl px-4 py-3 space-y-1.5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{s.driver_label || s.driver_name || 'Unnamed Vehicle'}</p>
+                    {avg && <p className="text-xs text-muted-foreground">{avg} avg · {fb.length} reviews</p>}
+                  </div>
+                  <button
+                    onClick={() => base44.entities.Sticker.update(s.id, { public_scorecard: !s.public_scorecard })}
+                    className={cn(
+                      'text-xs font-medium px-3 py-1.5 rounded-lg border transition-all shrink-0',
+                      s.public_scorecard
+                        ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'
+                        : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
+                    )}
+                  >
+                    {s.public_scorecard ? '✓ Public' : 'Make Public'}
+                  </button>
                 </div>
-                <button
-                  onClick={() => base44.entities.Sticker.update(s.id, { public_scorecard: !s.public_scorecard })}
-                  className={cn(
-                    'text-xs font-medium px-3 py-1.5 rounded-lg border transition-all',
-                    s.public_scorecard
-                      ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'
-                      : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
-                  )}
-                >
-                  {s.public_scorecard ? '✓ Public' : 'Make Public'}
-                </button>
+                {recentComment && (
+                  <p className="text-xs text-muted-foreground italic border-l-2 border-primary/20 pl-2">
+                    "{recentComment.comment}"
+                  </p>
+                )}
               </div>
             );
           })}
