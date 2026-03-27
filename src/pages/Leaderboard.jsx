@@ -179,7 +179,7 @@ export default function Leaderboard() {
               className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground"
             >
               <option value="monthly">This Month</option>
-              <option value="quarterly">This Quarter</option>
+              <option value="yearly">This Year</option>
               <option value="alltime">All Time</option>
             </select>
           </div>
