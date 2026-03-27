@@ -215,9 +215,9 @@ export default function Stickers() {
                     </Button>
                   </a>
                   <Button
-                    variant="outline"
+                    variant={sticker.printful_order_id ? 'outline' : 'default'}
                     size="sm"
-                    className="rounded-lg"
+                    className={`rounded-lg ${!sticker.printful_order_id ? 'bg-yellow-400 hover:bg-yellow-500 text-yellow-950 border-yellow-400' : ''}`}
                     onClick={() => { setSelectedDesign(sticker.design_id || 'default'); setDesignDialog(sticker); }}
                   >
                     <Palette className="w-4 h-4 mr-1" /> {sticker.printful_order_id ? 'Design' : 'Claim'}
