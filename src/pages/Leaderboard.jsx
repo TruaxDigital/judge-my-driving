@@ -30,38 +30,37 @@ function getRatingBadge(rating) {
 
 export default function Leaderboard() {
   const [view, setView] = useState('public'); // 'public' | 'mine'
+  const [selectedScope, setSelectedScope] = useState('national');
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState('monthly');
 
   const { data: user } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
 
-  // Load all registered active stickers with feedback
-  const { data: allStickers = [], isLoading: stickersLoading } = useQuery({
-    queryKey: ['leaderboard-stickers'],
-    queryFn: () => base44.entities.Sticker.filter({ is_registered: true, status: 'active' }, '-average_rating', 100),
+  // Fetch pre-calculated leaderboard from cache
+  const { data: leaderboardCache = null, isLoading: cacheLoading } = useQuery({
+    queryKey: ['leaderboard-cache', selectedScope, selectedTimePeriod],
+    queryFn: async () => {
+      const results = await base44.entities.LeaderboardCache.filter({
+        scope: selectedScope,
+        time_period: selectedTimePeriod,
+      });
+      return results.length > 0 ? results[0] : null;
+    },
   });
 
-  // Filter for user's own stickers
-  const myStickers = allStickers.filter(s => s.owner_id === user?.id);
+  // Get rankings from cache
+  const rankings = leaderboardCache?.rankings || [];
 
-  const displayStickers = view === 'mine' ? myStickers : allStickers;
+  // Filter for user's own vehicles in the rankings
+  const myRank = view === 'mine' ? null : rankings.findIndex(r => r.driver_id === user?.id) + 1;
 
-  // Sort: by average_rating desc, then feedback_count desc, must have at least 1 feedback
-  const ranked = displayStickers
-    .filter(s => (s.feedback_count || 0) >= 1)
-    .sort((a, b) => {
-      const ratingDiff = (b.average_rating || 0) - (a.average_rating || 0);
-      if (ratingDiff !== 0) return ratingDiff;
-      return (b.feedback_count || 0) - (a.feedback_count || 0);
-    });
+  const displayRankings = view === 'mine' 
+    ? rankings.filter(r => r.driver_id === user?.id)
+    : rankings;
 
-  // My best sticker rank
-  const myBestRank = user
-    ? ranked.findIndex(s => s.owner_id === user.id) + 1
-    : null;
-
-  const isLoading = stickersLoading;
+  const isLoading = cacheLoading;
 
   return (
     <div className="space-y-6">
@@ -93,27 +92,60 @@ export default function Leaderboard() {
         </div>
       </div>
 
+      {/* Filters */}
+      {view === 'public' && (
+        <div className="flex flex-wrap gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">Scope</label>
+            <select
+              value={selectedScope}
+              onChange={(e) => setSelectedScope(e.target.value)}
+              className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+            >
+              <option value="national">National</option>
+              <option value="state:virginia">Virginia</option>
+              <option value="state:california">California</option>
+              <option value="state:texas">Texas</option>
+              <option value="state:florida">Florida</option>
+              <option value="state:new-york">New York</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground block mb-1">Time Period</label>
+            <select
+              value={selectedTimePeriod}
+              onChange={(e) => setSelectedTimePeriod(e.target.value)}
+              className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+            >
+              <option value="monthly">This Month</option>
+              <option value="quarterly">This Quarter</option>
+              <option value="alltime">All Time</option>
+            </select>
+          </div>
+        </div>
+      )}
+
       {/* My rank callout */}
-      {view === 'public' && myBestRank > 0 && (
+      {view === 'public' && myRank > 0 && (
         <div className="bg-primary/10 border border-primary/20 rounded-2xl px-5 py-4 flex items-center gap-3">
           <Shield className="w-5 h-5 text-primary shrink-0" />
           <p className="text-sm font-medium text-foreground">
-            Your best vehicle ranks <span className="text-primary font-bold">#{myBestRank}</span> out of {ranked.length} drivers.
-            {myBestRank === 1 && ' 🏆 You\'re #1!'}
-            {myBestRank <= 3 && myBestRank > 1 && ' 🎉 Top 3!'}
+            Your best vehicle ranks <span className="text-primary font-bold">#{myRank}</span> out of {rankings.length} drivers.
+            {myRank === 1 && ' 🏆 You\'re #1!'}
+            {myRank <= 3 && myRank > 1 && ' 🎉 Top 3!'}
           </p>
         </div>
       )}
 
       {/* Top 3 podium */}
-      {ranked.length >= 3 && view === 'public' && (
+      {rankings.length >= 3 && view === 'public' && (
         <div className="grid grid-cols-3 gap-3">
-          {[ranked[1], ranked[0], ranked[2]].map((s, i) => {
+          {[rankings[1], rankings[0], rankings[2]].map((r, i) => {
             const actualRank = i === 0 ? 2 : i === 1 ? 1 : 3;
             const heights = ['h-24', 'h-32', 'h-20'];
-            const badge = getRatingBadge(s.average_rating || 0);
+            const badge = getRatingBadge(r.avg_rating || 0);
             return (
-              <div key={s.id} className={cn(
+              <div key={r.driver_id} className={cn(
                 'bg-card border rounded-2xl flex flex-col items-center justify-end pb-4 pt-3 px-2 gap-1',
                 actualRank === 1 ? 'border-primary/40 shadow-lg' : 'border-border',
                 heights[i]
@@ -122,10 +154,10 @@ export default function Leaderboard() {
                 {actualRank === 2 && <Medal className="w-4 h-4 text-slate-400 mb-1" />}
                 {actualRank === 3 && <Medal className="w-4 h-4 text-amber-600 mb-1" />}
                 <p className="text-xs font-semibold text-foreground text-center truncate w-full text-center px-1">
-                  {s.driver_label || s.driver_name || `#${s.unique_code}`}
+                  {r.display_name}
                 </p>
-                <p className={cn('text-sm font-bold', getRatingColor(s.average_rating || 0))}>
-                  ★ {(s.average_rating || 0).toFixed(1)}
+                <p className={cn('text-sm font-bold', getRatingColor(r.avg_rating || 0))}>
+                  ★ {(r.avg_rating || 0).toFixed(1)}
                 </p>
               </div>
             );
@@ -139,7 +171,7 @@ export default function Leaderboard() {
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="bg-card border border-border rounded-2xl h-16 animate-pulse" />
           ))
-        ) : ranked.length === 0 ? (
+        ) : displayRankings.length === 0 ? (
           <div className="bg-card border border-border rounded-2xl p-12 text-center">
             <Trophy className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">
@@ -149,29 +181,28 @@ export default function Leaderboard() {
             </p>
           </div>
         ) : (
-          ranked.map((sticker, idx) => {
-            const rank = idx + 1;
-            const badge = getRatingBadge(sticker.average_rating || 0);
-            const isMe = sticker.owner_id === user?.id;
+          displayRankings.map((ranking) => {
+            const badge = getRatingBadge(ranking.avg_rating || 0);
+            const isMe = ranking.driver_id === user?.id;
             return (
               <div
-                key={sticker.id}
+                key={ranking.driver_id}
                 className={cn(
                   'bg-card border rounded-2xl px-5 py-4 flex items-center gap-4 transition-all',
                   isMe ? 'border-primary/30 bg-primary/5' : 'border-border',
-                  rank === 1 && 'shadow-md'
+                  ranking.rank === 1 && 'shadow-md'
                 )}
               >
                 {/* Rank */}
                 <div className="w-8 flex items-center justify-center shrink-0">
-                  {getRankIcon(rank)}
+                  {getRankIcon(ranking.rank)}
                 </div>
 
                 {/* Driver info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-foreground truncate">
-                      {sticker.driver_label || sticker.driver_name || `Vehicle ${sticker.unique_code}`}
+                      {ranking.display_name}
                     </p>
                     {isMe && (
                       <Badge variant="outline" className="text-xs border-primary/30 text-primary">
@@ -182,8 +213,8 @@ export default function Leaderboard() {
                       {badge.label}
                     </Badge>
                   </div>
-                  {sticker.fleet_group && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{sticker.fleet_group}</p>
+                  {ranking.location && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{ranking.location}</p>
                   )}
                 </div>
 
@@ -191,12 +222,12 @@ export default function Leaderboard() {
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right hidden sm:block">
                     <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
-                      <MessageSquare className="w-3 h-3" /> {sticker.feedback_count || 0} reviews
+                      <MessageSquare className="w-3 h-3" /> {ranking.scan_count || 0} reviews
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={cn('text-xl font-bold', getRatingColor(sticker.average_rating || 0))}>
-                      {(sticker.average_rating || 0).toFixed(1)}
+                    <p className={cn('text-xl font-bold', getRatingColor(ranking.avg_rating || 0))}>
+                      {(ranking.avg_rating || 0).toFixed(1)}
                     </p>
                     <div className="flex gap-0.5 justify-end">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -204,7 +235,7 @@ export default function Leaderboard() {
                           key={i}
                           className={cn(
                             'w-3 h-3',
-                            i < Math.round(sticker.average_rating || 0)
+                            i < Math.round(ranking.avg_rating || 0)
                               ? 'text-primary fill-primary'
                               : 'text-muted-foreground/30'
                           )}
@@ -219,7 +250,7 @@ export default function Leaderboard() {
         )}
       </div>
 
-      {ranked.length > 0 && (
+      {displayRankings.length > 0 && (
         <p className="text-center text-xs text-muted-foreground">
           Rankings based on average star rating. Minimum 1 review required to appear.
         </p>
