@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,13 @@ export default function QRCodeModal({ sticker, open, onClose }) {
   if (!sticker) return null;
 
   const qrUrl = `https://app.judgemydriving.com/scan/${sticker.unique_code}`;
+
+  React.useEffect(() => {
+    // Auto-open shipping form if sticker is unclaimed (yellow "Claim" button)
+    if (sticker && !sticker.printful_order_id) {
+      setShowAddress(true);
+    }
+  }, [sticker]);
 
   const handleDownload = () => {
     const svg = qrRef.current?.querySelector('svg');
