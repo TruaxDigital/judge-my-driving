@@ -157,6 +157,7 @@ export default function InsuranceReportGenerator() {
       </div>
 
       <div className="md:w-72 shrink-0 bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-2">
+        <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-1">Lower Your Premiums</p>
         <p className="text-sm font-semibold text-foreground">What's included in the report?</p>
         <ul className="space-y-1 text-xs text-muted-foreground">
           <li>• <strong>Page 1:</strong> Executive summary with KPIs and narrative</li>
