@@ -280,7 +280,17 @@ export default function FleetReports({ stickers, allFeedback, user }) {
       {/* 4. New Driver Onboarding (90 days) */}
       <SectionCard title="New Driver Onboarding (First 90 Days)" icon={UserPlus}>
         <p className="text-sm text-muted-foreground">
-          Drivers with a start date within the last 90 days. Set a start date on a sticker via the Vehicles tab to track onboarding.
+          Drivers with a start date within the last 90 days. Set a start date on a sticker via the{' '}
+          <button
+            onClick={() => {
+              // navigate up to FleetDashboard and switch tab
+              window.dispatchEvent(new CustomEvent('fleet-tab-change', { detail: 'vehicles' }));
+            }}
+            className="text-primary underline underline-offset-2 hover:no-underline font-medium"
+          >
+            Vehicles tab
+          </button>{' '}
+          to track onboarding.
         </p>
         {onboardingDrivers.length > 0 ? (
           <div className="space-y-2">
@@ -301,7 +311,16 @@ export default function FleetReports({ stickers, allFeedback, user }) {
             })}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">No drivers currently in onboarding. Set a start date on vehicle stickers to enable this tracking.</p>
+          <p className="text-sm text-muted-foreground">
+            No drivers currently in onboarding.{' '}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('fleet-tab-change', { detail: 'vehicles' }))}
+              className="text-primary underline underline-offset-2 hover:no-underline font-medium"
+            >
+              Go to Vehicles tab
+            </button>{' '}
+            to set a start date on vehicle stickers and enable this tracking.
+          </p>
         )}
       </SectionCard>
 

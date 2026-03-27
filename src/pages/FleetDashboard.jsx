@@ -35,6 +35,12 @@ const DATE_RANGES = [
 export default function FleetDashboard() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('analytics');
+
+  React.useEffect(() => {
+    const handler = (e) => setActiveTab(e.detail);
+    window.addEventListener('fleet-tab-change', handler);
+    return () => window.removeEventListener('fleet-tab-change', handler);
+  }, []);
   const [expandedGroups, setExpandedGroups] = useState({});
   const [editDialog, setEditDialog] = useState(null);
   const [editData, setEditData] = useState({});

@@ -18,8 +18,13 @@ export default function EnterpriseContactForm({ open, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.firstName || !form.lastName || !form.email || !form.company) {
+    if (!form.firstName || !form.lastName || !form.email || !form.company || !form.phone) {
       setError('Please fill in all required fields.');
+      return;
+    }
+    const digitsOnly = form.phone.replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
       return;
     }
     setLoading(true);
@@ -80,7 +85,7 @@ export default function EnterpriseContactForm({ open, onClose }) {
               <Input type="email" placeholder="jane@company.com" value={form.email} onChange={set('email')} />
             </div>
             <div className="space-y-1.5">
-              <Label>Phone</Label>
+              <Label>Phone <span className="text-destructive">*</span></Label>
               <Input type="tel" placeholder="(555) 000-0000" value={form.phone} onChange={set('phone')} />
             </div>
 
