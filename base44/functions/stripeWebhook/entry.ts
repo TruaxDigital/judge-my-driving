@@ -165,6 +165,57 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (event.type === 'customer.subscription.updated') {
+      const sub = event.data.object;
+      const meta = sub.metadata || {};
+      // Only handle upgrades we triggered
+      if (meta.type === 'upgrade' && meta.upgrade_to === 'family' && meta.user_id) {
+        const userId = meta.user_id;
+        const userEmail = meta.user_email;
+        const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+        const user = users[0];
+        const currentTier = user?.plan_tier;
+
+        if (currentTier !== 'family') {
+          // Family = 3 stickers total. Individual already had 1. Provision 2 more.
+          await base44.asServiceRole.entities.User.update(userId, {
+            plan_tier: 'family',
+            plan: 'personal',
+            sticker_credits: (user?.sticker_credits || 0) + 2,
+          });
+          await createStickers(base44, userId, userEmail, 2);
+          console.log(`Upgraded user ${userId} to family, provisioned 2 additional stickers`);
+
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: userEmail,
+            subject: 'You\'ve upgraded to the Family plan!',
+            body: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
+              <h2 style="color: #FACC15;">Welcome to the Family Plan!</h2>
+              <p>Your plan has been upgraded successfully. We've added 2 more sticker slots to your account (3 total).</p>
+              <p style="text-align: center; margin: 24px 0;">
+                <a href="https://app.judgemydriving.com/Stickers" style="background: #FACC15; color: #111; font-weight: bold; padding: 12px 28px; border-radius: 8px; text-decoration: none;">
+                  View Your Stickers →
+                </a>
+              </p>
+            </div>`,
+          });
+
+          try {
+            const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
+            await base44.asServiceRole.functions.invoke('syncToHubSpot', {
+              email: userEmail,
+              full_name: user?.full_name || '',
+              plan_tier: 'family',
+              last_purchase_date: new Date().toISOString().split('T')[0],
+              total_stickers: stickers.length,
+            });
+          } catch (hsErr) {
+            console.error('HubSpot sync failed (upgrade):', hsErr.message);
+          }
+        }
+      }
+    }
+
     if (event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object;
       if (invoice.subscription) {

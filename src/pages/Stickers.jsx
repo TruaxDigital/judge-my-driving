@@ -53,6 +53,22 @@ export default function Stickers() {
     setAddonLoading(false);
   };
 
+  const handleUpgrade = async () => {
+    if (isInIframe()) {
+      alert('Checkout is only available from the published app. Please open the app directly.');
+      return;
+    }
+    setAddonLoading(true);
+    const res = await base44.functions.invoke('createCheckoutSession', { mode: 'upgrade' });
+    if (res.data?.success) {
+      alert('Your plan has been upgraded to Family! Your 2 additional stickers are being prepared.');
+      window.location.reload();
+    } else {
+      alert(res.data?.error || 'Could not process upgrade. Please try again.');
+    }
+    setAddonLoading(false);
+  };
+
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
   const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
 
@@ -88,6 +104,12 @@ export default function Stickers() {
           <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          {user?.plan_tier === 'individual' && (
+            <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl">
+              {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+              Upgrade to Add Vehicles
+            </Button>
+          )}
           {['family', 'starter_fleet', 'professional_fleet'].includes(user?.plan_tier) && (
             <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}

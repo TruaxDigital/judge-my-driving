@@ -83,6 +83,33 @@ Deno.serve(async (req) => {
       return Response.json({ url: session.url });
     }
 
+    // Upgrade individual → family (direct subscription update, no new checkout)
+    if (mode === 'upgrade') {
+      const subId = user.stripe_subscription_id;
+      if (!subId) return Response.json({ error: 'No active subscription found.' }, { status: 400 });
+
+      const sub = await stripe.subscriptions.retrieve(subId);
+      const currentItemId = sub.items.data[0]?.id;
+      if (!currentItemId) return Response.json({ error: 'Could not find subscription item.' }, { status: 400 });
+
+      const newPriceId = PRICE_MAP['family'];
+
+      await stripe.subscriptions.update(subId, {
+        items: [{ id: currentItemId, price: newPriceId }],
+        proration_behavior: 'always_invoice',
+        metadata: {
+          base44_app_id: Deno.env.get('BASE44_APP_ID'),
+          user_id: user.id,
+          user_email: user.email,
+          upgrade_to: 'family',
+          type: 'upgrade',
+        },
+      });
+
+      console.log(`Upgraded user ${user.id} subscription ${subId} to family plan`);
+      return Response.json({ success: true });
+    }
+
     // New subscription
     const { plan_tier } = body;
     const priceId = PRICE_MAP[plan_tier];
