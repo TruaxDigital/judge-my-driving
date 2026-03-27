@@ -11,6 +11,7 @@ import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
 import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
+import ClaimStickerWizard from '../components/stickers/ClaimStickerWizard';
 import { cn, isInIframe } from '@/lib/utils';
 
 export default function Stickers() {
@@ -23,6 +24,7 @@ export default function Stickers() {
   const [replacementSticker, setReplacementSticker] = useState(null);
   const [addonLoading, setAddonLoading] = useState(false);
   const [claimLoading, setClaimLoading] = useState(false);
+  const [claimWizardStickers, setClaimWizardStickers] = useState([]);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -76,6 +78,13 @@ export default function Stickers() {
       await base44.functions.invoke('provisionMyStickers', {});
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       queryClient.invalidateQueries({ queryKey: ['me'] });
+      // Fetch fresh stickers to get the newly created one
+      const u = await base44.auth.me();
+      const allStickers = await base44.entities.Sticker.filter({ owner_id: u.id }, '-created_date');
+      const unclaimedNew = allStickers.filter(s => !s.printful_order_id && !s.design_id);
+      if (unclaimedNew.length > 0) {
+        setClaimWizardStickers([unclaimedNew[0]]);
+      }
     } catch (err) {
       alert('Failed to claim sticker. Please try again.');
     }
@@ -253,7 +262,14 @@ export default function Stickers() {
                     variant={sticker.printful_order_id ? 'outline' : 'default'}
                     size="sm"
                     className={`rounded-lg ${!sticker.printful_order_id ? 'bg-yellow-400 hover:bg-yellow-500 text-yellow-950 border-yellow-400' : ''}`}
-                    onClick={() => { setSelectedDesign(sticker.design_id || 'default'); setDesignDialog(sticker); }}
+                    onClick={() => {
+                      if (sticker.printful_order_id) {
+                        setSelectedDesign(sticker.design_id || 'default');
+                        setDesignDialog(sticker);
+                      } else {
+                        setClaimWizardStickers([sticker]);
+                      }
+                    }}
                   >
                     <Palette className="w-4 h-4 mr-1" /> {sticker.printful_order_id ? 'Design' : 'Claim'}
                   </Button>
@@ -353,6 +369,17 @@ export default function Stickers() {
         sticker={replacementSticker}
         open={!!replacementSticker}
         onClose={() => setReplacementSticker(null)}
+      />
+
+      {/* Claim Sticker Wizard */}
+      <ClaimStickerWizard
+        stickers={claimWizardStickers}
+        open={claimWizardStickers.length > 0}
+        onClose={() => setClaimWizardStickers([])}
+        onComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
+          queryClient.invalidateQueries({ queryKey: ['me'] });
+        }}
       />
     </div>
   );
