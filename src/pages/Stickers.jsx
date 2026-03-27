@@ -25,6 +25,7 @@ export default function Stickers() {
   const [selectedDesign, setSelectedDesign] = useState('default');
   const [replacementSticker, setReplacementSticker] = useState(null);
   const [claimWizardOpen, setClaimWizardOpen] = useState(false);
+  const [provisioning, setProvisioning] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -48,6 +49,16 @@ export default function Stickers() {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [isLoading, stickers.length]);
+
+  const handleOpenWizardWithProvisioning = async () => {
+    if (pendingCredits > 0 && unclaimedStickers.length === 0) {
+      setProvisioning(true);
+      await base44.functions.invoke('provisionMyStickers', {});
+      await queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
+      setProvisioning(false);
+    }
+    setClaimWizardOpen(true);
+  };
 
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
   const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
@@ -122,12 +133,15 @@ export default function Stickers() {
         <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between gap-4">
           <div>
             <p className="font-semibold text-foreground text-sm">
-              🎉 You have {pendingCredits} sticker credit{pendingCredits > 1 ? 's' : ''} available!
+              🎉 You have {pendingCredits} sticker credit{pendingCredits > 1 ? 's' : ''} ready to order!
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Contact support or your account manager to get your stickers created.
+              Choose a design and provide your shipping address and we'll print & ship {pendingCredits > 1 ? 'them' : 'it'} to you.
             </p>
           </div>
+          <Button size="sm" className="rounded-xl shrink-0" onClick={handleOpenWizardWithProvisioning} disabled={provisioning}>
+            {provisioning ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Order Now'}
+          </Button>
         </div>
       )}
 
