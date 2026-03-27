@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Loader2, Truck, User, Users, Star, Mail } from 'lucide-react';
 import { cn, isInIframe } from '@/lib/utils';
+import EnterpriseContactForm from '@/components/pricing/EnterpriseContactForm';
 
 const PLANS = [
   {
@@ -60,6 +61,7 @@ const PLANS = [
 export default function Pricing() {
   const [loading, setLoading] = useState(null);
   const [contactSent, setContactSent] = useState(false);
+  const [enterpriseFormOpen, setEnterpriseFormOpen] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
 
   const { data: user } = useQuery({
@@ -94,13 +96,8 @@ export default function Pricing() {
     setLoading(null);
   };
 
-  const handleEnterprise = async () => {
-    await base44.integrations.Core.SendEmail({
-      to: 'hello@judgemydriving.com',
-      subject: 'Enterprise Fleet Inquiry',
-      body: `<p>New enterprise inquiry from: ${user?.email || 'unknown'} (${user?.full_name || ''})</p>`,
-    });
-    setContactSent(true);
+  const handleEnterprise = () => {
+    setEnterpriseFormOpen(true);
   };
 
   return (
@@ -177,18 +174,14 @@ export default function Pricing() {
             <p className="text-muted-foreground">Starting at $3,499/year. Custom pricing, full custom branding, API access, phone support, unlimited admin seats.</p>
           </div>
           <div className="shrink-0">
-            {contactSent ? (
-              <div className="flex items-center gap-2 text-green-600 font-medium">
-                <CheckCircle className="w-5 h-5" /> Message sent! We'll be in touch.
-              </div>
-            ) : (
-              <Button onClick={handleEnterprise} variant="outline" className="rounded-xl h-11 px-6">
-                <Mail className="w-4 h-4 mr-2" /> Contact Sales
-              </Button>
-            )}
+            <Button onClick={handleEnterprise} variant="outline" className="rounded-xl h-11 px-6">
+              <Mail className="w-4 h-4 mr-2" /> Contact Sales
+            </Button>
           </div>
         </div>
       </div>
+
+      <EnterpriseContactForm open={enterpriseFormOpen} onClose={() => setEnterpriseFormOpen(false)} />
 
       {/* Replacement note */}
       <p className="text-center text-sm text-muted-foreground">
