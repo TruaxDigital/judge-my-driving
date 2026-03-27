@@ -35,7 +35,6 @@ const DATE_RANGES = [
 export default function FleetDashboard() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('analytics');
-  const [incidentFilter, setIncidentFilter] = useState('all');
 
   React.useEffect(() => {
     const handler = (e) => setActiveTab(e.detail);
@@ -272,32 +271,14 @@ export default function FleetDashboard() {
           )}
 
           <div>
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-              <h2 className="text-lg font-semibold text-foreground">Open Safety Incidents</h2>
-              <Select value={incidentFilter} onValueChange={setIncidentFilter}>
-                <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Incidents</SelectItem>
-                  <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="follow_up">Follow Up</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Open Safety Incidents</h2>
             {filteredFeedback.filter(f => f.safety_flag).length === 0 ? (
               <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
                 No safety incidents in the selected period. 🎉
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredFeedback.filter(f => f.safety_flag).filter(incident => {
-                  if (incidentFilter === 'all') return true;
-                  const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
-                  if (incidentFilter === 'resolved') return action?.status === 'Resolved';
-                  if (incidentFilter === 'follow_up') return action?.status === 'In Progress';
-                  if (incidentFilter === 'open') return !action || action.status === 'Open';
-                  return true;
-                }).map(incident => {
+                {filteredFeedback.filter(f => f.safety_flag).map(incident => {
                   const sticker = stickers.find(s => s.id === incident._stickerId);
                   const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
                   return (
