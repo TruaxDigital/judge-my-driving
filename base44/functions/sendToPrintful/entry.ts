@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 // Printful sticker product variant ID for 4x4" kiss-cut sticker
 // Printful product 358 = Kiss-Cut Stickers, variant 9706 = 4"x4"
-const STICKER_VARIANT_ID = 9706;
+const STICKER_VARIANT_ID = 16362;
 const PRINTFUL_API = 'https://api.printful.com';
 
 async function printfulRequest(method, path, body) {
@@ -74,9 +74,6 @@ Deno.serve(async (req) => {
         {
           variant_id: STICKER_VARIANT_ID,
           quantity: 1,
-          options: [
-            { id: 'stitch_color', value: 'white' },
-          ],
           files: [
             {
               type: 'default',
