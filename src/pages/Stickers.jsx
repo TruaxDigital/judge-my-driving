@@ -6,27 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck, Palette, RefreshCw, PlusCircle } from 'lucide-react';
+import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, PackageCheck, Palette, RefreshCw, PlusCircle } from 'lucide-react';
 import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
 import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
-import ClaimStickerWizard from '../components/stickers/ClaimStickerWizard';
 import { cn, isInIframe } from '@/lib/utils';
 
 export default function Stickers() {
   const queryClient = useQueryClient();
   const [editDialog, setEditDialog] = useState(null);
   const [editLabel, setEditLabel] = useState('');
-  const [claimDialog, setClaimDialog] = useState(false);
-  const [claimCode, setClaimCode] = useState('');
-  const [claimError, setClaimError] = useState('');
   const [qrSticker, setQrSticker] = useState(null);
   const [designDialog, setDesignDialog] = useState(null);
   const [selectedDesign, setSelectedDesign] = useState('default');
   const [replacementSticker, setReplacementSticker] = useState(null);
-  const [claimWizardOpen, setClaimWizardOpen] = useState(false);
-  const [provisioning, setProvisioning] = useState(false);
   const [addonLoading, setAddonLoading] = useState(false);
 
   const { data: user } = useQuery({
@@ -41,16 +35,6 @@ export default function Stickers() {
       return base44.entities.Sticker.filter({ owner_id: u.id }, '-created_date');
     },
   });
-
-  // Auto-open claim wizard after a new subscription purchase
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('sub_success') === 'true' && !isLoading && stickers.length > 0) {
-      setClaimWizardOpen(true);
-      // Clean up URL
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [isLoading, stickers.length]);
 
   const handleOrderMore = async () => {
     if (isInIframe()) {
@@ -69,47 +53,8 @@ export default function Stickers() {
     setAddonLoading(false);
   };
 
-  const handleOpenWizardWithProvisioning = async () => {
-    if (pendingCredits > 0 && unclaimedStickers.length === 0) {
-      setProvisioning(true);
-      await base44.functions.invoke('provisionMyStickers', {});
-      await queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
-      setProvisioning(false);
-    }
-    setClaimWizardOpen(true);
-  };
-
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
   const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
-
-  // Credits available but no sticker records exist yet for them
-  const pendingCredits = Math.max(0, (user?.sticker_credits || 0) - unclaimedStickers.length);
-
-  const claimMutation = useMutation({
-    mutationFn: async () => {
-      setClaimError('');
-      const code = claimCode.trim().toUpperCase();
-      const user = await base44.auth.me();
-      const results = await base44.entities.Sticker.filter({ unique_code: code });
-
-      if (results.length === 0) throw new Error('No sticker found with that code. Double-check and try again.');
-      const sticker = results[0];
-      if (sticker.is_registered) throw new Error('This sticker is already registered to an account.');
-
-      return base44.entities.Sticker.update(sticker.id, {
-        owner_id: user.id,
-        owner_email: user.email,
-        is_registered: true,
-        status: 'active',
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
-      setClaimDialog(false);
-      setClaimCode('');
-    },
-    onError: (e) => setClaimError(e.message),
-  });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
@@ -143,47 +88,26 @@ export default function Stickers() {
           <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
-            {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
-            Order New Sticker
-          </Button>
-          <Button onClick={() => { setClaimCode(''); setClaimError(''); setClaimDialog(true); }} className="rounded-xl">
-            <ScanLine className="w-4 h-4 mr-2" /> Claim a Sticker
-          </Button>
+          {['family', 'starter_fleet', 'professional_fleet'].includes(user?.plan_tier) && (
+            <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
+              {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+              Order Additional Vehicle
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Banner for credit holders with no sticker records yet */}
-      {pendingCredits > 0 && unclaimedStickers.length === 0 && (
-        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="font-semibold text-foreground text-sm">
-              🎉 You have {pendingCredits} sticker credit{pendingCredits > 1 ? 's' : ''} ready to order!
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Choose a design and provide your shipping address and we'll print & ship {pendingCredits > 1 ? 'them' : 'it'} to you.
-            </p>
-          </div>
-          <Button size="sm" className="rounded-xl shrink-0" onClick={handleOpenWizardWithProvisioning} disabled={provisioning}>
-            {provisioning ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Order Now'}
-          </Button>
-        </div>
-      )}
-
-      {/* Banner for unclaimed stickers */}
+      {/* Banner for unclaimed stickers (not yet sent to Printful) */}
       {unclaimedStickers.length > 0 && (
-        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center gap-4">
           <div>
             <p className="font-semibold text-foreground text-sm">
-              🎉 You have {unclaimedStickers.length} sticker{unclaimedStickers.length > 1 ? 's' : ''} ready to claim!
+              🎉 You have {unclaimedStickers.length} sticker{unclaimedStickers.length > 1 ? 's' : ''} ready to configure and ship!
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Choose a design and provide your shipping address and we'll print & ship {unclaimedStickers.length > 1 ? 'them' : 'it'} to you.
+              Use the Design button on each sticker below to choose a design and enter your shipping address.
             </p>
           </div>
-          <Button size="sm" className="rounded-xl shrink-0" onClick={() => setClaimWizardOpen(true)}>
-            Claim Now
-          </Button>
         </div>
       )}
 
@@ -195,12 +119,9 @@ export default function Stickers() {
           <div>
             <p className="font-semibold text-foreground">No stickers yet</p>
             <p className="text-muted-foreground text-sm mt-1">
-              Once you receive your sticker in the mail, scan the QR code on it or enter the code below to link it to your account.
+              Your stickers will appear here automatically after subscribing. Visit the Pricing page to get started.
             </p>
           </div>
-          <Button onClick={() => { setClaimCode(''); setClaimError(''); setClaimDialog(true); }} variant="outline" className="rounded-xl">
-            <ScanLine className="w-4 h-4 mr-2" /> Claim a Sticker
-          </Button>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -292,42 +213,6 @@ export default function Stickers() {
         </div>
       )}
 
-      {/* Claim Dialog */}
-      <Dialog open={claimDialog} onOpenChange={setClaimDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Claim Your Sticker</DialogTitle>
-            <DialogDescription>
-              Enter the unique code printed on your sticker, or simply scan its QR code with your phone camera.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label>Sticker Code</Label>
-              <Input
-                placeholder="e.g. JMD8K3NP"
-                value={claimCode}
-                onChange={(e) => setClaimCode(e.target.value.toUpperCase())}
-                className="font-mono text-lg tracking-widest"
-                maxLength={8}
-              />
-              {claimError && (
-                <p className="text-sm text-destructive">{claimError}</p>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setClaimDialog(false)}>Cancel</Button>
-            <Button
-              onClick={() => claimMutation.mutate()}
-              disabled={claimCode.trim().length < 6 || claimMutation.isPending}
-            >
-              {claimMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Claim Sticker'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* QR Code Modal */}
       <QRCodeModal sticker={qrSticker} open={!!qrSticker} onClose={() => setQrSticker(null)} />
 
@@ -389,14 +274,6 @@ export default function Stickers() {
         sticker={replacementSticker}
         open={!!replacementSticker}
         onClose={() => setReplacementSticker(null)}
-      />
-
-      {/* Claim Sticker Wizard */}
-      <ClaimStickerWizard
-        stickers={unclaimedStickers}
-        open={claimWizardOpen}
-        onClose={() => setClaimWizardOpen(false)}
-        onComplete={() => queryClient.invalidateQueries({ queryKey: ['my-stickers'] })}
       />
     </div>
   );

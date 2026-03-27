@@ -3,6 +3,7 @@ import Stripe from 'npm:stripe@14.21.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+// Main subscription plan prices
 const PRICE_MAP = {
   individual:         'price_1TEytxPRtZZpxDXapf6My9d1',
   family:             'price_1TEytwPRtZZpxDXaABsJ4zGy',
@@ -10,12 +11,22 @@ const PRICE_MAP = {
   professional_fleet: 'price_1TEytvPRtZZpxDXaUKUtslV0',
 };
 
-const ADDON_PRICES = {
-  individual:         2900,
-  family:             2900,
-  starter_fleet:      8900,
-  professional_fleet: 7900,
+// Additional sticker subscription prices (per year)
+const ADDON_PRICE_MAP = {
+  family:             'price_1TFb5aPRtZZpxDXa1rhuMy6h', // $29/year
+  starter_fleet:      'price_1TFb5aPRtZZpxDXal5tdqzv5', // $79/year
+  professional_fleet: 'price_1TFb5aPRtZZpxDXal5tdqzv5', // $79/year
 };
+
+// Replacement sticker one-time price
+const REPLACEMENT_PRICE_ID = 'price_1TFb5aPRtZZpxDXa2dYghLsC'; // $19 one-time
+
+async function getOrCreateCustomer(stripe, base44, user) {
+  if (user.stripe_customer_id) return user.stripe_customer_id;
+  const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
+  await base44.auth.updateMe({ stripe_customer_id: customer.id });
+  return customer.id;
+}
 
 Deno.serve(async (req) => {
   try {
@@ -24,23 +35,21 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { plan_tier, mode, success_url, cancel_url, discount_code } = body;
+    const { mode, success_url, cancel_url, discount_code } = body;
 
-    // Addon sticker purchase (one-time) — new QR code, not a replacement
+    // Additional sticker subscription (family or fleet only)
     if (mode === 'addon') {
-      const addonPrice = ADDON_PRICES[body.plan_tier || user.plan_tier] || 1999; // default $19.99 for all account levels
-
-      let customerId = user.stripe_customer_id;
-      if (!customerId) {
-        const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
-        customerId = customer.id;
-        await base44.auth.updateMe({ stripe_customer_id: customerId });
+      const planTier = user.plan_tier;
+      const priceId = ADDON_PRICE_MAP[planTier];
+      if (!priceId) {
+        return Response.json({ error: 'Additional stickers are not available for your plan.' }, { status: 400 });
       }
 
+      const customerId = await getOrCreateCustomer(stripe, base44, user);
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
-        mode: 'payment',
-        line_items: [{ price_data: { currency: 'usd', unit_amount: addonPrice, product_data: { name: 'Additional Sticker (New QR Code)' } }, quantity: 1 }],
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: 1 }],
         success_url: success_url || `${req.headers.get('origin')}/Stickers?addon_success=true`,
         cancel_url: cancel_url || `${req.headers.get('origin')}/Stickers`,
         metadata: {
@@ -53,19 +62,14 @@ Deno.serve(async (req) => {
       return Response.json({ url: session.url });
     }
 
-    // Replacement sticker ($29)
+    // Replacement sticker ($19 one-time, same QR code)
     if (mode === 'replacement') {
       const { sticker_id } = body;
-      let customerId = user.stripe_customer_id;
-      if (!customerId) {
-        const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
-        customerId = customer.id;
-        await base44.auth.updateMe({ stripe_customer_id: customerId });
-      }
+      const customerId = await getOrCreateCustomer(stripe, base44, user);
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'payment',
-        line_items: [{ price_data: { currency: 'usd', unit_amount: 1999, product_data: { name: 'Replacement Sticker (Same QR Code)' } }, quantity: 1 }],
+        line_items: [{ price: REPLACEMENT_PRICE_ID, quantity: 1 }],
         success_url: success_url || `${req.headers.get('origin')}/Stickers?replacement_success=true`,
         cancel_url: cancel_url || `${req.headers.get('origin')}/Stickers`,
         metadata: {
@@ -80,17 +84,12 @@ Deno.serve(async (req) => {
     }
 
     // New subscription
+    const { plan_tier } = body;
     const priceId = PRICE_MAP[plan_tier];
     if (!priceId) return Response.json({ error: 'Invalid plan' }, { status: 400 });
 
-    let customerId = user.stripe_customer_id;
-    if (!customerId) {
-      const customer = await stripe.customers.create({ email: user.email, name: user.full_name });
-      customerId = customer.id;
-      await base44.auth.updateMe({ stripe_customer_id: customerId });
-    }
+    const customerId = await getOrCreateCustomer(stripe, base44, user);
 
-    // Look up Stripe coupon for discount code
     let discounts = undefined;
     if (discount_code) {
       try {

@@ -3,6 +3,7 @@ import Stripe from 'npm:stripe@14.21.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
+// How many stickers each plan gets on signup
 const PLAN_STICKER_COUNT = {
   individual:         1,
   family:             3,
@@ -77,6 +78,7 @@ Deno.serve(async (req) => {
         const planTier = meta.plan_tier;
         const subId = session.subscription;
         const subscription = await stripe.subscriptions.retrieve(subId);
+        const count = PLAN_STICKER_COUNT[planTier] || 1;
 
         const isFleetPlan = ['starter_fleet', 'professional_fleet', 'enterprise_fleet'].includes(planTier);
         await base44.asServiceRole.entities.User.update(userId, {
@@ -85,11 +87,11 @@ Deno.serve(async (req) => {
           role: isFleetPlan ? 'fleet_admin' : 'user',
           stripe_subscription_id: subId,
           subscription_status: 'active',
+          sticker_credits: count,
           subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),
           subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
         });
 
-        const count = PLAN_STICKER_COUNT[planTier] || 1;
         await createStickers(base44, userId, userEmail, count);
 
         // Sync to HubSpot
@@ -111,14 +113,14 @@ Deno.serve(async (req) => {
         // Welcome email
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: userEmail,
-          subject: 'Welcome to Judge My Driving! Claim your sticker(s)',
+          subject: 'Welcome to Judge My Driving! Your sticker(s) are ready',
           body: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
             <h2 style="color: #FACC15;">Welcome to Judge My Driving!</h2>
             <p>Your <strong>${planTier.replace(/_/g, ' ')}</strong> plan is now active.</p>
-            <p>Your sticker${count > 1 ? 's are' : ' is'} ready to be claimed! Visit your Stickers page to choose a design and enter your shipping address — we'll print and ship ${count > 1 ? 'them' : 'it'} to you right away.</p>
+            <p>Your sticker${count > 1 ? 's are' : ' is'} ready! Visit your Stickers page to choose a design and enter your shipping address — we'll print and ship ${count > 1 ? 'them' : 'it'} to you right away.</p>
             <p style="text-align: center; margin: 24px 0;">
-              <a href="https://app.judgemydriving.com/Stickers?sub_success=true" style="background: #FACC15; color: #111; font-weight: bold; padding: 12px 28px; border-radius: 8px; text-decoration: none;">
-                Claim Your Sticker${count > 1 ? 's' : ''} →
+              <a href="https://app.judgemydriving.com/Stickers" style="background: #FACC15; color: #111; font-weight: bold; padding: 12px 28px; border-radius: 8px; text-decoration: none;">
+                Get Your Sticker${count > 1 ? 's' : ''} →
               </a>
             </p>
             <h3>After your sticker arrives:</h3>
@@ -129,16 +131,20 @@ Deno.serve(async (req) => {
             </ol>
           </div>`,
         });
-        console.log(`New subscription created for user ${userId}, plan: ${planTier}, ${count} stickers created`);
+        console.log(`New subscription for user ${userId}, plan: ${planTier}, ${count} stickers created`);
       }
 
       if (meta.type === 'addon_sticker') {
+        // Add 1 sticker credit and create the sticker record
+        const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+        const user = users[0];
+        const currentCredits = user?.sticker_credits || 0;
+        await base44.asServiceRole.entities.User.update(userId, { sticker_credits: currentCredits + 1 });
         await createStickers(base44, userId, userEmail, 1);
         console.log(`Add-on sticker created for user ${userId}`);
+
         // Sync to HubSpot
         try {
-          const users = await base44.asServiceRole.entities.User.filter({ id: userId });
-          const user = users[0];
           const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
           await base44.asServiceRole.functions.invoke('syncToHubSpot', {
             email: userEmail,
@@ -153,12 +159,9 @@ Deno.serve(async (req) => {
       }
 
       if (meta.type === 'replacement_sticker') {
-        const oldStickerId = meta.sticker_id;
-        if (oldStickerId) {
-          await base44.asServiceRole.entities.Sticker.update(oldStickerId, { status: 'deactivated' });
-        }
-        await createStickers(base44, userId, userEmail, 1);
-        console.log(`Replacement sticker created for user ${userId}`);
+        // Replacement: same QR code, just needs a new physical sticker printed
+        // We don't create a new sticker record — the existing one stays active
+        console.log(`Replacement sticker purchased for user ${userId}, sticker_id: ${meta.sticker_id}`);
       }
     }
 
@@ -166,7 +169,6 @@ Deno.serve(async (req) => {
       const invoice = event.data.object;
       if (invoice.subscription) {
         const sub = await stripe.subscriptions.retrieve(invoice.subscription);
-        // Find user by stripe_customer_id
         const users = await base44.asServiceRole.entities.User.filter({ stripe_customer_id: invoice.customer });
         if (users.length > 0) {
           await base44.asServiceRole.entities.User.update(users[0].id, {
@@ -174,7 +176,6 @@ Deno.serve(async (req) => {
             subscription_end_date: new Date(sub.current_period_end * 1000).toISOString(),
           });
           console.log(`Subscription renewed for user ${users[0].id}`);
-          // Sync to HubSpot on renewal
           try {
             const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: users[0].id });
             await base44.asServiceRole.functions.invoke('syncToHubSpot', {
@@ -202,7 +203,7 @@ Deno.serve(async (req) => {
           body: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
             <h2 style="color: #ef4444;">Payment Failed</h2>
             <p>We couldn't process your annual subscription payment for Judge My Driving.</p>
-            <p>Please update your payment method to keep your stickers active. If payment remains failed for 30 days, your stickers will be deactivated.</p>
+            <p>Please update your payment method to keep your stickers active.</p>
             <p><a href="https://app.judgemydriving.com/Settings" style="color: #FACC15;">Update payment method →</a></p>
           </div>`,
         });
@@ -216,7 +217,6 @@ Deno.serve(async (req) => {
       if (users.length > 0) {
         const userId = users[0].id;
         await base44.asServiceRole.entities.User.update(userId, { subscription_status: 'canceled' });
-        // Deactivate all stickers
         const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
         for (const s of stickers) {
           if (s.status === 'active') {
