@@ -44,7 +44,7 @@ export default function ScanSticker() {
 
       if (s.status === 'deactivated') {
         setError('This sticker has been deactivated');
-      } else if (!s.is_registered) {
+      } else if (!s.owner_id) {
         setView('register');
       } else {
         setView('feedback');
