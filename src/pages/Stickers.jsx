@@ -113,7 +113,7 @@ export default function Stickers() {
           {(['family', 'starter_fleet', 'professional_fleet'].includes(user?.plan_tier) || user?.plan === 'fleet') && (
             <Button variant="outline" onClick={handleOrderMore} disabled={addonLoading} className="rounded-xl">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
-              Order Additional Vehicle
+              Order Additional Vehicle Sticker
             </Button>
           )}
         </div>
