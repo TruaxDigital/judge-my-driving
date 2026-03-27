@@ -59,6 +59,17 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
 
     if (res.data?.error) {
       console.error('Feedback submission error:', res.data.error);
+    } else if (!isPreview) {
+      base44.analytics.track({
+        eventName: 'feedback_submitted',
+        properties: {
+          sticker_code: sticker.unique_code,
+          rating,
+          has_comment: !!comment,
+          safety_flag: safetyFlag,
+          has_location: !!location,
+        },
+      });
     }
 
     onSubmitted(rating, safetyFlag);
