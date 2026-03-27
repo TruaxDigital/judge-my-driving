@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import {
   Mail, TrendingUp, TrendingDown, Minus, FileText, UserPlus,
-  Trophy, Flame, Globe, Loader2, CheckCircle, Star, ShieldAlert, AlertTriangle
+  Trophy, Flame, Globe, Loader2, CheckCircle, Star, ShieldAlert, AlertTriangle, Code, Copy, Check
 } from 'lucide-react';
 import moment from 'moment';
 import { cn } from '@/lib/utils';
@@ -64,12 +64,40 @@ function SectionCard({ title, icon: Icon, children }) {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
+function buildEmbedCode({ label, avg, reviewCount, comments = [] }) {
+  const stars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+  const commentsHtml = comments.length > 0
+    ? comments.map(c => `<div style="font-style:italic;color:#555;font-size:13px;border-left:3px solid #f5c000;padding-left:10px;margin-top:8px">"${c}"</div>`).join('')
+    : '';
+  return `<!-- Judge My Driving Scorecard Widget -->
+<div style="font-family:sans-serif;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px 24px;max-width:320px;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+    <img src="https://app.judgemydriving.com/jmd-logo.png" alt="Judge My Driving" style="height:28px" onerror="this.style.display='none'" />
+    <span style="font-weight:700;font-size:15px;color:#111">${label}</span>
+  </div>
+  <div style="font-size:28px;font-weight:800;color:#111">${avg} <span style="font-size:18px;color:#f5c000">${stars}</span></div>
+  <div style="font-size:13px;color:#666;margin-top:2px">Based on ${reviewCount} verified review${reviewCount !== 1 ? 's' : ''}</div>
+  ${commentsHtml}
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;font-size:11px;color:#999">
+    Powered by <a href="https://judgemydriving.com" target="_blank" style="color:#f5c000;font-weight:600;text-decoration:none">Judge My Driving</a> — Real feedback from real drivers on the road.
+  </div>
+</div>`;
+}
+
 export default function FleetReports({ stickers, allFeedback, user }) {
   const [sendingReport, setSendingReport] = useState(false);
   const [reportSent, setReportSent] = useState(false);
   const [reportDialog, setReportDialog] = useState(false);
   const [reportEmails, setReportEmails] = useState('');
   const [reportPeriod, setReportPeriod] = useState('monthly');
+  const [embedDialog, setEmbedDialog] = useState(null); // { code, title }
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Driver improvement tracking
   const driverTrends = useMemo(() => {
@@ -357,12 +385,29 @@ export default function FleetReports({ stickers, allFeedback, user }) {
             .slice(0, 3);
           return fleetWideAvg ? (
             <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-3">
-              <div className="text-center space-y-1">
-                <p className="text-2xl font-bold text-foreground">⭐ {fleetWideAvg} / 5</p>
-                <p className="text-sm text-muted-foreground">Fleet-wide average across all {stickers.length} vehicle{stickers.length !== 1 ? 's' : ''} · {totalFb.length} total reviews</p>
-                <p className="text-xs text-muted-foreground font-mono bg-white/60 rounded px-2 py-1 mt-1 inline-block">
-                  "Our drivers are rated {fleetWideAvg}/5 — Judge My Driving"
-                </p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-foreground">⭐ {fleetWideAvg} / 5</p>
+                  <p className="text-sm text-muted-foreground">Fleet-wide average across all {stickers.length} vehicle{stickers.length !== 1 ? 's' : ''} · {totalFb.length} total reviews</p>
+                  <p className="text-xs text-muted-foreground font-mono bg-white/60 rounded px-2 py-1 inline-block">
+                    "Our drivers are rated {fleetWideAvg}/5 — Judge My Driving"
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEmbedDialog({
+                    title: 'Fleet-Wide Scorecard Widget',
+                    code: buildEmbedCode({
+                      label: 'Our Fleet',
+                      avg: fleetWideAvg,
+                      reviewCount: totalFb.length,
+                      comments: recentComments.slice(0, 2).map(f => f.comment),
+                    })
+                  })}
+                  className="shrink-0 p-2 rounded-lg border border-primary/30 bg-white/60 text-primary hover:bg-white transition-all"
+                  title="Get embed code"
+                >
+                  <Code className="w-4 h-4" />
+                </button>
               </div>
               {recentComments.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-primary/10">
@@ -396,17 +441,36 @@ export default function FleetReports({ stickers, allFeedback, user }) {
                     <p className="text-sm font-medium text-foreground">{s.driver_label || s.driver_name || 'Unnamed Vehicle'}</p>
                     {avg && <p className="text-xs text-muted-foreground">{avg} avg · {fb.length} reviews</p>}
                   </div>
-                  <button
-                    onClick={() => base44.entities.Sticker.update(s.id, { public_scorecard: !s.public_scorecard })}
-                    className={cn(
-                      'text-xs font-medium px-3 py-1.5 rounded-lg border transition-all shrink-0',
-                      s.public_scorecard
-                        ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'
-                        : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
+                  <div className="flex items-center gap-2 shrink-0">
+                    {avg && (
+                      <button
+                        onClick={() => setEmbedDialog({
+                          title: `${s.driver_label || s.driver_name || 'Driver'} Scorecard Widget`,
+                          code: buildEmbedCode({
+                            label: s.driver_label || s.driver_name || 'Our Driver',
+                            avg,
+                            reviewCount: fb.length,
+                            comments: recentComment ? [recentComment.comment] : [],
+                          })
+                        })}
+                        className="p-1.5 rounded-lg border border-border bg-background text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
+                        title="Get embed code"
+                      >
+                        <Code className="w-3.5 h-3.5" />
+                      </button>
                     )}
-                  >
-                    {s.public_scorecard ? '✓ Public' : 'Make Public'}
-                  </button>
+                    <button
+                      onClick={() => base44.entities.Sticker.update(s.id, { public_scorecard: !s.public_scorecard })}
+                      className={cn(
+                        'text-xs font-medium px-3 py-1.5 rounded-lg border transition-all',
+                        s.public_scorecard
+                          ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20'
+                          : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
+                      )}
+                    >
+                      {s.public_scorecard ? '✓ Public' : 'Make Public'}
+                    </button>
+                  </div>
                 </div>
                 {recentComment && (
                   <p className="text-xs text-muted-foreground italic border-l-2 border-primary/20 pl-2">
@@ -418,6 +482,24 @@ export default function FleetReports({ stickers, allFeedback, user }) {
           })}
         </div>
       </SectionCard>
+
+      {/* Embed Code Dialog */}
+      <Dialog open={!!embedDialog} onOpenChange={() => setEmbedDialog(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Code className="w-4 h-4 text-primary" /> {embedDialog?.title}</DialogTitle>
+            <DialogDescription>Paste this snippet anywhere on your website. It includes your rating, recent reviews, and a Judge My Driving badge.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <pre className="bg-muted rounded-xl p-4 text-xs text-foreground overflow-x-auto whitespace-pre-wrap break-all max-h-64 overflow-y-auto">
+              {embedDialog?.code}
+            </pre>
+            <Button className="w-full rounded-xl" onClick={() => handleCopy(embedDialog?.code)}>
+              {copied ? <><Check className="w-4 h-4 mr-2" /> Copied!</> : <><Copy className="w-4 h-4 mr-2" /> Copy Embed Code</>}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Send Report Dialog */}
       <Dialog open={reportDialog} onOpenChange={setReportDialog}>
