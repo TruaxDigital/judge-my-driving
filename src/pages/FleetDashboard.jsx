@@ -298,14 +298,21 @@ export default function FleetDashboard() {
               <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
                 No safety incidents in the selected period. 🎉
               </div>
-            ) : (
+            ) : (() => {
+              const visibleIncidents = filteredFeedback.filter(f => f.safety_flag).filter(incident => {
+                if (incidentFilter === 'all') return true;
+                const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
+                const status = action?.status || 'Open';
+                return status === incidentFilter;
+              });
+              if (visibleIncidents.length === 0) return (
+                <div className="bg-card border border-border rounded-2xl p-8 text-center text-muted-foreground text-sm">
+                  No incidents found 🎉
+                </div>
+              );
+              return (
               <div className="space-y-3">
-                {filteredFeedback.filter(f => f.safety_flag).filter(incident => {
-                  if (incidentFilter === 'all') return true;
-                  const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
-                  const status = action?.status || 'Open';
-                  return status === incidentFilter;
-                }).map(incident => {
+                {visibleIncidents.map(incident => {
                   const sticker = stickers.find(s => s.id === incident._stickerId);
                   const action = allCorrectiveActions.find(a => a.incident_id === incident.id);
                   return (
@@ -331,7 +338,8 @@ export default function FleetDashboard() {
                   );
                 })}
               </div>
-            )}
+              );
+            })()}
           </div>
 
           <div className="border-t border-border pt-8">
