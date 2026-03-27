@@ -87,16 +87,10 @@ export default function Stickers() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       setEditDialog(null);
-      if (variables.data.design_id) {
-        // After design is saved, open QR modal to prompt for shipping
-        setDesignDialog(null);
-        setQrSticker(variables.sticker);
-      } else {
-        setDesignDialog(null);
-      }
+      setDesignDialog(null);
     },
   });
 
@@ -345,7 +339,7 @@ export default function Stickers() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDesignDialog(null)}>Cancel</Button>
             <Button
-              onClick={() => updateMutation.mutate({ id: designDialog.id, data: { design_id: selectedDesign }, sticker: designDialog })}
+              onClick={() => updateMutation.mutate({ id: designDialog.id, data: { design_id: selectedDesign } })}
               disabled={updateMutation.isPending}
             >
               {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Design'}
