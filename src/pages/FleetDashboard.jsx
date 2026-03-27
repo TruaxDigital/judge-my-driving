@@ -7,13 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Star, MessageSquare, Pencil, Power, ChevronDown, ChevronRight, Truck, AlertTriangle, BarChart2, List } from 'lucide-react';
+import { Loader2, Star, MessageSquare, Pencil, Power, ChevronDown, ChevronRight, Truck, AlertTriangle, BarChart2, List, FileBarChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 import FleetUpgradeBanner from '../components/fleet/FleetUpgradeBanner';
 import FleetStatCards from '../components/fleet/FleetStatCards';
 import FleetDriverLeaderboard from '../components/fleet/FleetDriverLeaderboard';
 import FleetFeedbackThemes from '../components/fleet/FleetFeedbackThemes';
+import FleetReports from '../components/fleet/FleetReports';
 
 const statusColors = {
   active: 'bg-green-500/10 text-green-600 border-green-500/20',
@@ -150,6 +151,12 @@ export default function FleetDashboard() {
           >
             <List className="w-4 h-4" /> Vehicles
           </button>
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={cn('flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all', activeTab === 'reports' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}
+          >
+            <FileBarChart className="w-4 h-4" /> Reports
+          </button>
         </div>
       </div>
 
@@ -182,6 +189,10 @@ export default function FleetDashboard() {
             <FleetFeedbackThemes feedback={feedback} />
           </div>
         </div>
+      )}
+
+      {activeTab === 'reports' && (
+        <FleetReports stickers={stickers} allFeedback={allFeedback} user={user} />
       )}
 
       {activeTab === 'vehicles' && (
@@ -240,6 +251,9 @@ export default function FleetDashboard() {
                               {sticker.driver_name && <span className="text-xs text-muted-foreground">· {sticker.driver_name}</span>}
                               {sticker.vehicle_id && <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{sticker.vehicle_id}</span>}
                               <Badge variant="outline" className={cn('border text-xs', statusColors[sticker.status])}>{sticker.status}</Badge>
+                              {sticker.start_date && (() => { const days = moment().diff(moment(sticker.start_date), 'days'); return days >= 0 && days <= 90; })() && (
+                                <Badge variant="outline" className="text-xs border-yellow-500/30 text-yellow-600 bg-yellow-500/5">🆕 90 Days</Badge>
+                              )}
                             </div>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               <span className="font-mono">{sticker.unique_code}</span>
@@ -250,7 +264,7 @@ export default function FleetDashboard() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <Button variant="outline" size="sm" className="rounded-lg h-8"
-                              onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', fleet_group: sticker.fleet_group || '', vehicle_id: sticker.vehicle_id || '' }); setEditDialog(sticker); }}>
+                              onClick={() => { setEditData({ driver_label: sticker.driver_label || '', driver_name: sticker.driver_name || '', fleet_group: sticker.fleet_group || '', vehicle_id: sticker.vehicle_id || '', start_date: sticker.start_date || '' }); setEditDialog(sticker); }}>
                               <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
                             </Button>
                             <Button variant="outline" size="sm" className="rounded-lg h-8"
@@ -289,6 +303,7 @@ export default function FleetDashboard() {
               { key: 'driver_name', label: 'Driver Name', placeholder: 'e.g. John Smith' },
               { key: 'vehicle_id', label: 'Vehicle ID / Plate', placeholder: 'e.g. VAN-014, ABC1234' },
               { key: 'fleet_group', label: 'Fleet Group', placeholder: 'e.g. Route 7, Sales Team' },
+              { key: 'start_date', label: 'Start Date (for 90-day onboarding tracking)', placeholder: 'YYYY-MM-DD' },
             ].map(({ key, label, placeholder }) => (
               <div key={key} className="space-y-2">
                 <Label>{label}</Label>

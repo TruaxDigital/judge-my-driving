@@ -1,0 +1,107 @@
+{
+  "name": "Sticker",
+  "type": "object",
+  "properties": {
+    "unique_code": {
+      "type": "string",
+      "description": "8-char alphanumeric unique code"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User ID of the sticker owner"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Email of the sticker owner"
+    },
+    "driver_label": {
+      "type": "string",
+      "description": "Nickname for this sticker (e.g. Mom's Car)"
+    },
+    "driver_name": {
+      "type": "string",
+      "description": "Full name of the assigned driver (fleet use)"
+    },
+    "fleet_group": {
+      "type": "string",
+      "description": "Fleet group or route name (e.g. Route 7, Sales Team)"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "description": "Internal vehicle ID or plate number (fleet use)"
+    },
+    "design_id": {
+      "type": "string",
+      "enum": [
+        "default",
+        "company_vehicle",
+        "decades_behind_wheel",
+        "experienced_driver",
+        "go_easy_new",
+        "tell_my_boss",
+        "tell_my_dad",
+        "tell_my_kids",
+        "tell_my_mom",
+        "our_driver_feedback",
+        "keeping_roads_safe",
+        "new_driver",
+        "on_the_clock",
+        "rate_this_driver",
+        "still_got_it",
+        "student_driver"
+      ],
+      "default": "default",
+      "description": "Sticker design template reference"
+    },
+    "composed_image_url": {
+      "type": "string",
+      "description": "URL of the composed sticker PNG (QR overlaid on template), ready for Printful"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "registered",
+        "active",
+        "deactivated"
+      ],
+      "default": "pending"
+    },
+    "is_registered": {
+      "type": "boolean",
+      "default": false
+    },
+    "qr_url": {
+      "type": "string",
+      "description": "Full URL the QR resolves to"
+    },
+    "printful_order_id": {
+      "type": "string"
+    },
+    "feedback_count": {
+      "type": "number",
+      "default": 0
+    },
+    "average_rating": {
+      "type": "number",
+      "default": 0
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the driver started (used for 90-day onboarding tracking)"
+    },
+    "public_scorecard": {
+      "type": "boolean",
+      "default": false,
+      "description": "Opt-in to show this driver on the public scorecard widget"
+    },
+    "stakeholder_emails": {
+      "type": "string",
+      "description": "Comma-separated emails for safety report recipients (fleet use)"
+    }
+  },
+  "required": [
+    "unique_code"
+  ]
+}

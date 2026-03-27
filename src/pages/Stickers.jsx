@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, ScanLine, PackageCheck, Palette, RefreshCw } from 'lucide-react';
+import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
 import ReplacementStickerDialog from '../components/stickers/ReplacementStickerDialog';
@@ -190,6 +191,9 @@ export default function Stickers() {
                     <Badge variant="outline" className={cn("border text-xs", statusColors[sticker.status])}>
                       {sticker.status}
                     </Badge>
+                    {sticker.start_date && (() => { const days = moment().diff(moment(sticker.start_date), 'days'); return days >= 0 && days <= 90; })() && (
+                      <Badge variant="outline" className="text-xs border-yellow-500/30 text-yellow-600 bg-yellow-500/5">🆕 90 Days</Badge>
+                    )}
                     {sticker.design_id && sticker.design_id !== 'default' && (
                       <Badge variant="outline" className="text-xs border-primary/30 text-primary/80">
                         <Palette className="w-3 h-3 mr-1" />
