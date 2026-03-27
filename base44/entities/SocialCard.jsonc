@@ -1,0 +1,43 @@
+{
+  "name": "SocialCard",
+  "type": "object",
+  "properties": {
+    "driver_id": {
+      "type": "string",
+      "description": "ID of the driver who earned this achievement"
+    },
+    "card_type": {
+      "type": "string",
+      "enum": [
+        "badge_earned",
+        "state_top10",
+        "scan_milestone",
+        "streak_milestone"
+      ],
+      "description": "Type of milestone this card represents"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL to the generated PNG image"
+    },
+    "share_text": {
+      "type": "string",
+      "description": "Pre-filled sharing text for social media"
+    },
+    "achievement_data": {
+      "type": "object",
+      "description": "Metadata about the achievement (badge name, rank, state, count, etc.)"
+    },
+    "shared": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the driver has shared this card"
+    }
+  },
+  "required": [
+    "driver_id",
+    "card_type",
+    "image_url",
+    "achievement_data"
+  ]
+}

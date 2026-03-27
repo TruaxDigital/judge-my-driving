@@ -1,0 +1,42 @@
+{
+  "name": "MetroAreaMapping",
+  "type": "object",
+  "properties": {
+    "metro_name": {
+      "type": "string",
+      "description": "Full name of the metro area (e.g. 'Washington DC Metro')"
+    },
+    "metro_slug": {
+      "type": "string",
+      "description": "URL-friendly slug (e.g. 'washington-dc-metro')"
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of US states in this metro"
+    },
+    "cities_include": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of cities/areas that belong to this metro"
+    },
+    "center_lat": {
+      "type": "number",
+      "description": "Center latitude for the metro (optional, for future use)"
+    },
+    "center_lon": {
+      "type": "number",
+      "description": "Center longitude for the metro (optional, for future use)"
+    }
+  },
+  "required": [
+    "metro_name",
+    "metro_slug",
+    "states",
+    "cities_include"
+  ]
+}

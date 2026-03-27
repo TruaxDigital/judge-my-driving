@@ -1,0 +1,37 @@
+{
+  "name": "LeaderboardCache",
+  "type": "object",
+  "properties": {
+    "scope": {
+      "type": "string",
+      "description": "Leaderboard scope: 'national', 'state:virginia', 'metro:washington-dc-metro'"
+    },
+    "time_period": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "alltime"
+      ],
+      "description": "Time period for the rankings"
+    },
+    "rankings": {
+      "type": "array",
+      "description": "Array of up to 10 ranked driver objects",
+      "items": {
+        "type": "object"
+      }
+    },
+    "calculated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this leaderboard was last calculated"
+    }
+  },
+  "required": [
+    "scope",
+    "time_period",
+    "rankings",
+    "calculated_at"
+  ]
+}
