@@ -75,7 +75,7 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
   };
 
   return (
-    <Dialog open={open} onOpenChange={allDone ? handleClose : undefined}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
       <DialogContent className="max-w-2xl">
         {allDone ? (
           <div className="py-8 flex flex-col items-center gap-4 text-center">
