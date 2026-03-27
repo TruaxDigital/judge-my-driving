@@ -61,6 +61,49 @@ export default function Leaderboard() {
     enabled: view === 'mine',
   });
 
+  // Fetch all stickers to get unique states and metros
+  const { data: allStickers = [] } = useQuery({
+    queryKey: ['all-stickers-for-scopes'],
+    queryFn: async () => {
+      return base44.entities.Sticker.list('-created_date');
+    },
+  });
+
+  // Fetch metro mappings
+  const { data: metroMappings = [] } = useQuery({
+    queryKey: ['metro-mappings'],
+    queryFn: () => base44.entities.MetroAreaMapping.list(),
+  });
+
+  // Build dynamic scope options
+  const scopeOptions = (() => {
+    const options = [{ value: 'national', label: 'National' }];
+    const stateMap = new Map();
+    const metroMap = new Map();
+
+    for (const sticker of allStickers) {
+      if (sticker.home_state_slug) {
+        stateMap.set(sticker.home_state_slug, sticker.home_state);
+      }
+      if (sticker.home_metro_slug) {
+        const metro = metroMappings.find(m => m.metro_slug === sticker.home_metro_slug);
+        if (metro) {
+          metroMap.set(sticker.home_metro_slug, metro.metro_name);
+        }
+      }
+    }
+
+    stateMap.forEach((stateName, stateSlug) => {
+      options.push({ value: `state:${stateSlug}`, label: stateName });
+    });
+
+    metroMap.forEach((metroName, metroSlug) => {
+      options.push({ value: `metro:${metroSlug}`, label: `${metroName} (Metro)` });
+    });
+
+    return options;
+  })();
+
   // Get rankings from cache
   const rankings = leaderboardCache?.rankings || [];
 
@@ -121,12 +164,11 @@ export default function Leaderboard() {
               onChange={(e) => setSelectedScope(e.target.value)}
               className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground"
             >
-              <option value="national">National</option>
-              <option value="state:virginia">Virginia</option>
-              <option value="state:california">California</option>
-              <option value="state:texas">Texas</option>
-              <option value="state:florida">Florida</option>
-              <option value="state:new-york">New York</option>
+              {scopeOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <div>
