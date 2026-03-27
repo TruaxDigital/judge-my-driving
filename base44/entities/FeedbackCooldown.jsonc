@@ -1,0 +1,24 @@
+{
+  "name": "FeedbackCooldown",
+  "type": "object",
+  "properties": {
+    "ip_address": {
+      "type": "string",
+      "description": "IP address of the submitter"
+    },
+    "sticker_id": {
+      "type": "string",
+      "description": "Sticker ID that was reviewed"
+    },
+    "last_submission": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of last feedback submission"
+    }
+  },
+  "required": [
+    "ip_address",
+    "sticker_id",
+    "last_submission"
+  ]
+}

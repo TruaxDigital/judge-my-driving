@@ -99,6 +99,13 @@ Deno.serve(async (req) => {
       status: 'pending',
     });
 
+    // Step 5: Decrement the owner's sticker_credits by 1
+    const currentCredits = user.sticker_credits || 0;
+    if (currentCredits > 0) {
+      await base44.auth.updateMe({ sticker_credits: currentCredits - 1 });
+      console.log(`Decremented sticker_credits for ${user.email}: ${currentCredits} → ${currentCredits - 1}`);
+    }
+
     return Response.json({
       success: true,
       printful_order_id: order.id,

@@ -14,6 +14,23 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, preview: true });
     }
 
+    // IP-based cooldown check (1 hour per sticker per IP)
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('cf-connecting-ip') || 'unknown';
+    const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+    const existing = await base44.asServiceRole.entities.FeedbackCooldown.filter({ ip_address: ip, sticker_id });
+    if (existing.length > 0) {
+      const lastSubmission = new Date(existing[0].last_submission).getTime();
+      const elapsed = Date.now() - lastSubmission;
+      if (elapsed < COOLDOWN_MS) {
+        const minutesLeft = Math.ceil((COOLDOWN_MS - elapsed) / 60000);
+        return Response.json({ error: `You already submitted feedback for this vehicle recently. Please wait ${minutesLeft} more minute${minutesLeft !== 1 ? 's' : ''} before submitting again.` }, { status: 429 });
+      }
+      // Update existing record
+      await base44.asServiceRole.entities.FeedbackCooldown.update(existing[0].id, { last_submission: new Date().toISOString() });
+    } else {
+      await base44.asServiceRole.entities.FeedbackCooldown.create({ ip_address: ip, sticker_id, last_submission: new Date().toISOString() });
+    }
+
     // Create feedback using service role (public action - no auth needed)
     const feedback = await base44.asServiceRole.entities.Feedback.create({
       sticker_id,
