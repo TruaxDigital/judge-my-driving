@@ -94,9 +94,21 @@ export default function FleetDashboard() {
 
   const allGroups = Object.keys(groups);
 
+  // Stickers filtered by the selected fleet group
+  const filteredStickers = useMemo(() => {
+    if (groupFilter === 'all') return stickers;
+    return stickers.filter(s => (s.fleet_group || 'Ungrouped') === groupFilter);
+  }, [stickers, groupFilter]);
+
+  // Feedback filtered by group + date range
+  const filteredFeedback = useMemo(() => {
+    const groupStickerIds = new Set(filteredStickers.map(s => s.id));
+    return feedback.filter(f => groupStickerIds.has(f._stickerId));
+  }, [feedback, filteredStickers]);
+
   const driverRows = useMemo(() => {
-    return stickers.map(s => {
-      const fb = feedback.filter(f => f._stickerId === s.id);
+    return filteredStickers.map(s => {
+      const fb = filteredFeedback.filter(f => f._stickerId === s.id);
       const avg = fb.length > 0
         ? parseFloat((fb.reduce((acc, f) => acc + f.rating, 0) / fb.length).toFixed(1))
         : 0;
@@ -110,14 +122,14 @@ export default function FleetDashboard() {
         safetyCount: fb.filter(f => f.safety_flag).length,
       };
     });
-  }, [stickers, feedback]);
+  }, [filteredStickers, filteredFeedback]);
 
-  const totalScans = feedback.length;
+  const totalScans = filteredFeedback.length;
   const reviewedDrivers = driverRows.filter(d => d.totalReviews > 0);
   const fleetAvg = reviewedDrivers.length > 0
     ? (reviewedDrivers.reduce((s, d) => s + d.avgRating, 0) / reviewedDrivers.length).toFixed(1)
     : '—';
-  const safetyIncidents = feedback.filter(f => f.safety_flag).length;
+  const safetyIncidents = filteredFeedback.filter(f => f.safety_flag).length;
 
   const getFeedbackForSticker = (id) => allFeedback.filter(f => f._stickerId === id);
   const toggleGroup = (g) => setExpandedGroups(prev => ({ ...prev, [g]: !prev[g] }));
@@ -193,14 +205,14 @@ export default function FleetDashboard() {
               </div>
             )}
           </div>
-          <FleetStatCards totalDrivers={stickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} />
+          <FleetStatCards totalDrivers={filteredStickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} />
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Driver Leaderboard</h2>
             <FleetDriverLeaderboard drivers={driverRows} />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Feedback Themes</h2>
-            <FleetFeedbackThemes feedback={feedback} />
+            <FleetFeedbackThemes feedback={filteredFeedback} />
           </div>
         </div>
       )}
