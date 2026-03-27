@@ -12,7 +12,7 @@ const PLANS = [
     name: 'Individual',
     price: 49,
     stickers: 1,
-    addonPrice: 29,
+    addonPrice: 19,
     icon: User,
     description: 'Perfect for personal accountability',
     features: ['1 sticker included', 'Instant + daily email alerts', 'Feedback map view', '1 year feedback history', 'Personal dashboard'],
@@ -23,7 +23,7 @@ const PLANS = [
     name: 'Family',
     price: 99,
     stickers: 3,
-    addonPrice: 29,
+    addonPrice: 19,
     icon: Users,
     description: 'Great for households with multiple drivers',
     features: ['3 stickers included', 'Instant + daily + weekly alerts', 'Feedback map view', 'Unlimited feedback history', 'Personal dashboard'],
@@ -167,7 +167,7 @@ export default function Pricing() {
 
       {/* Replacement note */}
       <p className="text-center text-sm text-muted-foreground">
-        Need a replacement sticker? $5 flat fee. Manage from your Stickers page.
+        Need a replacement sticker? $19.99 flat fee. Manage from your Stickers page.
       </p>
     </div>
   );
