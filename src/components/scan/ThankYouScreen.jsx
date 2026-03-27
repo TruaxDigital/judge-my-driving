@@ -14,7 +14,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <h1 className="text-3xl font-bold text-white">Great Driver!</h1>
           <p className="text-zinc-400 text-lg">Thanks for the positive feedback.</p>
         </div>
-        <SalesBox />
+        <SalesBox rating={rating} />
       </div>
     );
   }
@@ -29,7 +29,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <h1 className="text-3xl font-bold text-white">Thanks!</h1>
           <p className="text-zinc-400 text-lg">Your feedback has been submitted.</p>
         </div>
-        <SalesBox discountCode="DRIVE20" />
+        <SalesBox discountCode="DRIVE20" rating={rating} />
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           </a>
         </div>
       )}
-      <SalesBox />
+      <SalesBox rating={rating} />
     </div>
   );
 }

@@ -1,11 +1,22 @@
 import React from 'react';
 import { Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { base44 } from '@/api/base44Client';
 
-export default function SalesBox({ discountCode }) {
+export default function SalesBox({ discountCode, rating }) {
   const href = discountCode
     ? `/get-started?discount=${discountCode}`
     : '/get-started';
+
+  const handleClick = () => {
+    base44.analytics.track({
+      eventName: 'post_feedback_purchase_click',
+      properties: {
+        discount_code: discountCode || null,
+        rating: rating || null,
+      },
+    });
+  };
 
   return (
     <div className="bg-zinc-800/60 border border-zinc-700 rounded-2xl p-6 space-y-4">
@@ -18,7 +29,7 @@ export default function SalesBox({ discountCode }) {
       ) : (
         <p className="text-zinc-400 text-sm">Get a Judge My Driving sticker for your vehicle.</p>
       )}
-      <a href={href}>
+      <a href={href} onClick={handleClick}>
         <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl h-12">
           {discountCode ? 'Get 20% Off — Claim Now' : 'Get Your Sticker'}
         </Button>
