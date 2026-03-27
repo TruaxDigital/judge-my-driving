@@ -2,12 +2,21 @@ import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, TrendingUp, BarChart2, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import moment from 'moment';
 
+const DATE_RANGES = [
+  { label: '30 days', value: 30 },
+  { label: '90 days', value: 90 },
+  { label: '1 year', value: 365 },
+  { label: 'All time', value: null },
+];
+
 export default function Analytics() {
   const [groupFilter, setGroupFilter] = useState('all');
+  const [dateRange, setDateRange] = useState(30);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -49,21 +58,44 @@ export default function Analytics() {
   });
 
   const filteredFeedback = useMemo(() => {
-    if (!isFleet || groupFilter === 'all') return feedback;
-    const ids = new Set(filteredStickers.map(s => s.id));
-    return feedback.filter(f => ids.has(f._stickerId));
-  }, [feedback, filteredStickers, groupFilter, isFleet]);
+    let result = feedback;
+    if (isFleet && groupFilter !== 'all') {
+      const ids = new Set(filteredStickers.map(s => s.id));
+      result = result.filter(f => ids.has(f._stickerId));
+    }
+    if (dateRange) {
+      const cutoff = moment().subtract(dateRange, 'days').toISOString();
+      result = result.filter(f => f.created_date >= cutoff);
+    }
+    return result;
+  }, [feedback, filteredStickers, groupFilter, isFleet, dateRange]);
 
-  // Feedback frequency over last 30 days
+  // Feedback frequency bucketed by date range
   const frequencyData = useMemo(() => {
     const days = [];
-    for (let i = 29; i >= 0; i--) {
-      const day = moment().subtract(i, 'days');
-      const count = filteredFeedback.filter(f => moment(f.created_date).isSame(day, 'day')).length;
-      days.push({ date: day.format('MMM D'), count });
+    const totalDays = dateRange || moment().diff(moment(feedback[0]?.created_date), 'days') + 1 || 30;
+    // For long ranges, bucket by week or month
+    if (totalDays > 180) {
+      for (let i = 11; i >= 0; i--) {
+        const month = moment().subtract(i, 'months');
+        const count = filteredFeedback.filter(f => moment(f.created_date).isSame(month, 'month')).length;
+        days.push({ date: month.format('MMM YY'), count });
+      }
+    } else if (totalDays > 60) {
+      for (let i = 12; i >= 0; i--) {
+        const week = moment().subtract(i, 'weeks').startOf('week');
+        const count = filteredFeedback.filter(f => moment(f.created_date).isSame(week, 'week')).length;
+        days.push({ date: week.format('MMM D'), count });
+      }
+    } else {
+      for (let i = totalDays - 1; i >= 0; i--) {
+        const day = moment().subtract(i, 'days');
+        const count = filteredFeedback.filter(f => moment(f.created_date).isSame(day, 'day')).length;
+        days.push({ date: day.format('MMM D'), count });
+      }
     }
     return days;
-  }, [filteredFeedback]);
+  }, [filteredFeedback, dateRange, feedback]);
 
   // Rating distribution
   const distributionData = useMemo(() => {
@@ -104,23 +136,42 @@ export default function Analytics() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h1>
-          <p className="text-muted-foreground mt-1">Understand your feedback patterns over time.</p>
-        </div>
-        {isFleet && fleetGroups.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground shrink-0">Fleet group:</span>
-            <Select value={groupFilter} onValueChange={setGroupFilter}>
-              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Groups</SelectItem>
-                {fleetGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-              </SelectContent>
-            </Select>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Analytics</h1>
+            <p className="text-muted-foreground mt-1">Understand your feedback patterns over time.</p>
           </div>
-        )}
+          {isFleet && fleetGroups.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground shrink-0">Fleet group:</span>
+              <Select value={groupFilter} onValueChange={setGroupFilter}>
+                <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Groups</SelectItem>
+                  {fleetGroups.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm text-muted-foreground">Date range:</span>
+          {DATE_RANGES.map(r => (
+            <button
+              key={r.label}
+              onClick={() => setDateRange(r.value)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
+                dateRange === r.value
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-card text-foreground border-border hover:bg-muted'
+              )}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {filteredFeedback.length === 0 && feedback.length === 0 ? (
@@ -140,7 +191,7 @@ export default function Analytics() {
           <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
-              <h2 className="font-semibold text-foreground">Feedback Frequency — Last 30 Days</h2>
+              <h2 className="font-semibold text-foreground">Feedback Frequency — {dateRange ? `Last ${dateRange >= 365 ? '1 Year' : dateRange + ' Days'}` : 'All Time'}</h2>
             </div>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={frequencyData}>
