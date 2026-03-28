@@ -92,7 +92,7 @@ export default function PartnerSignup() {
           </div>
           <Button
             className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900"
-            onClick={() => base44.auth.redirectToLogin('/PartnerPortal')}
+            onClick={() => base44.auth.redirectToLogin(`${window.location.origin}/PartnerPortal`)}
           >
             Go to My Partner Dashboard →
           </Button>
