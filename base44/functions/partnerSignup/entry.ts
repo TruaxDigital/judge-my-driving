@@ -103,6 +103,15 @@ Deno.serve(async (req) => {
     // Generate QR codes
     const qrCodes = await generateQRCodes(base44, ref_code);
 
+    // Invite the partner as a user with 'partner' role (no-op if already registered)
+    try {
+      await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
+      console.log(`[partnerSignup] Invited user ${contact_email} with partner role`);
+    } catch (inviteErr) {
+      // User may already exist — that's fine, just log it
+      console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+    }
+
     // Create partner record (user_id linked later when they log in via PartnerPortal)
     const partner = await base44.asServiceRole.entities.ReferralPartner.create({
       user_id: null,
