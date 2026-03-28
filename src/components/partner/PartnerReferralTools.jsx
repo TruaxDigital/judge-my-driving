@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Copy, Check, Download, ExternalLink } from 'lucide-react';
+import { Copy, Check, Download, ExternalLink, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { printPartnerFlyer } from './PartnerFlyerPrint';
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
@@ -17,7 +18,7 @@ function CopyButton({ text }) {
   );
 }
 
-function QRCard({ title, qrUrl, referralUrl, label, audience }) {
+function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
   const handleDownload = async () => {
     if (!qrUrl) return;
     const a = document.createElement('a');
@@ -57,8 +58,13 @@ function QRCard({ title, qrUrl, referralUrl, label, audience }) {
 
       {/* Flyer buttons */}
       <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" size="sm" className="rounded-lg text-xs" onClick={() => window.print()}>
-          Print Flyer
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-lg text-xs"
+          onClick={() => printPartnerFlyer(partner, audience)}
+        >
+          <Printer className="w-3 h-3 mr-1" /> Print Flyer
         </Button>
         <a href={referralUrl} target="_blank" rel="noopener noreferrer">
           <Button variant="outline" size="sm" className="rounded-lg text-xs w-full">
@@ -100,6 +106,7 @@ export default function PartnerReferralTools({ partner }) {
           referralUrl={teenUrl}
           label="Share this with parents of teen drivers"
           audience="teen"
+          partner={partner}
         />
         <QRCard
           title="Senior Driver Referral"
@@ -107,6 +114,7 @@ export default function PartnerReferralTools({ partner }) {
           referralUrl={seniorUrl}
           label="Share this with families of senior drivers"
           audience="senior"
+          partner={partner}
         />
       </div>
     </div>

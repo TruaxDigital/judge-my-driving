@@ -84,9 +84,12 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
+      // Don't redirect if on a public route
+      const isPublicRoute = isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute;
+      if (!isPublicRoute) {
+        navigateToLogin();
+        return null;
+      }
     }
   }
 
