@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap } from 'lucide-react';
+import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap, ExternalLink } from 'lucide-react';
 import { cn, isInIframe } from '@/lib/utils';
-
-const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
+import { DESIGN_URLS } from '@/components/stickers/StickerDesignPicker';
 
 const FEATURED_DESIGNS = [
-  { id: 'new_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "New Driver" },
-  { id: 'student_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "Student Driver" },
-  { id: 'tell_my_mom', url: `${GITHUB_BASE}/Tell%20My%20Mom.svg`, label: "Tell My Mom" },
-  { id: 'tell_my_dad', url: `${GITHUB_BASE}/Tell%20My%20Boss.svg`, label: "Tell My Dad" },
+  { id: 'new_driver', label: "New Driver" },
+  { id: 'student_driver', label: "Student Driver" },
+  { id: 'tell_my_mom', label: "Tell My Mom" },
+  { id: 'tell_my_dad', label: "Tell My Dad" },
+  { id: 'go_easy_new', label: "Go Easy, I'm New" },
+  { id: 'tell_my_kids', label: "Tell My Kids" },
 ];
 
 const PLANS = [
@@ -162,14 +163,17 @@ export default function StudentDrivers() {
         {/* Sticker previews */}
         <div className="mb-8">
           <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2 mb-3">
             {FEATURED_DESIGNS.map(d => (
               <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
-                <img src={d.url} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
+                <img src={DESIGN_URLS[d.id]} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
                 <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
               </div>
             ))}
           </div>
+          <a href="/get-started" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 text-xs text-primary hover:underline">
+            <ExternalLink className="w-3 h-3" /> See all 15+ designs
+          </a>
         </div>
 
         {/* Plan selector */}

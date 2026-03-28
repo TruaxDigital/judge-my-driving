@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap } from 'lucide-react';
+import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap, ExternalLink } from 'lucide-react';
 import { cn, isInIframe } from '@/lib/utils';
-
-const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
+import { DESIGN_URLS } from '@/components/stickers/StickerDesignPicker';
 
 const FEATURED_DESIGNS = [
-  { id: 'still_got_it', url: `${GITHUB_BASE}/Still%20Got%20It.svg`, label: "Still Got It" },
-  { id: 'experienced_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "Experienced Driver" },
-  { id: 'decades_behind_wheel', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "Decades on the Road" },
-  { id: 'rate_this_driver', url: `${GITHUB_BASE}/Rate%20this%20Driver.svg`, label: "Rate This Driver" },
+  { id: 'still_got_it', label: "Still Got It" },
+  { id: 'experienced_driver', label: "Experienced Driver" },
+  { id: 'decades_behind_wheel', label: "Decades on the Road" },
+  { id: 'rate_this_driver', label: "Rate This Driver" },
+  { id: 'keeping_roads_safe', label: "Keeping Roads Safe" },
+  { id: 'tell_my_kids', label: "Tell My Kids" },
 ];
 
 const PLANS = [
@@ -162,14 +163,17 @@ export default function SeniorDrivers() {
         {/* Sticker previews */}
         <div className="mb-8">
           <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2 mb-3">
             {FEATURED_DESIGNS.map(d => (
               <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
-                <img src={d.url} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
+                <img src={DESIGN_URLS[d.id]} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
                 <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
               </div>
             ))}
           </div>
+          <a href="/get-started" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 text-xs text-primary hover:underline">
+            <ExternalLink className="w-3 h-3" /> See all 15+ designs
+          </a>
         </div>
 
         {/* Plan selector */}

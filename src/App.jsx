@@ -54,7 +54,10 @@ const AuthenticatedApp = () => {
   const isSeniorDriversRoute = window.location.pathname.startsWith('/senior-drivers');
   const isPartnerPortalRoute = window.location.pathname.startsWith('/PartnerPortal');
 
-  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute) {
+  const isPublicRoute = isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute;
+
+  // Always render public routes immediately — no auth gate, no loading spinner
+  if (isPublicRoute) {
     return (
       <Routes>
         <Route path="/scan/:code" element={<ScanSticker />} />
@@ -84,8 +87,6 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Don't redirect if on a public route
-      const isPublicRoute = isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute;
       if (!isPublicRoute) {
         navigateToLogin();
         return null;
