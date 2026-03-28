@@ -122,10 +122,59 @@ Deno.serve(async (req) => {
     console.log(`[partnerSignup] Created partner ${partner_name} with ref_code ${ref_code}`);
 
     // Send welcome email to new partner
+    const teenLink = `https://app.judgemydriving.com/student-drivers?ref=${ref_code}`;
+    const seniorLink = `https://app.judgemydriving.com/senior-drivers?ref=${ref_code}`;
+
+    const emailBody = `Hi ${contact_name},
+
+Welcome to the Judge My Driving Partner Program! 🎉 We're excited to have ${partner_name} on board.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+HOW YOU EARN
+━━━━━━━━━━━━━━━━━━━━━━━━
+You earn $10 for every Individual or Family plan subscription that comes through your referral link. Payouts are processed quarterly (minimum $25 balance).
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR REFERRAL CODE
+━━━━━━━━━━━━━━━━━━━━━━━━
+Code: ${ref_code}
+
+Share these links with your audience:
+
+👦 Teen / Student Drivers:
+${teenLink}
+
+👴 Senior Drivers:
+${seniorLink}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT TO SHARE
+━━━━━━━━━━━━━━━━━━━━━━━━
+Judge My Driving puts a QR sticker on a car. When other drivers scan it, they can rate the driver — and the family gets real-time alerts. Parents use it to monitor teen drivers. Adult children use it to keep tabs on aging parents.
+
+Plans start at $49/year. 30-day money-back guarantee.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR PARTNER DASHBOARD
+━━━━━━━━━━━━━━━━━━━━━━━━
+Log in to track your conversions, download QR codes, and access pitch scripts:
+
+👉 https://app.judgemydriving.com/PartnerPortal
+
+(Our team will send your login invite to this email address shortly.)
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions? Reply to this email or reach us at hello@judgemydriving.com.
+
+Thanks for spreading the word,
+The Judge My Driving Team`;
+
     await base44.asServiceRole.integrations.Core.SendEmail({
       to: contact_email,
-      subject: 'Welcome to the Judge My Driving Partner Program!',
-      body: `Hi ${contact_name},\n\nYou're in! Your partner account has been created with referral code: ${ref_code}\n\nOur team will send you a login invite shortly so you can access your partner dashboard at https://app.judgemydriving.com/PartnerPortal\n\nQuestions? hello@judgemydriving.com\n\nThe JMD Team`,
+      from_name: 'Judge My Driving',
+      subject: `Welcome to the JMD Partner Program — your referral code is ${ref_code}`,
+      body: emailBody,
     });
 
     return Response.json({ success: true, partner, ref_code });
