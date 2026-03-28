@@ -11,7 +11,7 @@ import { Loader2, Star, MessageSquare, Pencil, Power, ChevronDown, ChevronRight,
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 import FleetUpgradeBanner from '../components/fleet/FleetUpgradeBanner';
-import FleetStatCards from '../components/fleet/FleetStatCards';
+import FleetStatCardsWithTrend from '../components/fleet/FleetStatCardsWithTrend';
 import FleetDriverLeaderboard from '../components/fleet/FleetDriverLeaderboard';
 import FleetFeedbackThemes from '../components/fleet/FleetFeedbackThemes';
 import FleetReports from '../components/fleet/FleetReports';
@@ -244,7 +244,17 @@ export default function FleetDashboard() {
               </div>
             )}
           </div>
-          <FleetStatCards totalDrivers={filteredStickers.length} totalScans={totalScans} avgRating={fleetAvg} safetyIncidents={safetyIncidents} unresolvedIncidents={unresolvedIncidents} />
+          <FleetStatCardsWithTrend 
+            metrics={{
+              totalDrivers: filteredStickers.length,
+              totalScans: totalScans,
+              avgRating: fleetAvg,
+              safetyIncidents: safetyIncidents,
+              unresolvedIncidents: unresolvedIncidents,
+              allFeedback: allFeedback,
+              dateRange: dateRange,
+            }}
+          />
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Driver Leaderboard</h2>
             <FleetDriverLeaderboard drivers={driverRows} />
