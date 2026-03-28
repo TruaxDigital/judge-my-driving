@@ -32,20 +32,8 @@ export default function PartnerPortal() {
   const { data: partner, isLoading: partnerLoading } = useQuery({
     queryKey: ['my-partner'],
     queryFn: async () => {
-      const u = await base44.auth.me();
-      // First try by user_id
-      let records = await base44.entities.ReferralPartner.filter({ user_id: u.id });
-      if (records.length > 0) return records[0];
-
-      // Fallback: match by contact_email (partner signed up via public form before logging in)
-      records = await base44.entities.ReferralPartner.filter({ contact_email: u.email });
-      if (records.length > 0) {
-        // Link the user_id now
-        await base44.entities.ReferralPartner.update(records[0].id, { user_id: u.id });
-        return { ...records[0], user_id: u.id };
-      }
-
-      return null;
+      const res = await base44.functions.invoke('getMyPartnerRecord', {});
+      return res.data?.partner || null;
     },
     enabled: !!user,
   });
