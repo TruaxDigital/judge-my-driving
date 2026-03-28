@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Copy, Check, Download, ExternalLink, Printer } from 'lucide-react';
+import { Copy, Check, Download, ExternalLink, Printer, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { printPartnerFlyer } from './PartnerFlyerPrint';
+import { base44 } from '@/api/base44Client';
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
@@ -19,6 +20,8 @@ function CopyButton({ text }) {
 }
 
 function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
+  const [printLoading, setPrintLoading] = useState(false);
+
   const handleDownload = async () => {
     if (!qrUrl) return;
     const a = document.createElement('a');
@@ -26,6 +29,12 @@ function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
     a.download = `jmd-qr-${audience}.png`;
     a.target = '_blank';
     a.click();
+  };
+
+  const handlePrint = async () => {
+    setPrintLoading(true);
+    await printPartnerFlyer(partner, audience);
+    setPrintLoading(false);
   };
 
   return (
@@ -39,7 +48,7 @@ function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
           <img src={qrUrl} alt={`${title} QR Code`} className="w-48 h-48 rounded-xl border border-border" />
         ) : (
           <div className="w-48 h-48 bg-muted rounded-xl flex items-center justify-center">
-            <p className="text-xs text-muted-foreground text-center px-4">QR code generating... Check back in a moment.</p>
+            <p className="text-xs text-muted-foreground text-center px-4">No QR code yet. Click "Generate QR Codes" above.</p>
           </div>
         )}
       </div>
@@ -62,9 +71,11 @@ function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
           variant="outline"
           size="sm"
           className="rounded-lg text-xs"
-          onClick={() => printPartnerFlyer(partner, audience)}
+          onClick={handlePrint}
+          disabled={printLoading}
         >
-          <Printer className="w-3 h-3 mr-1" /> Print Flyer
+          {printLoading ? <RefreshCw className="w-3 h-3 mr-1 animate-spin" /> : <Printer className="w-3 h-3 mr-1" />}
+          {printLoading ? 'Loading...' : 'Print Flyer'}
         </Button>
         <a href={referralUrl} target="_blank" rel="noopener noreferrer">
           <Button variant="outline" size="sm" className="rounded-lg text-xs w-full">
@@ -77,6 +88,9 @@ function QRCard({ title, qrUrl, referralUrl, label, audience, partner }) {
 }
 
 export default function PartnerReferralTools({ partner }) {
+  const [regenLoading, setRegenLoading] = useState(false);
+  const [regenDone, setRegenDone] = useState(false);
+
   if (!partner) {
     return (
       <div className="text-center py-20 text-muted-foreground">
@@ -88,6 +102,19 @@ export default function PartnerReferralTools({ partner }) {
   const teenUrl = `https://app.judgemydriving.com/student-drivers?ref=${partner.ref_code}`;
   const seniorUrl = `https://app.judgemydriving.com/senior-drivers?ref=${partner.ref_code}`;
 
+  const handleRegenQR = async () => {
+    setRegenLoading(true);
+    await base44.functions.invoke('regeneratePartnerQR', {
+      partner_id: partner.id,
+      ref_code: partner.ref_code,
+    });
+    setRegenLoading(false);
+    setRegenDone(true);
+    setTimeout(() => window.location.reload(), 1500);
+  };
+
+  const qrMissing = !partner.teen_qr_url || !partner.senior_qr_url;
+
   return (
     <div className="space-y-6">
       <div>
@@ -95,9 +122,25 @@ export default function PartnerReferralTools({ partner }) {
         <p className="text-muted-foreground mt-1">Your unique referral QR codes and links for both audiences.</p>
       </div>
 
-      <div className="bg-muted/30 border border-border rounded-2xl px-5 py-3 text-sm">
-        Your ref code: <span className="font-mono font-semibold text-foreground">{partner.ref_code}</span>
+      <div className="bg-muted/30 border border-border rounded-2xl px-5 py-3 text-sm flex items-center justify-between gap-4 flex-wrap">
+        <span>Your ref code: <span className="font-mono font-semibold text-foreground">{partner.ref_code}</span></span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-lg text-xs"
+          onClick={handleRegenQR}
+          disabled={regenLoading || regenDone}
+        >
+          {regenLoading ? <RefreshCw className="w-3 h-3 mr-1 animate-spin" /> : <RefreshCw className="w-3 h-3 mr-1" />}
+          {regenDone ? 'Refreshing...' : qrMissing ? 'Generate QR Codes' : 'Regenerate QR Codes'}
+        </Button>
       </div>
+
+      {qrMissing && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 text-sm text-yellow-700">
+          Your QR codes haven't been generated yet. Click "Generate QR Codes" above.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <QRCard

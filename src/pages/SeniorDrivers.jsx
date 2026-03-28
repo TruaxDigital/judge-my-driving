@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap, ExternalLink } from 'lucide-react';
+import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap } from 'lucide-react';
 import { cn, isInIframe } from '@/lib/utils';
 import { DESIGN_URLS } from '@/components/stickers/StickerDesignPicker';
+import DesignCatalogModal from '@/components/GetStarted/DesignCatalogModal';
 
 const FEATURED_DESIGNS = [
   { id: 'still_got_it', label: "Still Got It" },
@@ -55,6 +56,7 @@ export default function SeniorDrivers() {
   const [error, setError] = useState('');
   const [isAuthed, setIsAuthed] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showDesignModal, setShowDesignModal] = useState(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(authed => {
@@ -171,10 +173,11 @@ export default function SeniorDrivers() {
               </div>
             ))}
           </div>
-          <a href="/get-started" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 text-xs text-primary hover:underline">
-            <ExternalLink className="w-3 h-3" /> See all 15+ designs
-          </a>
+          <button onClick={() => setShowDesignModal(true)} className="flex items-center justify-center gap-1.5 text-xs text-primary hover:underline w-full">
+            See all designs →
+          </button>
         </div>
+        <DesignCatalogModal open={showDesignModal} onClose={() => setShowDesignModal(false)} />
 
         {/* Plan selector */}
         <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Less than $1/week</p>

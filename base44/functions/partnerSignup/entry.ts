@@ -52,18 +52,27 @@ async function generateQRCodes(base44, refCode) {
   const teenUrl = `https://app.judgemydriving.com/student-drivers?ref=${refCode}`;
   const seniorUrl = `https://app.judgemydriving.com/senior-drivers?ref=${refCode}`;
 
-  const [teenResult, seniorResult] = await Promise.all([
-    base44.asServiceRole.integrations.Core.GenerateImage({
-      prompt: `Generate a clean, minimal QR code image on a pure white background. The QR code should be centered, black on white, square format, 400x400 pixels. The QR code encodes this URL: ${teenUrl}. No decorations, no text, just the QR code.`,
-    }),
-    base44.asServiceRole.integrations.Core.GenerateImage({
-      prompt: `Generate a clean, minimal QR code image on a pure white background. The QR code should be centered, black on white, square format, 400x400 pixels. The QR code encodes this URL: ${seniorUrl}. No decorations, no text, just the QR code.`,
-    }),
+  // Use QuickChart QR code API for real, scannable QR codes
+  const makeQrApiUrl = (url) =>
+    `https://quickchart.io/qr?text=${encodeURIComponent(url)}&size=400&margin=2&format=png`;
+
+  const [teenRes, seniorRes] = await Promise.all([
+    fetch(makeQrApiUrl(teenUrl)),
+    fetch(makeQrApiUrl(seniorUrl)),
+  ]);
+
+  const [teenBlob, seniorBlob] = await Promise.all([teenRes.blob(), seniorRes.blob()]);
+
+  const toFile = (blob, name) => new File([blob], name, { type: 'image/png' });
+
+  const [teenUpload, seniorUpload] = await Promise.all([
+    base44.asServiceRole.integrations.Core.UploadFile({ file: toFile(teenBlob, 'teen-qr.png') }),
+    base44.asServiceRole.integrations.Core.UploadFile({ file: toFile(seniorBlob, 'senior-qr.png') }),
   ]);
 
   return {
-    teen_qr_url: teenResult?.url || null,
-    senior_qr_url: seniorResult?.url || null,
+    teen_qr_url: teenUpload?.file_url || null,
+    senior_qr_url: seniorUpload?.file_url || null,
   };
 }
 

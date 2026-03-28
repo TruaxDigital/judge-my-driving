@@ -207,15 +207,33 @@ function buildFlyerHTML(f, c, qrImageUrl, referralUrl) {
 </html>`;
 }
 
-export function printPartnerFlyer(partner, type) {
+async function toDataUrl(url) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function printPartnerFlyer(partner, type) {
   const f = FLYERS[type];
   const c = f.color;
-  const qrImageUrl = type === 'teen' ? partner.teen_qr_url : partner.senior_qr_url;
+  const rawQrUrl = type === 'teen' ? partner.teen_qr_url : partner.senior_qr_url;
   const referralUrl = type === 'teen'
     ? `https://app.judgemydriving.com/student-drivers?ref=${partner.ref_code}`
     : `https://app.judgemydriving.com/senior-drivers?ref=${partner.ref_code}`;
 
-  const html = buildFlyerHTML(f, c, qrImageUrl, referralUrl);
+  // Convert QR image to data URL so it works in a new window without CORS issues
+  const qrDataUrl = rawQrUrl ? await toDataUrl(rawQrUrl) : null;
+
+  const html = buildFlyerHTML(f, c, qrDataUrl || rawQrUrl, referralUrl);
   const win = window.open('', '_blank', 'width=700,height=900');
   win.document.write(html);
   win.document.close();
