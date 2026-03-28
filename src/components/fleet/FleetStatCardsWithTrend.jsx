@@ -68,6 +68,7 @@ export default function FleetStatCardsWithTrend({ metrics }) {
       value: totalDrivers,
       trend: null,
       icon: Users,
+      iconColor: 'text-blue-600',
     },
     {
       label: 'Total Scans',
@@ -75,6 +76,7 @@ export default function FleetStatCardsWithTrend({ metrics }) {
       trend: prev ? calculateTrend(totalScans, prevMetrics.scans) : null,
       isNegativeBetter: false,
       icon: Activity,
+      iconColor: 'text-green-600',
     },
     {
       label: 'Fleet Avg Rating',
@@ -82,6 +84,7 @@ export default function FleetStatCardsWithTrend({ metrics }) {
       trend: prev && prevMetrics.avgRating ? calculateTrend(avgRating - prevMetrics.avgRating, prevMetrics.avgRating) : null,
       isNegativeBetter: false,
       icon: Star,
+      iconColor: 'text-amber-500',
     },
     {
       label: 'Safety Incidents',
@@ -89,6 +92,7 @@ export default function FleetStatCardsWithTrend({ metrics }) {
       trend: prev ? calculateTrend(safetyIncidents, prevMetrics.incidents) : null,
       isNegativeBetter: true,
       icon: AlertTriangle,
+      iconColor: 'text-orange-500',
     },
     {
       label: 'Unresolved Incidents',
@@ -96,6 +100,7 @@ export default function FleetStatCardsWithTrend({ metrics }) {
       trend: prev ? calculateTrend(unresolvedIncidents, prevMetrics.unresolved) : null,
       isNegativeBetter: true,
       icon: AlertCircle,
+      iconColor: 'text-red-600',
     },
   ];
 
@@ -107,16 +112,14 @@ export default function FleetStatCardsWithTrend({ metrics }) {
           <div key={card.label} className="bg-card border border-border rounded-2xl px-6 py-5 space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">{card.label}</p>
-              <Icon className="w-4 h-4 text-primary/60" />
+              <Icon className={`w-6 h-6 ${card.iconColor}`} />
             </div>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-3xl font-bold text-foreground">{card.value}</p>
-              {card.trend !== null && card.trend !== undefined && (
-                <TrendIndicator value={card.trend} isNegativeBetter={card.isNegativeBetter} />
-              )}
-            </div>
+            <p className="text-3xl font-bold text-foreground">{card.value}</p>
             {card.trend !== null && card.trend !== undefined && (
-              <p className="text-xs text-muted-foreground">vs last period</p>
+              <div className="flex items-center gap-2 pt-1">
+                <TrendIndicator value={card.trend} isNegativeBetter={card.isNegativeBetter} />
+                <p className="text-xs text-muted-foreground">vs last period</p>
+              </div>
             )}
           </div>
         );
