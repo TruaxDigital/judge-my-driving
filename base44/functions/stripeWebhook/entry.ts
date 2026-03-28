@@ -109,6 +109,7 @@ Deno.serve(async (req) => {
                 subscription_type,
                 commission_amount: 10,
                 commission_status: 'pending',
+                stripe_subscription_id: subId,
                 conversion_date: new Date().toISOString().split('T')[0],
               });
               console.log(`Created referral conversion for partner ${partner.id}, customer ${userEmail}`);
@@ -271,7 +272,28 @@ Deno.serve(async (req) => {
       const invoice = event.data.object;
       const users = await base44.asServiceRole.entities.User.filter({ stripe_customer_id: invoice.customer });
       if (users.length > 0) {
-        await base44.asServiceRole.entities.User.update(users[0].id, { subscription_status: 'past_due' });
+        const userId = users[0].id;
+        await base44.asServiceRole.entities.User.update(userId, { subscription_status: 'past_due' });
+        
+        // Mark conversions as canceled for this subscription
+        if (invoice.subscription) {
+          const conversions = await base44.asServiceRole.entities.ReferralConversion.filter({ stripe_subscription_id: invoice.subscription });
+          for (const c of conversions) {
+            if (c.commission_status === 'pending') {
+              await base44.asServiceRole.entities.ReferralConversion.update(c.id, { commission_status: 'canceled' });
+            }
+          }
+          console.log(`Marked ${conversions.length} referral conversions as canceled for subscription ${invoice.subscription}`);
+        }
+        
+        // Deactivate stickers
+        const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
+        for (const s of stickers) {
+          if (s.status === 'active') {
+            await base44.asServiceRole.entities.Sticker.update(s.id, { status: 'deactivated' });
+          }
+        }
+        
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: users[0].email,
           subject: 'Action needed: payment failed for Judge My Driving',
@@ -282,7 +304,7 @@ Deno.serve(async (req) => {
             <p><a href="https://app.judgemydriving.com/Settings" style="color: #FACC15;">Update payment method →</a></p>
           </div>`,
         });
-        console.log(`Payment failed for user ${users[0].id}, set to past_due`);
+        console.log(`Payment failed for user ${userId}, set to past_due, ${stickers.length} stickers deactivated`);
       }
     }
 
@@ -292,13 +314,23 @@ Deno.serve(async (req) => {
       if (users.length > 0) {
         const userId = users[0].id;
         await base44.asServiceRole.entities.User.update(userId, { subscription_status: 'canceled' });
+        
+        // Mark conversions as canceled
+        const conversions = await base44.asServiceRole.entities.ReferralConversion.filter({ stripe_subscription_id: sub.id });
+        for (const c of conversions) {
+          if (c.commission_status === 'pending') {
+            await base44.asServiceRole.entities.ReferralConversion.update(c.id, { commission_status: 'canceled' });
+          }
+        }
+        
+        // Deactivate stickers
         const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
         for (const s of stickers) {
           if (s.status === 'active') {
             await base44.asServiceRole.entities.Sticker.update(s.id, { status: 'deactivated' });
           }
         }
-        console.log(`Subscription canceled for user ${userId}, ${stickers.length} stickers deactivated`);
+        console.log(`Subscription canceled for user ${userId}, ${conversions.length} conversions marked canceled, ${stickers.length} stickers deactivated`);
       }
     }
   } catch (err) {

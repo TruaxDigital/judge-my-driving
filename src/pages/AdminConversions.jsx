@@ -128,6 +128,7 @@ export default function AdminConversions() {
           <option value="all">All Statuses</option>
           <option value="pending">Pending</option>
           <option value="paid">Paid</option>
+          <option value="canceled">Canceled</option>
         </select>
         <Input type="date" value={filterStart} onChange={e => setFilterStart(e.target.value)} className="w-auto" placeholder="Start date" />
         <Input type="date" value={filterEnd} onChange={e => setFilterEnd(e.target.value)} className="w-auto" placeholder="End date" />

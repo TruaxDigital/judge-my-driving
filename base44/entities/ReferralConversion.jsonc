@@ -35,9 +35,14 @@
       "type": "string",
       "enum": [
         "pending",
-        "paid"
+        "paid",
+        "canceled"
       ],
       "default": "pending"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID for linking cancellations"
     },
     "paid_date": {
       "type": "string",
