@@ -40,7 +40,7 @@ function PodiumCard({ driver, rank }) {
   );
 }
 
-export default function FleetDriverLeaderboard({ drivers }) {
+export default function FleetDriverLeaderboard({ drivers, fleetAvgRating, unresolvedIncidents, allCorrectiveActions = [] }) {
   const [sortBy, setSortBy] = useState('rating'); // 'rating' | 'scans'
 
   const sorted = [...drivers].sort((a, b) =>
@@ -113,43 +113,60 @@ export default function FleetDriverLeaderboard({ drivers }) {
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs">Driver / Vehicle</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs">Group</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs">Avg Rating</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs">vs Fleet Avg</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs">Reviews</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs">Safety</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs">Unresolved</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {sorted.map((driver, idx) => {
-                  const isBottom = bottom3.some(b => b.stickerId === driver.stickerId) && driver.totalReviews > 0 && top3.length > 3;
-                  return (
-                    <tr key={driver.stickerId} className={cn('hover:bg-muted/30 transition-colors', isBottom && 'bg-red-500/5')}>
-                      <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{idx + 1}</td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-foreground">{driver.name}</div>
-                        {driver.vehicleId && <div className="text-xs text-muted-foreground font-mono">{driver.vehicleId}</div>}
-                      </td>
-                      <td className="px-4 py-3">
-                        {driver.group ? <Badge variant="outline" className="text-xs">{driver.group}</Badge> : <span className="text-muted-foreground text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {driver.totalReviews > 0 ? (
-                          <div className="flex items-center justify-end gap-1">
-                            <Star className="w-3.5 h-3.5 text-primary fill-primary" />
-                            <span className="font-semibold">{driver.avgRating}</span>
-                          </div>
-                        ) : <span className="text-muted-foreground text-xs">No data</span>}
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium">{driver.totalReviews}</td>
-                      <td className="px-4 py-3 text-right">
-                        {driver.safetyCount > 0
-                          ? <span className="text-red-500 font-semibold">{driver.safetyCount}</span>
-                          : <span className="text-muted-foreground">0</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
+                   const isBottom = bottom3.some(b => b.stickerId === driver.stickerId) && driver.totalReviews > 0 && top3.length > 3;
+                   const driverUnresolved = allCorrectiveActions.filter(a => a.driver_id === driver.stickerId && a.status !== 'Resolved').length;
+                   const diff = driver.avgRating - parseFloat(fleetAvgRating);
+                   const isAboveAvg = diff > 0;
+                   return (
+                     <tr key={driver.stickerId} className={cn('hover:bg-muted/30 transition-colors', isBottom && 'bg-red-500/5')}>
+                       <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{idx + 1}</td>
+                       <td className="px-4 py-3">
+                         <div className="font-medium text-foreground">{driver.name}</div>
+                         {driver.vehicleId && <div className="text-xs text-muted-foreground font-mono">{driver.vehicleId}</div>}
+                       </td>
+                       <td className="px-4 py-3">
+                         {driver.group ? <Badge variant="outline" className="text-xs">{driver.group}</Badge> : <span className="text-muted-foreground text-xs">—</span>}
+                       </td>
+                       <td className="px-4 py-3 text-right">
+                         {driver.totalReviews > 0 ? (
+                           <div className="flex items-center justify-end gap-1">
+                             <Star className="w-3.5 h-3.5 text-primary fill-primary" />
+                             <span className="font-semibold">{driver.avgRating}</span>
+                           </div>
+                         ) : <span className="text-muted-foreground text-xs">No data</span>}
+                       </td>
+                       <td className="px-4 py-3 text-right">
+                         {driver.totalReviews > 0 ? (
+                           <span className={cn('font-semibold text-xs', isAboveAvg ? 'text-green-600' : 'text-red-600')}>
+                             {isAboveAvg ? '+' : ''}{diff.toFixed(1)}
+                           </span>
+                         ) : <span className="text-muted-foreground text-xs">—</span>}
+                       </td>
+                       <td className="px-4 py-3 text-right font-medium">{driver.totalReviews}</td>
+                       <td className="px-4 py-3 text-right">
+                         {driver.safetyCount > 0
+                           ? <span className="text-red-500 font-semibold">{driver.safetyCount}</span>
+                           : <span className="text-muted-foreground">0</span>}
+                       </td>
+                       <td className="px-4 py-3 text-right">
+                         {driverUnresolved > 0
+                           ? <span className="text-red-500 font-semibold">{driverUnresolved}</span>
+                           : <span className="text-muted-foreground">0</span>}
+                       </td>
+                     </tr>
+                   );
+                 })}
                 {sorted.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground text-sm">No driver data available for this period.</td>
+                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground text-sm">No driver data available for this period.</td>
                   </tr>
                 )}
               </tbody>
