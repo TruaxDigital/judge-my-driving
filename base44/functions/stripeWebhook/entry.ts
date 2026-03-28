@@ -94,6 +94,20 @@ Deno.serve(async (req) => {
 
         await createStickers(base44, userId, userEmail, count);
 
+        // Create or update sale record
+        const user = users.length > 0 ? users[0] : null;
+        await base44.asServiceRole.functions.invoke('createOrUpdateSale', {
+          user_id: userId,
+          email: userEmail,
+          full_name: user?.full_name || '',
+          plan_tier: planTier,
+          subscription_amount: session.amount_total ? session.amount_total / 100 : 0,
+          stripe_subscription_id: subId,
+          stripe_customer_id: session.customer,
+          subscription_start_date: new Date().toISOString().split('T')[0],
+          subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString().split('T')[0],
+        });
+
         // Create referral conversion if ref_code provided
         if (meta.ref_code) {
           try {
@@ -166,6 +180,19 @@ Deno.serve(async (req) => {
         const currentCredits = user?.sticker_credits || 0;
         await base44.asServiceRole.entities.User.update(userId, { sticker_credits: currentCredits + 1 });
         await createStickers(base44, userId, userEmail, 1);
+
+        // Update sale record with additional stickers
+        const sales = await base44.asServiceRole.entities.Sale.filter({ user_id: userId });
+        if (sales.length > 0) {
+          const sale = sales[0];
+          const newTotal = (sale.total_revenue || 0) + (session.amount_total ? session.amount_total / 100 : 0);
+          await base44.asServiceRole.entities.Sale.update(sale.id, {
+            additional_stickers_sold: (sale.additional_stickers_sold || 0) + 1,
+            total_revenue: newTotal,
+          });
+          // Sync updated sale to HubSpot
+          await base44.asServiceRole.functions.invoke('syncSaleToHubSpot', { sale_id: sale.id });
+        }
         console.log(`Add-on sticker created for user ${userId}`);
 
         // Sync to HubSpot
@@ -186,6 +213,19 @@ Deno.serve(async (req) => {
       if (meta.type === 'replacement_sticker') {
         // Replacement: same QR code, just needs a new physical sticker printed
         // We don't create a new sticker record — the existing one stays active
+        
+        // Update sale record with replacement sticker count
+        const sales = await base44.asServiceRole.entities.Sale.filter({ user_id: userId });
+        if (sales.length > 0) {
+          const sale = sales[0];
+          const newTotal = (sale.total_revenue || 0) + (session.amount_total ? session.amount_total / 100 : 0);
+          await base44.asServiceRole.entities.Sale.update(sale.id, {
+            replacement_stickers_sold: (sale.replacement_stickers_sold || 0) + 1,
+            total_revenue: newTotal,
+          });
+          // Sync updated sale to HubSpot
+          await base44.asServiceRole.functions.invoke('syncSaleToHubSpot', { sale_id: sale.id });
+        }
         console.log(`Replacement sticker purchased for user ${userId}, sticker_id: ${meta.sticker_id}`);
       }
     }

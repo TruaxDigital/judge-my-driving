@@ -1,0 +1,119 @@
+{
+  "name": "Sale",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "User ID from app auth"
+    },
+    "email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "Customer full name"
+    },
+    "plan_tier": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "family",
+        "starter_fleet",
+        "professional_fleet"
+      ],
+      "description": "Current subscription plan"
+    },
+    "subscription_amount": {
+      "type": "number",
+      "description": "Annual subscription amount in dollars"
+    },
+    "additional_stickers_sold": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of additional stickers purchased"
+    },
+    "replacement_stickers_sold": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of replacement stickers purchased"
+    },
+    "total_revenue": {
+      "type": "number",
+      "default": 0,
+      "description": "Total revenue from this customer (subscription + add-ons)"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID"
+    },
+    "hubspot_contact_id": {
+      "type": "string",
+      "description": "HubSpot contact ID for syncing"
+    },
+    "hubspot_deal_id": {
+      "type": "string",
+      "description": "HubSpot deal ID for syncing"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled"
+      ],
+      "default": "active",
+      "description": "Customer subscription status"
+    },
+    "subscription_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When subscription started"
+    },
+    "subscription_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When subscription expires or ended"
+    },
+    "last_sync_to_hubspot": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of last HubSpot sync"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal notes"
+    }
+  },
+  "required": [
+    "user_id",
+    "email",
+    "plan_tier"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

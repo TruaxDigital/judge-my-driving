@@ -13,8 +13,38 @@ export default function AdminSales() {
   });
 
   const { data: salesData, isLoading: salesLoading, error } = useQuery({
-    queryKey: ['hubspot-deals'],
-    queryFn: () => base44.functions.invoke('getHubSpotDeals', {}),
+    queryKey: ['all-sales'],
+    queryFn: async () => {
+      const sales = await base44.asServiceRole.entities.Sale.list('-created_date');
+      
+      // Calculate metrics
+      const activeSales = sales.filter(s => s.status === 'active');
+      const totalRevenue = sales.reduce((sum, s) => sum + (s.total_revenue || 0), 0);
+      
+      // Monthly revenue (sales updated in last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const monthlyRevenue = sales
+        .filter(s => new Date(s.updated_date) >= thirtyDaysAgo)
+        .reduce((sum, s) => sum + (s.subscription_amount || 0), 0);
+
+      // New sales (created in last 30 days)
+      const newSales = sales.filter(s => new Date(s.created_date) >= thirtyDaysAgo).length;
+
+      return {
+        data: {
+          allSales: sales,
+          activeSales: activeSales,
+          metrics: {
+            totalRevenue,
+            monthlyRevenue,
+            activeSalesCount: activeSales.length,
+            totalSalesCount: sales.length,
+            newSalesCount: newSales,
+          }
+        }
+      };
+    },
     enabled: !!user && user.role === 'admin',
   });
 
@@ -38,17 +68,17 @@ export default function AdminSales() {
     );
   }
 
-  if (error || !salesData?.data) {
+  if (error) {
     return (
       <div className="bg-card border border-border rounded-2xl p-12 text-center">
         <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
         <p className="text-foreground font-semibold">Error Loading Sales Data</p>
-        <p className="text-muted-foreground text-sm mt-1">{error?.message || 'Could not connect to HubSpot'}</p>
+        <p className="text-muted-foreground text-sm mt-1">{error?.message || 'Could not load sales'}</p>
       </div>
     );
   }
 
-  const { metrics, allDeals, openDeals, closedWonDeals } = salesData.data;
+  const { metrics, allSales, activeSales } = salesData?.data || { metrics: {}, allSales: [], activeSales: [] };
 
   const statCards = [
     {
@@ -64,14 +94,14 @@ export default function AdminSales() {
       color: 'text-blue-600',
     },
     {
-      label: 'Open Deals',
-      value: metrics.openDealsCount,
+      label: 'Active Subscriptions',
+      value: metrics.activeSalesCount,
       icon: HandshakeIcon,
       color: 'text-amber-600',
     },
     {
-      label: 'Closed Deals',
-      value: metrics.closedDealsCount,
+      label: 'Total Customers',
+      value: metrics.totalSalesCount,
       icon: CheckCircle2,
       color: 'text-green-600',
     },
@@ -100,17 +130,17 @@ export default function AdminSales() {
         })}
       </div>
 
-      {/* Open Deals */}
+      {/* Active Subscriptions */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Open Deals ({openDeals.length})</h2>
-        {openDeals.length === 0 ? (
-          <p className="text-muted-foreground text-sm text-center py-8">No open deals</p>
+        <h2 className="text-lg font-semibold text-foreground">Active Subscriptions ({activeSales.length})</h2>
+        {activeSales.length === 0 ? (
+          <p className="text-muted-foreground text-sm text-center py-8">No active subscriptions</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {['Deal Name', 'Stage', 'Amount', 'Close Date'].map((h) => (
+                  {['Customer', 'Plan', 'Monthly Value', 'Add-ons', 'Replacements', 'Total Revenue'].map((h) => (
                     <th key={h} className="text-left px-4 py-3 text-muted-foreground font-medium text-xs">
                       {h}
                     </th>
@@ -118,15 +148,17 @@ export default function AdminSales() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {openDeals.map((deal) => (
-                  <tr key={deal.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground">{deal.name}</td>
-                    <td className="px-4 py-3 capitalize text-muted-foreground">{deal.stage}</td>
+                {activeSales.map((sale) => (
+                  <tr key={sale.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3 font-medium text-foreground">{sale.full_name || sale.email}</td>
+                    <td className="px-4 py-3 capitalize text-muted-foreground">{sale.plan_tier.replace(/_/g, ' ')}</td>
                     <td className="px-4 py-3 font-semibold text-foreground">
-                      ${deal.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      ${sale.subscription_amount?.toLocaleString('en-US', { maximumFractionDigits: 0 }) || '0'}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {deal.closeDate ? moment(deal.closeDate).format('MMM D, YYYY') : '—'}
+                    <td className="px-4 py-3 text-muted-foreground">{sale.additional_stickers_sold || 0}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{sale.replacement_stickers_sold || 0}</td>
+                    <td className="px-4 py-3 font-semibold text-green-600">
+                      ${sale.total_revenue?.toLocaleString('en-US', { maximumFractionDigits: 0 }) || '0'}
                     </td>
                   </tr>
                 ))}
@@ -136,17 +168,17 @@ export default function AdminSales() {
         )}
       </div>
 
-      {/* Closed Deals */}
+      {/* All Customers */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Closed Deals ({closedWonDeals.length})</h2>
-        {closedWonDeals.length === 0 ? (
-          <p className="text-muted-foreground text-sm text-center py-8">No closed deals</p>
+        <h2 className="text-lg font-semibold text-foreground">All Customers ({allSales.length})</h2>
+        {allSales.length === 0 ? (
+          <p className="text-muted-foreground text-sm text-center py-8">No customers</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  {['Deal Name', 'Amount', 'Closed Date'].map((h) => (
+                  {['Customer', 'Plan', 'Status', 'Total Revenue', 'Started'].map((h) => (
                     <th key={h} className="text-left px-4 py-3 text-muted-foreground font-medium text-xs">
                       {h}
                     </th>
@@ -154,14 +186,22 @@ export default function AdminSales() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {closedWonDeals.map((deal) => (
-                  <tr key={deal.id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground">{deal.name}</td>
-                    <td className="px-4 py-3 font-semibold text-green-600">
-                      ${deal.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                {allSales.map((sale) => (
+                  <tr key={sale.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3 font-medium text-foreground">{sale.full_name || sale.email}</td>
+                    <td className="px-4 py-3 capitalize text-muted-foreground">{sale.plan_tier.replace(/_/g, ' ')}</td>
+                    <td className="px-4 py-3 capitalize">
+                      <span className={`text-xs font-medium px-2 py-1 rounded-lg ${
+                        sale.status === 'active' ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
+                      }`}>
+                        {sale.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-foreground">
+                      ${sale.total_revenue?.toLocaleString('en-US', { maximumFractionDigits: 0 }) || '0'}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {deal.closeDate ? moment(deal.closeDate).format('MMM D, YYYY') : '—'}
+                      {sale.subscription_start_date ? moment(sale.subscription_start_date).format('MMM D, YYYY') : '—'}
                     </td>
                   </tr>
                 ))}
