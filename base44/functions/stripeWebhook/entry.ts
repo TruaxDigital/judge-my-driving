@@ -74,6 +74,10 @@ Deno.serve(async (req) => {
         return Response.json({ received: true });
       }
 
+      // Fetch user early to avoid undefined references
+      const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+      const user = users.length > 0 ? users[0] : null;
+
       if (meta.type === 'new_subscription') {
         const planTier = meta.plan_tier;
         const subId = session.subscription;
@@ -95,7 +99,6 @@ Deno.serve(async (req) => {
         await createStickers(base44, userId, userEmail, count);
 
         // Create or update sale record
-        const user = users.length > 0 ? users[0] : null;
         await base44.asServiceRole.functions.invoke('createOrUpdateSale', {
           user_id: userId,
           email: userEmail,
@@ -127,6 +130,8 @@ Deno.serve(async (req) => {
                 conversion_date: new Date().toISOString().split('T')[0],
               });
               console.log(`Created referral conversion for partner ${partner.id}, customer ${userEmail}`);
+            } else {
+              console.warn(`Referral partner not found for ref_code: ${meta.ref_code}`);
             }
           } catch (refErr) {
             console.error('Failed to create referral conversion:', refErr.message);
@@ -135,8 +140,6 @@ Deno.serve(async (req) => {
 
         // Sync to HubSpot
         try {
-          const users = await base44.asServiceRole.entities.User.filter({ id: userId });
-          const user = users[0];
           const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: userId });
           await base44.asServiceRole.functions.invoke('syncToHubSpot', {
             email: userEmail,
