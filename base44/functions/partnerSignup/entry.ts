@@ -114,8 +114,14 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
         console.log(`[partnerSignup] Invited user ${contact_email} with partner role`);
       } catch (inviteErr) {
-        // User may already exist — that's fine, just log it
-        console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+        // User may already exist — check and update their role if needed
+        const existingUsers = await base44.asServiceRole.entities.User.filter({ email: contact_email });
+        if (existingUsers.length > 0 && existingUsers[0].role !== 'partner') {
+          await base44.asServiceRole.auth.updateUserRole(existingUsers[0].id, 'partner');
+          console.log(`[partnerSignup] Updated existing user ${contact_email} to partner role`);
+        } else {
+          console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+        }
       }
     }
 
