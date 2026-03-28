@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CheckCircle2, Upload } from 'lucide-react';
+import { Loader2, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const CHANNEL_OPTIONS = [
@@ -23,12 +23,9 @@ const PAYOUT_OPTIONS = [
 ];
 
 export default function PartnerSignup() {
-  const [step, setStep] = useState(1); // 1=form, 2=w9, 3=done
+  const [step, setStep] = useState(1); // 1=form, 2=done
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [partnerId, setPartnerId] = useState(null);
-  const [w9Loading, setW9Loading] = useState(false);
-  const [w9Skipped, setW9Skipped] = useState(false);
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -70,32 +67,11 @@ export default function PartnerSignup() {
       return;
     }
 
-    setPartnerId(res.data.partner.id);
     setLoading(false);
     setStep(2);
   };
 
-  const handleW9Upload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setW9Loading(true);
-
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    await base44.entities.ReferralPartner.update(partnerId, {
-      w9_file: file_url,
-      w9_uploaded_at: new Date().toISOString(),
-    });
-
-    setW9Loading(false);
-    setStep(3);
-  };
-
-  const handleSkipW9 = () => {
-    setW9Skipped(true);
-    setStep(3);
-  };
-
-  if (step === 3) {
+  if (step === 2) {
     return (
       <div className="min-h-screen bg-zinc-900 font-inter flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-6">
@@ -105,61 +81,21 @@ export default function PartnerSignup() {
           <div>
             <h1 className="text-2xl font-bold text-white">You're in!</h1>
             <p className="text-zinc-400 mt-2 text-sm">
-              Your partner account has been created. Your referral codes and QR codes are being generated now.
+              Your partner account has been created. Check your email for your referral code and links.
             </p>
           </div>
-          {w9Skipped && (
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-400">
-              Don't forget to upload your W-9 — it's required before any payouts can be processed.
-            </div>
-          )}
+          <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-4 text-sm text-zinc-400 text-left space-y-1">
+            <p className="font-semibold text-zinc-300">Next steps:</p>
+            <p>1. Check your inbox for your welcome email with referral links.</p>
+            <p>2. Log in to your Partner Dashboard to track commissions.</p>
+            <p>3. Upload your W-9 in Account Settings before your first payout.</p>
+          </div>
           <Button
             className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900"
-            onClick={() => window.location.href = '/PartnerPortal'}
+            onClick={() => base44.auth.redirectToLogin('/PartnerPortal')}
           >
             Go to My Partner Dashboard →
           </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 2) {
-    return (
-      <div className="min-h-screen bg-zinc-900 font-inter flex items-center justify-center p-6">
-        <div className="max-w-md w-full space-y-6">
-          <div className="text-center">
-            <h2 className="text-primary font-extrabold text-xl tracking-tight mb-2">JUDGE MY DRIVING</h2>
-            <h1 className="text-2xl font-bold text-white">Upload Your W-9</h1>
-            <p className="text-zinc-400 text-sm mt-2">
-              Before we can process any commission payouts, we need a completed W-9 on file.
-            </p>
-          </div>
-
-          <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
-            <Label className="block text-center">
-              <div className={cn(
-                "border-2 border-dashed border-zinc-600 rounded-xl p-8 cursor-pointer hover:border-primary/50 transition-colors text-center space-y-3",
-                w9Loading && "opacity-50 pointer-events-none"
-              )}>
-                {w9Loading ? (
-                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-                ) : (
-                  <Upload className="w-8 h-8 text-zinc-400 mx-auto" />
-                )}
-                <p className="text-sm text-zinc-300 font-medium">{w9Loading ? 'Uploading...' : 'Click to upload W-9'}</p>
-                <p className="text-xs text-zinc-500">PDF or image file</p>
-                <input type="file" accept=".pdf,image/*" className="hidden" onChange={handleW9Upload} disabled={w9Loading} />
-              </div>
-            </Label>
-          </div>
-
-          <button
-            onClick={handleSkipW9}
-            className="w-full text-center text-sm text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
-          >
-            Skip for now — I'll upload later
-          </button>
         </div>
       </div>
     );
