@@ -4,7 +4,7 @@ import { MessageSquare, Star, HelpCircle, Zap, Link as LinkIcon } from 'lucide-r
 const HOW_IT_WORKS = [
   'Share your referral link or print your flyer from the My Referral Tools tab. You have separate links for teen drivers and senior drivers.',
   'The parent signs up through your link. The referral is tracked automatically.',
-  'You earn $10 for every paid signup. Payouts monthly.',
+  'You earn $10 for every paid signup. Payouts quarterly.',
 ];
 
 const WHY_PARENTS_SAY_YES = [
