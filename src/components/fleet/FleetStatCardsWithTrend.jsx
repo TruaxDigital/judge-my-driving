@@ -115,12 +115,12 @@ export default function FleetStatCardsWithTrend({ metrics }) {
               <Icon className={`w-6 h-6 ${card.iconColor}`} />
             </div>
             <p className="text-3xl font-bold text-foreground">{card.value}</p>
-            <div className="flex items-center gap-2 pt-1">
-              {card.trend !== null && card.trend !== undefined && (
+            {card.trend !== null && card.trend !== undefined && (
+              <div className="flex items-center gap-2 pt-1">
                 <TrendIndicator value={card.trend} isNegativeBetter={card.isNegativeBetter} />
-              )}
-              <p className="text-xs text-muted-foreground">vs last period</p>
-            </div>
+                <p className="text-xs text-muted-foreground">vs last period</p>
+              </div>
+            )}
           </div>
         );
       })}
