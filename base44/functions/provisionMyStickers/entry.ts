@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     unique_code: code,
     owner_id: user.id,
     owner_email: user.email,
-    status: 'pending',
+    status: 'deactivated',
     is_registered: false,
     qr_url: qrUrl,
     feedback_count: 0,

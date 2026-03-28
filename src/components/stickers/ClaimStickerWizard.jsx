@@ -45,8 +45,8 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
     setLoading(true);
     setError('');
     try {
-      // Save design to sticker first
-      await base44.entities.Sticker.update(sticker.id, { design_id: currentDesign });
+      // Save design to sticker and activate it
+      await base44.entities.Sticker.update(sticker.id, { design_id: currentDesign, status: 'active' });
       // Send to Printful
       const res = await base44.functions.invoke('sendToPrintful', {
         sticker_id: sticker.id,
