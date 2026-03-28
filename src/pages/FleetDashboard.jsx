@@ -253,6 +253,8 @@ export default function FleetDashboard() {
               unresolvedIncidents: unresolvedIncidents,
               allFeedback: allFeedback,
               dateRange: dateRange,
+              filteredStickers: filteredStickers,
+              allCorrectiveActions: allCorrectiveActions,
             }}
           />
           <div>
