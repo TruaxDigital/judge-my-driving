@@ -70,7 +70,7 @@ const PublicPages = () => (
 );
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
 
   // Always render public routes immediately — no auth gate, no loading spinner, regardless of auth state
   if (isPublicPath()) {
@@ -94,6 +94,16 @@ const AuthenticatedApp = () => {
       navigateToLogin();
       return null;
     }
+  }
+
+  // Redirect partner role users to their portal
+  if (user?.role === 'partner') {
+    return (
+      <Routes>
+        <Route path="/PartnerPortal" element={<PartnerPortal />} />
+        <Route path="*" element={<Navigate to="/PartnerPortal" replace />} />
+      </Routes>
+    );
   }
 
   // Render the main app
