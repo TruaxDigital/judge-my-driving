@@ -9,6 +9,7 @@ import PartnerReferralTools from '@/components/partner/PartnerReferralTools';
 import PartnerPitchScripts from '@/components/partner/PartnerPitchScripts';
 import PartnerDesigns from '@/components/partner/PartnerDesigns';
 import PartnerSettings from '@/components/partner/PartnerSettings';
+import PartnerSetup from '@/components/partner/PartnerSetup';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -58,6 +59,11 @@ export default function PartnerPortal() {
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
+  }
+
+  // Partner role but no ReferralPartner record — show inline setup
+  if (!partner) {
+    return <PartnerSetup user={user} onComplete={() => queryClient.invalidateQueries({ queryKey: ['my-partner'] })} />;
   }
 
   const needsW9 = partner && !partner.w9_file;

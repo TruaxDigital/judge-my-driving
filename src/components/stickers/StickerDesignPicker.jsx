@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 
-const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
+const GITHUB_BASE = 'https://cdn.jsdelivr.net/gh/TruaxDigital/judge-my-driving@d29729a262739c008d997bd793d1f8f2d5f1d08d';
 
 export const DESIGN_URLS = {
   company_vehicle:      `${GITHUB_BASE}/Company%20Vehicle.%20Got%20Feedback.svg`,

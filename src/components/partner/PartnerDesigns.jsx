@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
+const GITHUB_BASE = 'https://cdn.jsdelivr.net/gh/TruaxDigital/judge-my-driving@d29729a262739c008d997bd793d1f8f2d5f1d08d';
 
 const DESIGNS = [
   { id: 'tell_my_boss', label: 'Tell My Boss', url: `${GITHUB_BASE}/How's%20My%20Driving.%20Tell%20My%20Boss.svg` },
