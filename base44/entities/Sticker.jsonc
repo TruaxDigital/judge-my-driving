@@ -80,6 +80,11 @@
       "type": "boolean",
       "default": false
     },
+    "is_hidden": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this sticker is hidden from the main dashboard (fleet use only)"
+    },
     "qr_url": {
       "type": "string",
       "description": "Full URL the QR resolves to"

@@ -26,6 +26,7 @@ export default function Stickers() {
   const [addonLoading, setAddonLoading] = useState(false);
   const [claimLoading, setClaimLoading] = useState(false);
   const [claimWizardStickers, setClaimWizardStickers] = useState([]);
+  const [showHidden, setShowHidden] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -94,6 +95,10 @@ export default function Stickers() {
 
   // Stickers that haven't been sent to Printful yet (no printful_order_id)
   const unclaimedStickers = stickers.filter(s => !s.printful_order_id);
+
+  // Filter stickers based on visibility and user role (fleet users can hide/show)
+  const isFleetUser = ['fleet_admin', 'starter_fleet', 'professional_fleet'].includes(user?.role) || user?.plan === 'fleet';
+  const visibleStickers = isFleetUser && !showHidden ? stickers.filter(s => !s.is_hidden) : stickers;
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
@@ -208,9 +213,22 @@ export default function Stickers() {
           </div>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {stickers.map(sticker => (
-            <div key={sticker.id} className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
+        <div className="space-y-4">
+          {isFleetUser && stickers.some(s => s.is_hidden) && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant={showHidden ? "default" : "outline"}
+                size="sm"
+                className="rounded-lg"
+                onClick={() => setShowHidden(!showHidden)}
+              >
+                {showHidden ? 'Hide' : 'Show'} Hidden ({stickers.filter(s => s.is_hidden).length})
+              </Button>
+            </div>
+          )}
+          <div className="grid gap-4">
+            {visibleStickers.map(sticker => (
+              <div key={sticker.id} className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex items-center gap-3 flex-wrap">
@@ -314,12 +332,21 @@ export default function Stickers() {
                         <Power className="w-4 h-4 mr-2" />
                         {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      {isFleetUser && (
+                        <DropdownMenuItem
+                          onClick={() => updateMutation.mutate({ id: sticker.id, data: { is_hidden: !sticker.is_hidden } })}
+                        >
+                          {sticker.is_hidden ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
+                          {sticker.is_hidden ? 'Unhide' : 'Hide'} from Dashboard
+                        </DropdownMenuItem>
+                      )}
+                      </DropdownMenuContent>
+                      </DropdownMenu>
                 </div>
               </div>
             </div>
-          ))}
+              ))}
+          </div>
         </div>
       )}
 
