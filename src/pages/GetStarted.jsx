@@ -273,17 +273,15 @@ export default function GetStarted() {
           'Subscribe Now →'}
         </Button>
 
-        {!isAuthed &&
-        <p className="text-center text-zinc-500 text-sm mt-4">
-            Already have an account?{' '}
-            <button
-            className="text-primary underline"
-            onClick={() => base44.auth.redirectToLogin('/Pricing')}>
-            
+        {!isAuthed && (
+          <p className="text-center text-zinc-500 text-sm mt-3">
+            New here? You'll create your account on the next screen.{' '}
+            Already have one?{' '}
+            <button className="text-primary underline" onClick={() => base44.auth.redirectToLogin('/Pricing')}>
               Sign in
             </button>
           </p>
-        }
+        )}
 
         <div className="text-center mt-10 pt-6 border-t border-zinc-800">
           <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} Judge My Driving. Privacy-first feedback.</p>

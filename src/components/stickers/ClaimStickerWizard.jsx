@@ -7,7 +7,7 @@ import { Loader2, ChevronRight, ChevronLeft, CheckCircle2, Package } from 'lucid
 import StickerDesignPicker from './StickerDesignPicker';
 import { base44 } from '@/api/base44Client';
 
-const STEPS = ['Design', 'Shipping', 'Confirm'];
+const STEPS = ['Name', 'Design', 'Shipping', 'Confirm'];
 
 const emptyAddress = {
   name: '', address1: '', address2: '', city: '', state_code: '', zip: '', country_code: 'US',
@@ -15,7 +15,8 @@ const emptyAddress = {
 
 export default function ClaimStickerWizard({ stickers, open, onClose, onComplete }) {
   const [currentStickerIndex, setCurrentStickerIndex] = useState(0);
-  const [step, setStep] = useState(0); // 0=Design, 1=Shipping, 2=Confirm
+  const [step, setStep] = useState(0); // 0=Name, 1=Design, 2=Shipping, 3=Confirm
+  const [labels, setLabels] = useState({});
   const [designs, setDesigns] = useState({});
   const [addresses, setAddresses] = useState({});
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,8 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
   const currentDesign = designs[sticker?.id] || 'default';
   const currentAddress = addresses[sticker?.id] || { ...emptyAddress };
 
+  const currentLabel = labels[sticker?.id] || '';
+  const setLabel = (val) => setLabels(prev => ({ ...prev, [sticker.id]: val }));
   const setDesign = (val) => setDesigns(prev => ({ ...prev, [sticker.id]: val }));
   const setAddress = (field, val) => setAddresses(prev => ({
     ...prev,
@@ -45,8 +48,12 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
     setLoading(true);
     setError('');
     try {
-      // Save design to sticker and activate it
-      await base44.entities.Sticker.update(sticker.id, { design_id: currentDesign, status: 'active' });
+      // Save label, design to sticker and activate it
+      await base44.entities.Sticker.update(sticker.id, {
+        driver_label: currentLabel || undefined,
+        design_id: currentDesign,
+        status: 'active',
+      });
       // Send to Printful
       const res = await base44.functions.invoke('sendToPrintful', {
         sticker_id: sticker.id,
@@ -106,25 +113,43 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
                 ))}</span>
               </div>
               <DialogTitle>
-                {step === 0 && 'Choose Your Sticker Design'}
-                {step === 1 && 'Where Should We Ship It?'}
-                {step === 2 && 'Confirm Your Order'}
+                {step === 0 && 'Name This Vehicle'}
+                {step === 1 && 'Choose Your Sticker Design'}
+                {step === 2 && 'Where Should We Ship It?'}
+                {step === 3 && 'Confirm Your Order'}
               </DialogTitle>
               <DialogDescription>
-                {step === 0 && `Pick a design for sticker ${sticker?.unique_code}. This will be printed and shipped to you.`}
-                {step === 1 && 'Enter the shipping address for this sticker.'}
-                {step === 2 && 'Review your selection before we send it to print.'}
+                {step === 0 && 'Give this sticker a nickname so you can easily identify which vehicle it belongs to.'}
+                {step === 1 && `Pick a design for sticker ${sticker?.unique_code}. This will be printed and shipped to you.`}
+                {step === 2 && 'Enter the shipping address for this sticker.'}
+                {step === 3 && 'Review your selection before we send it to print.'}
               </DialogDescription>
             </DialogHeader>
 
             <div className="py-2">
               {step === 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-1">
+                    <Label className="text-sm">Vehicle Nickname *</Label>
+                    <Input
+                      autoFocus
+                      placeholder="e.g. Mom's Car, My Truck, Teen Driver"
+                      value={currentLabel}
+                      onChange={e => setLabel(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && currentLabel.trim()) setStep(1); }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">This name is just for you — it helps identify which car this sticker belongs to.</p>
+                </div>
+              )}
+
+              {step === 1 && (
                 <div className="max-h-[55vh] overflow-y-auto pr-1">
                   <StickerDesignPicker value={currentDesign} onChange={setDesign} />
                 </div>
               )}
 
-              {step === 1 && (
+              {step === 2 && (
                 <div className="space-y-3">
                   {[
                     { key: 'name', label: 'Full Name *', placeholder: 'John Smith' },
@@ -146,8 +171,12 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
                 </div>
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <div className="space-y-4">
+                  <div className="bg-muted rounded-xl p-4 space-y-2 text-sm">
+                    <p className="font-semibold text-foreground">Vehicle Name</p>
+                    <p className="text-muted-foreground">{currentLabel || '(unnamed)'}</p>
+                  </div>
                   <div className="bg-muted rounded-xl p-4 space-y-2 text-sm">
                     <p className="font-semibold text-foreground">Design</p>
                     <p className="text-muted-foreground capitalize">{currentDesign.replace(/_/g, ' ')}</p>
@@ -174,15 +203,15 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
                   <ChevronLeft className="w-4 h-4 mr-1" /> Back
                 </Button>
               )}
-              {step < 2 && (
+              {step < 3 && (
                 <Button
                   onClick={() => setStep(s => s + 1)}
-                  disabled={step === 1 && !addressValid()}
+                  disabled={(step === 0 && !currentLabel.trim()) || (step === 2 && !addressValid())}
                 >
                   Next <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               )}
-              {step === 2 && (
+              {step === 3 && (
                 <Button onClick={handleOrderSticker} disabled={loading}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   {currentStickerIndex < totalStickers - 1 ? 'Order & Next Sticker' : 'Place Order'}

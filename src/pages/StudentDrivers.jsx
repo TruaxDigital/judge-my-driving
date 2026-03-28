@@ -235,8 +235,9 @@ export default function StudentDrivers() {
         </Button>
 
         {!isAuthed && (
-          <p className="text-center text-zinc-500 text-sm mt-4">
-            Already have an account?{' '}
+          <p className="text-center text-zinc-500 text-sm mt-3">
+            New here? You'll create your account on the next screen.{' '}
+            Already have one?{' '}
             <button className="text-primary underline" onClick={() => base44.auth.redirectToLogin(window.location.href)}>Sign in</button>
           </p>
         )}
