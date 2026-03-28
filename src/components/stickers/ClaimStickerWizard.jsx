@@ -139,7 +139,7 @@ export default function ClaimStickerWizard({ stickers, open, onClose, onComplete
                       onKeyDown={e => { if (e.key === 'Enter' && currentLabel.trim()) setStep(1); }}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">This name is just for you — it helps identify which car this sticker belongs to.</p>
+                  <p className="text-xs text-muted-foreground">This name identifies your vehicle and will be shown publicly if you opt in to the leaderboard.</p>
                 </div>
               )}
 
