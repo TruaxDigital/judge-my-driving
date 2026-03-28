@@ -89,10 +89,12 @@ export default function GetStarted() {
     }
     setLoading(true);
     setError('');
+    const storedRef = sessionStorage.getItem('jmd_ref_code');
     const res = await base44.functions.invoke('createCheckoutSession', {
       plan_tier: selectedPlan,
       mode: 'subscription',
-      discount_code: hasDiscount ? discountCode : undefined
+      discount_code: hasDiscount ? discountCode : undefined,
+      ref_code: storedRef || undefined,
     });
     if (res.data?.url) {
       window.location.href = res.data.url;

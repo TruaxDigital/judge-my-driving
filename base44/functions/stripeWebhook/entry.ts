@@ -94,6 +94,30 @@ Deno.serve(async (req) => {
 
         await createStickers(base44, userId, userEmail, count);
 
+        // Create referral conversion if ref_code provided
+        if (meta.ref_code) {
+          try {
+            const partners = await base44.asServiceRole.entities.ReferralPartner.filter({ ref_code: meta.ref_code });
+            if (partners.length > 0) {
+              const partner = partners[0];
+              const subscription_type = planTier.includes('fleet') ? 'fleet' : 'individual';
+              await base44.asServiceRole.entities.ReferralConversion.create({
+                ref_code: meta.ref_code,
+                partner_id: partner.id,
+                customer_name: user?.full_name || '',
+                customer_email: userEmail,
+                subscription_type,
+                commission_amount: 10,
+                commission_status: 'pending',
+                conversion_date: new Date().toISOString().split('T')[0],
+              });
+              console.log(`Created referral conversion for partner ${partner.id}, customer ${userEmail}`);
+            }
+          } catch (refErr) {
+            console.error('Failed to create referral conversion:', refErr.message);
+          }
+        }
+
         // Sync to HubSpot
         try {
           const users = await base44.asServiceRole.entities.User.filter({ id: userId });

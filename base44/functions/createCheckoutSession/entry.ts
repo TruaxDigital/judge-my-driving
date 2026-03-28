@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { mode, success_url, cancel_url, discount_code } = body;
+    const { mode, success_url, cancel_url, discount_code, ref_code } = body;
 
     // Additional sticker subscription (family or fleet only)
     if (mode === 'addon') {
@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
           user_id: user.id,
           user_email: user.email,
           type: 'addon_sticker',
+          ref_code: ref_code || '',
         },
       });
       return Response.json({ url: session.url });
@@ -78,6 +79,7 @@ Deno.serve(async (req) => {
           user_email: user.email,
           type: 'replacement_sticker',
           sticker_id: sticker_id || '',
+          ref_code: ref_code || '',
         },
       });
       return Response.json({ url: session.url });
@@ -145,6 +147,7 @@ Deno.serve(async (req) => {
         user_email: user.email,
         plan_tier,
         type: 'new_subscription',
+        ref_code: ref_code || '',
       },
     });
 
