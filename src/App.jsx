@@ -91,10 +91,8 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      if (!isPublicRoute) {
-        navigateToLogin();
-        return null;
-      }
+      navigateToLogin();
+      return null;
     }
   }
 
