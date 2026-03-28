@@ -11,6 +11,80 @@
         "partner"
       ],
       "default": "user"
+    },
+    "plan_tier": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "family",
+        "starter_fleet",
+        "professional_fleet"
+      ],
+      "description": "The user's current subscription plan tier"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "fleet"
+      ],
+      "description": "Broad plan type"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled",
+        "trialing"
+      ],
+      "description": "Current Stripe subscription status"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "subscription_start_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the current subscription period started"
+    },
+    "subscription_end_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the current subscription period ends / renews"
+    },
+    "sticker_credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of unclaimed sticker credits available to the user"
+    },
+    "notification_pref": {
+      "type": "string",
+      "enum": [
+        "instant",
+        "daily",
+        "weekly"
+      ],
+      "default": "instant",
+      "description": "How often the user wants feedback notifications"
+    },
+    "home_state": {
+      "type": "string",
+      "description": "User's home state (for leaderboard scoping)"
+    },
+    "home_state_slug": {
+      "type": "string",
+      "description": "URL-friendly state slug"
+    },
+    "home_metro_slug": {
+      "type": "string",
+      "description": "URL-friendly metro area slug"
     }
-  }
+  },
+  "required": []
 }
