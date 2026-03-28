@@ -1,0 +1,332 @@
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2, CheckCircle2, Upload } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const CHANNEL_OPTIONS = [
+  { value: 'driving_school', label: 'Driving School' },
+  { value: 'pta', label: 'PTA / Parent Organization' },
+  { value: 'insurance', label: 'Insurance Agency' },
+  { value: 'dealership', label: 'Dealership' },
+  { value: 'event', label: 'Event / Conference' },
+  { value: 'influencer', label: 'Content Creator / Influencer' },
+  { value: 'other', label: 'Other' },
+];
+
+const PAYOUT_OPTIONS = [
+  { value: 'venmo', label: 'Venmo', detailLabel: 'Venmo username' },
+  { value: 'paypal', label: 'PayPal', detailLabel: 'PayPal email' },
+  { value: 'eft', label: 'EFT (Bank Transfer)', detailLabel: 'Bank routing and account number' },
+];
+
+export default function PartnerSignup() {
+  const [step, setStep] = useState(1); // 1=form, 2=w9, 3=done
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [partnerId, setPartnerId] = useState(null);
+  const [w9Loading, setW9Loading] = useState(false);
+  const [w9Skipped, setW9Skipped] = useState(false);
+
+  const [form, setForm] = useState({
+    contact_name: '',
+    contact_email: '',
+    contact_phone: '',
+    password: '',
+    partner_name: '',
+    channel_type: '',
+    location: '',
+    payout_method: 'venmo',
+    payout_details: '',
+  });
+
+  const payoutOption = PAYOUT_OPTIONS.find(p => p.value === form.payout_method);
+
+  const handleChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    // 1. Create user account
+    const signupRes = await base44.auth.signUp({
+      email: form.contact_email,
+      password: form.password,
+      full_name: form.contact_name,
+      role: 'partner',
+    });
+
+    if (!signupRes?.id) {
+      setError('Failed to create account. The email may already be in use.');
+      setLoading(false);
+      return;
+    }
+
+    // 2. Create partner record via backend function
+    const res = await base44.functions.invoke('partnerSignup', {
+      user_id: signupRes.id,
+      partner_name: form.partner_name,
+      channel_type: form.channel_type,
+      location: form.location,
+      contact_name: form.contact_name,
+      contact_email: form.contact_email,
+      contact_phone: form.contact_phone,
+      payout_method: form.payout_method,
+      payout_details: form.payout_details,
+    });
+
+    if (!res.data?.success) {
+      setError(res.data?.error || 'Failed to create partner profile.');
+      setLoading(false);
+      return;
+    }
+
+    setPartnerId(res.data.partner.id);
+    setLoading(false);
+    setStep(2);
+  };
+
+  const handleW9Upload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setW9Loading(true);
+
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    await base44.entities.ReferralPartner.update(partnerId, {
+      w9_file: file_url,
+      w9_uploaded_at: new Date().toISOString(),
+    });
+
+    setW9Loading(false);
+    setStep(3);
+  };
+
+  const handleSkipW9 = () => {
+    setW9Skipped(true);
+    setStep(3);
+  };
+
+  if (step === 3) {
+    return (
+      <div className="min-h-screen bg-zinc-900 font-inter flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-8 h-8 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">You're in!</h1>
+            <p className="text-zinc-400 mt-2 text-sm">
+              Your partner account has been created. Your referral codes and QR codes are being generated now.
+            </p>
+          </div>
+          {w9Skipped && (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-400">
+              Don't forget to upload your W-9 — it's required before any payouts can be processed.
+            </div>
+          )}
+          <Button
+            className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900"
+            onClick={() => window.location.href = '/PartnerPortal'}
+          >
+            Go to My Partner Dashboard →
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 2) {
+    return (
+      <div className="min-h-screen bg-zinc-900 font-inter flex items-center justify-center p-6">
+        <div className="max-w-md w-full space-y-6">
+          <div className="text-center">
+            <h2 className="text-primary font-extrabold text-xl tracking-tight mb-2">JUDGE MY DRIVING</h2>
+            <h1 className="text-2xl font-bold text-white">Upload Your W-9</h1>
+            <p className="text-zinc-400 text-sm mt-2">
+              Before we can process any commission payouts, we need a completed W-9 on file.
+            </p>
+          </div>
+
+          <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-6 space-y-4">
+            <Label className="block text-center">
+              <div className={cn(
+                "border-2 border-dashed border-zinc-600 rounded-xl p-8 cursor-pointer hover:border-primary/50 transition-colors text-center space-y-3",
+                w9Loading && "opacity-50 pointer-events-none"
+              )}>
+                {w9Loading ? (
+                  <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
+                ) : (
+                  <Upload className="w-8 h-8 text-zinc-400 mx-auto" />
+                )}
+                <p className="text-sm text-zinc-300 font-medium">{w9Loading ? 'Uploading...' : 'Click to upload W-9'}</p>
+                <p className="text-xs text-zinc-500">PDF or image file</p>
+                <input type="file" accept=".pdf,image/*" className="hidden" onChange={handleW9Upload} disabled={w9Loading} />
+              </div>
+            </Label>
+          </div>
+
+          <button
+            onClick={handleSkipW9}
+            className="w-full text-center text-sm text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
+          >
+            Skip for now — I'll upload later
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-900 font-inter">
+      <div className="max-w-lg mx-auto px-5 py-10">
+        <div className="text-center mb-8">
+          <h2 className="text-primary font-extrabold text-xl tracking-tight">JUDGE MY DRIVING</h2>
+          <h1 className="text-3xl font-extrabold text-white mt-2">Sign Up as a Referral Partner</h1>
+          <p className="text-zinc-400 text-sm mt-2">Earn $10 for every individual or family plan signup through your link.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Contact Name *</Label>
+            <Input
+              required
+              placeholder="Your full name"
+              value={form.contact_name}
+              onChange={e => handleChange('contact_name', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Contact Email * (this becomes your login)</Label>
+            <Input
+              required
+              type="email"
+              placeholder="you@example.com"
+              value={form.contact_email}
+              onChange={e => handleChange('contact_email', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Contact Phone</Label>
+            <Input
+              placeholder="(optional)"
+              value={form.contact_phone}
+              onChange={e => handleChange('contact_phone', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Password *</Label>
+            <Input
+              required
+              type="password"
+              placeholder="Create a password"
+              value={form.password}
+              onChange={e => handleChange('password', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Partner / Business Name *</Label>
+            <Input
+              required
+              placeholder="e.g. ABC Driving School"
+              value={form.partner_name}
+              onChange={e => handleChange('partner_name', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Channel Type *</Label>
+            <select
+              required
+              value={form.channel_type}
+              onChange={e => handleChange('channel_type', e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 text-white rounded-md px-3 py-2 text-sm"
+            >
+              <option value="">Select type...</option>
+              {CHANNEL_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Location (city or area)</Label>
+            <Input
+              placeholder="e.g. Arlington, VA"
+              value={form.location}
+              onChange={e => handleChange('location', e.target.value)}
+              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-zinc-300 text-sm">Payout Method *</Label>
+            <div className="flex gap-2">
+              {PAYOUT_OPTIONS.map(o => (
+                <button
+                  key={o.value}
+                  type="button"
+                  onClick={() => handleChange('payout_method', o.value)}
+                  className={cn(
+                    'flex-1 py-2 rounded-xl border text-sm font-medium transition-all',
+                    form.payout_method === o.value
+                      ? 'border-primary bg-primary/20 text-primary'
+                      : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-500'
+                  )}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {payoutOption && (
+            <div className="space-y-1">
+              <Label className="text-zinc-300 text-sm">{payoutOption.detailLabel}</Label>
+              <Input
+                placeholder={payoutOption.detailLabel}
+                value={form.payout_details}
+                onChange={e => handleChange('payout_details', e.target.value)}
+                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
+              />
+            </div>
+          )}
+
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          <Button
+            type="submit"
+            className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900 text-base"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Partner Account →'}
+          </Button>
+
+          <p className="text-center text-zinc-500 text-sm">
+            Already have an account?{' '}
+            <button className="text-primary underline" onClick={() => base44.auth.redirectToLogin('/PartnerPortal')}>
+              Sign in
+            </button>
+          </p>
+        </form>
+
+        <div className="text-center mt-10 pt-6 border-t border-zinc-800">
+          <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} Judge My Driving. Questions? hello@judgemydriving.com</p>
+        </div>
+      </div>
+    </div>
+  );
+}

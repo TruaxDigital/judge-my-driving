@@ -1,0 +1,99 @@
+{
+  "name": "ReferralConversion",
+  "type": "object",
+  "properties": {
+    "ref_code": {
+      "type": "string",
+      "description": "The referral code used"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "Links to ReferralPartner"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer who signed up"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "subscription_type": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "family"
+      ],
+      "description": "Plan type purchased"
+    },
+    "commission_amount": {
+      "type": "number",
+      "default": 10,
+      "description": "Fixed $10 commission"
+    },
+    "commission_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid"
+      ],
+      "default": "pending"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When commission was paid"
+    },
+    "conversion_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the conversion occurred"
+    },
+    "payout_period": {
+      "type": "string",
+      "description": "e.g. Q2 2026"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin-only notes"
+    }
+  },
+  "required": [
+    "ref_code",
+    "partner_id",
+    "subscription_type",
+    "commission_amount",
+    "commission_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

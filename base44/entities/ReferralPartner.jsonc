@@ -1,0 +1,142 @@
+{
+  "name": "ReferralPartner",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Links to the app's auth user"
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Business or organization name"
+    },
+    "channel_type": {
+      "type": "string",
+      "enum": [
+        "driving_school",
+        "pta",
+        "insurance",
+        "dealership",
+        "event",
+        "influencer",
+        "other"
+      ],
+      "description": "Type of partner channel"
+    },
+    "location": {
+      "type": "string",
+      "description": "City or area"
+    },
+    "ref_code": {
+      "type": "string",
+      "description": "Unique referral code"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Primary contact name"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Primary contact email"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "w9_file": {
+      "type": "string",
+      "description": "URL of uploaded W-9 file"
+    },
+    "w9_uploaded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When W-9 was uploaded"
+    },
+    "payout_method": {
+      "type": "string",
+      "enum": [
+        "venmo",
+        "paypal",
+        "eft"
+      ],
+      "description": "How the partner wants to be paid"
+    },
+    "payout_details": {
+      "type": "string",
+      "description": "Venmo handle, PayPal email, or bank info"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin-only notes"
+    },
+    "teen_qr_url": {
+      "type": "string",
+      "description": "URL of generated teen driver QR code PNG"
+    },
+    "senior_qr_url": {
+      "type": "string",
+      "description": "URL of generated senior driver QR code PNG"
+    }
+  },
+  "required": [
+    "partner_name",
+    "channel_type",
+    "contact_name",
+    "contact_email",
+    "ref_code"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

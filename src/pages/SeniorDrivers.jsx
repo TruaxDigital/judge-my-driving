@@ -1,0 +1,243 @@
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, CheckCircle, Star, Bell, ShieldCheck, Zap } from 'lucide-react';
+import { cn, isInIframe } from '@/lib/utils';
+
+const GITHUB_BASE = 'https://github.com/TruaxDigital/judge-my-driving/raw/d29729a262739c008d997bd793d1f8f2d5f1d08d';
+
+const FEATURED_DESIGNS = [
+  { id: 'still_got_it', url: `${GITHUB_BASE}/Still%20Got%20It.svg`, label: "Still Got It" },
+  { id: 'experienced_driver', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "Experienced Driver" },
+  { id: 'decades_behind_wheel', url: `${GITHUB_BASE}/New%20Driver.%20Got%20Feedback.svg`, label: "Decades on the Road" },
+  { id: 'rate_this_driver', url: `${GITHUB_BASE}/Rate%20this%20Driver.svg`, label: "Rate This Driver" },
+];
+
+const PLANS = [
+  {
+    id: 'individual',
+    name: 'Individual',
+    price: 49,
+    features: ['1 sticker included', 'Real-time email alerts', 'Feedback map & dashboard', '1 year history'],
+  },
+  {
+    id: 'family',
+    name: 'Family',
+    price: 99,
+    features: ['3 stickers included', 'All alert types', 'Unlimited feedback history', 'Family dashboard'],
+    popular: true,
+  },
+];
+
+const STATS = [
+  { number: '#1', label: 'highest crash death rate per mile: drivers 75+', source: 'IIHS, 2023' },
+  { number: '83%', label: 'of adult children avoid the driving conversation with aging parents', source: 'AAA Foundation, 2022' },
+];
+
+const HOW_IT_WORKS = [
+  { step: 1, title: 'Get your sticker', body: 'Choose a tasteful design. Delivered to your door.' },
+  { step: 2, title: 'Place it on their car', body: 'Simple. No tech, no GPS, no confrontation.' },
+  { step: 3, title: 'See how they\'re doing on the road', body: 'Other drivers provide honest ratings. You see everything in real time.' },
+];
+
+export default function SeniorDrivers() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+
+  useEffect(() => {
+    if (refCode) sessionStorage.setItem('jmd_ref_code', refCode);
+  }, [refCode]);
+
+  const [selectedPlan, setSelectedPlan] = useState('individual');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    base44.auth.isAuthenticated().then(authed => {
+      setIsAuthed(authed);
+      setCheckingAuth(false);
+    });
+  }, []);
+
+  const handleContinue = async () => {
+    if (!isAuthed) {
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    }
+    if (isInIframe()) {
+      alert('Checkout is only available from the published app.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const storedRef = sessionStorage.getItem('jmd_ref_code') || refCode;
+    const res = await base44.functions.invoke('createCheckoutSession', {
+      plan_tier: selectedPlan,
+      mode: 'subscription',
+      ref_code: storedRef || undefined,
+    });
+    if (res.data?.url) {
+      window.location.href = res.data.url;
+    } else {
+      setError(res.data?.error || 'Could not start checkout. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-900 font-inter">
+      <div className="max-w-lg mx-auto px-5 py-10">
+
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <h2 className="text-primary font-extrabold text-xl tracking-tight">JUDGE MY DRIVING</h2>
+          {refCode && (
+            <p className="text-zinc-500 text-xs mt-1">Referred by a partner</p>
+          )}
+        </div>
+
+        {/* Hero */}
+        <div className="text-center space-y-3 mb-8">
+          <h1 className="text-3xl font-extrabold text-white leading-tight">
+            You Worry Every Time They Drive.{' '}
+            <span className="text-primary">Now You'll Know.</span>
+          </h1>
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            Other drivers scan a QR sticker on your parent's car and rate how they drive. You get the feedback, delivered in real time. No awkward conversation required.
+          </p>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3 mb-8">
+          {STATS.map(s => (
+            <div key={s.number} className="bg-zinc-800/60 border border-zinc-700 rounded-2xl p-4 text-center">
+              <p className="text-3xl font-extrabold text-primary">{s.number}</p>
+              <p className="text-zinc-300 text-xs mt-1 leading-tight">{s.label}</p>
+              <p className="text-zinc-600 text-xs mt-1">{s.source}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* How it works */}
+        <div className="mb-8">
+          <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-4">How it works</p>
+          <div className="space-y-3">
+            {HOW_IT_WORKS.map(h => (
+              <div key={h.step} className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-primary/20 text-primary font-bold text-sm flex items-center justify-center shrink-0 mt-0.5">{h.step}</div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{h.title}</p>
+                  <p className="text-zinc-400 text-xs mt-0.5">{h.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trust signals */}
+        <div className="flex flex-col gap-2 mb-8">
+          {[
+            { icon: Bell, text: 'Instant email alerts every time someone rates the driver' },
+            { icon: ShieldCheck, text: 'Anonymous for the reviewer, transparent for you' },
+            { icon: Zap, text: 'Ships in 3–5 days. Works immediately.' },
+          ].map(({ icon: Icon, text }) => (
+            <div key={text} className="flex items-center gap-2.5">
+              <Icon className="w-4 h-4 text-primary shrink-0" />
+              <p className="text-zinc-300 text-sm">{text}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Sticker previews */}
+        <div className="mb-8">
+          <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
+          <div className="grid grid-cols-4 gap-2">
+            {FEATURED_DESIGNS.map(d => (
+              <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
+                <img src={d.url} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
+                <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Plan selector */}
+        <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Less than $1/week</p>
+        <p className="text-center text-zinc-400 text-sm mb-4">Plans start at $49/year. 30-day money-back guarantee.</p>
+
+        <div className="space-y-3 mb-6">
+          {PLANS.map(plan => (
+            <button
+              key={plan.id}
+              type="button"
+              onClick={() => setSelectedPlan(plan.id)}
+              className={cn(
+                'w-full text-left rounded-2xl border-2 p-5 transition-all',
+                selectedPlan === plan.id ? 'border-primary bg-primary/10' : 'border-zinc-700 bg-zinc-800/60 hover:border-zinc-500'
+              )}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className={cn('w-5 h-5 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center', selectedPlan === plan.id ? 'border-primary bg-primary' : 'border-zinc-600')}>
+                    {selectedPlan === plan.id && <div className="w-2 h-2 rounded-full bg-zinc-900" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-semibold">{plan.name}</span>
+                      {plan.popular && <Badge className="bg-primary/20 text-primary border-primary/30 border text-xs px-2 py-0"><Star className="w-2.5 h-2.5 mr-1" />Popular</Badge>}
+                    </div>
+                    <ul className="mt-2 space-y-1">
+                      {plan.features.map(f => (
+                        <li key={f} className="flex items-center gap-1.5 text-xs text-zinc-300">
+                          <CheckCircle className="w-3 h-3 text-primary shrink-0" />{f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-white font-extrabold text-xl">${plan.price}</p>
+                  <p className="text-zinc-400 text-xs">/yr</p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <p className="text-center text-zinc-400 text-xs mb-4 italic">Real feedback from real drivers. Delivered to you.</p>
+
+        {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
+
+        <Button
+          onClick={handleContinue}
+          className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900 text-base"
+          disabled={loading}
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : !isAuthed ? 'Create Account & Subscribe →' : 'Subscribe Now →'}
+        </Button>
+
+        {!isAuthed && (
+          <p className="text-center text-zinc-500 text-sm mt-4">
+            Already have an account?{' '}
+            <button className="text-primary underline" onClick={() => base44.auth.redirectToLogin(window.location.href)}>Sign in</button>
+          </p>
+        )}
+
+        <div className="text-center mt-10 pt-6 border-t border-zinc-800">
+          <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} Judge My Driving. Privacy-first feedback.</p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -23,6 +23,13 @@ import GetStarted from './pages/GetStarted';
 import Liability from './pages/Liability';
 import AdminUsers from './pages/AdminUsers';
 import DriverProfile from './pages/DriverProfile';
+import PartnerSignup from './pages/PartnerSignup';
+import StudentDrivers from './pages/StudentDrivers';
+import SeniorDrivers from './pages/SeniorDrivers';
+import PartnerPortal from './pages/PartnerPortal';
+import AdminPartners from './pages/AdminPartners';
+import AdminConversions from './pages/AdminConversions';
+import AdminPayoutReports from './pages/AdminPayoutReports';
 
 const PublicRoutes = () => {
   return (
@@ -42,7 +49,12 @@ const AuthenticatedApp = () => {
   const isLiabilityRoute = window.location.pathname.startsWith('/liability');
   const isPricingRoute = window.location.pathname.startsWith('/Pricing') || window.location.pathname.startsWith('/pricing');
   const isDriverProfileRoute = window.location.pathname.startsWith('/driver-profile');
-  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute) {
+  const isPartnerSignupRoute = window.location.pathname.startsWith('/partner-signup');
+  const isStudentDriversRoute = window.location.pathname.startsWith('/student-drivers');
+  const isSeniorDriversRoute = window.location.pathname.startsWith('/senior-drivers');
+  const isPartnerPortalRoute = window.location.pathname.startsWith('/PartnerPortal');
+
+  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute) {
     return (
       <Routes>
         <Route path="/scan/:code" element={<ScanSticker />} />
@@ -50,6 +62,10 @@ const AuthenticatedApp = () => {
         <Route path="/liability" element={<Liability />} />
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/driver-profile" element={<DriverProfile />} />
+        <Route path="/partner-signup" element={<PartnerSignup />} />
+        <Route path="/student-drivers" element={<StudentDrivers />} />
+        <Route path="/senior-drivers" element={<SeniorDrivers />} />
+        <Route path="/PartnerPortal" element={<PartnerPortal />} />
       </Routes>
     );
   }
@@ -90,11 +106,18 @@ const AuthenticatedApp = () => {
         <Route path="/Pricing" element={<Pricing />} />
         <Route path="/Support" element={<Support />} />
         <Route path="/AdminUsers" element={<AdminUsers />} />
+        <Route path="/AdminPartners" element={<AdminPartners />} />
+        <Route path="/AdminConversions" element={<AdminConversions />} />
+        <Route path="/AdminPayoutReports" element={<AdminPayoutReports />} />
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/liability" element={<Liability />} />
       <Route path="/driver-profile" element={<DriverProfile />} />
+      <Route path="/partner-signup" element={<PartnerSignup />} />
+      <Route path="/student-drivers" element={<StudentDrivers />} />
+      <Route path="/senior-drivers" element={<SeniorDrivers />} />
+      <Route path="/PartnerPortal" element={<PartnerPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
