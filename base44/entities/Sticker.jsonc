@@ -128,6 +128,9 @@
           "user_condition": {
             "role": "admin"
           }
+        },
+        {
+          "data.public_scorecard": true
         }
       ]
     },
