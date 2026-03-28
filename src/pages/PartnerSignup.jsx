@@ -68,7 +68,8 @@ export default function PartnerSignup() {
     }
 
     setLoading(false);
-    setStep(2);
+    // Small delay to ensure state updates, then redirect
+    setTimeout(() => setStep(2), 100);
   };
 
   if (step === 2) {

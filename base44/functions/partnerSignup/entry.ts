@@ -79,10 +79,11 @@ async function generateQRCodes(base44, refCode) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    // This is a public endpoint — no auth required
+    // Can be called as public endpoint (signup) or authenticated (PartnerSetup)
     const body = await req.json();
 
     const {
+      user_id,
       partner_name,
       channel_type,
       location,
@@ -103,18 +104,24 @@ Deno.serve(async (req) => {
     // Generate QR codes
     const qrCodes = await generateQRCodes(base44, ref_code);
 
-    // Invite the partner as a user with 'partner' role (no-op if already registered)
-    try {
-      await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
-      console.log(`[partnerSignup] Invited user ${contact_email} with partner role`);
-    } catch (inviteErr) {
-      // User may already exist — that's fine, just log it
-      console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+    // If called from PartnerSetup (authenticated), user_id will be provided
+    // If called from public signup, user_id is null (will be linked via email later)
+    const linkedUserId = user_id || null;
+
+    // Only invite if this is a public signup (no user_id provided)
+    if (!user_id) {
+      try {
+        await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
+        console.log(`[partnerSignup] Invited user ${contact_email} with partner role`);
+      } catch (inviteErr) {
+        // User may already exist — that's fine, just log it
+        console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+      }
     }
 
-    // Create partner record (user_id linked later when they log in via PartnerPortal)
+    // Create partner record
     const partner = await base44.asServiceRole.entities.ReferralPartner.create({
-      user_id: null,
+      user_id: linkedUserId,
       partner_name,
       channel_type,
       location: location || '',
@@ -131,10 +138,11 @@ Deno.serve(async (req) => {
 
     console.log(`[partnerSignup] Created partner ${partner_name} with ref_code ${ref_code}`);
 
-    // Send welcome email via Resend
-    const teenLink = `https://app.judgemydriving.com/student-drivers?ref=${ref_code}`;
-    const seniorLink = `https://app.judgemydriving.com/senior-drivers?ref=${ref_code}`;
-    const portalLink = `https://app.judgemydriving.com/PartnerPortal`;
+    // Only send welcome email if this is a public signup
+    if (!user_id) {
+      const teenLink = `https://app.judgemydriving.com/student-drivers?ref=${ref_code}`;
+      const seniorLink = `https://app.judgemydriving.com/senior-drivers?ref=${ref_code}`;
+      const portalLink = `https://app.judgemydriving.com/PartnerPortal`;
 
     const emailHtml = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
@@ -195,11 +203,12 @@ Deno.serve(async (req) => {
       }),
     });
 
-    if (!resendRes.ok) {
-      const resendError = await resendRes.text();
-      console.error('[partnerSignup] Resend email failed:', resendError);
-    } else {
-      console.log(`[partnerSignup] Welcome email sent to ${contact_email}`);
+      if (!resendRes.ok) {
+        const resendError = await resendRes.text();
+        console.error('[partnerSignup] Resend email failed:', resendError);
+      } else {
+        console.log(`[partnerSignup] Welcome email sent to ${contact_email}`);
+      }
     }
 
     return Response.json({ success: true, partner, ref_code });
