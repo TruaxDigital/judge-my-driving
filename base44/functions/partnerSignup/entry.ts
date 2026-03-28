@@ -122,8 +122,76 @@ Deno.serve(async (req) => {
 
     console.log(`[partnerSignup] Created partner ${partner_name} with ref_code ${ref_code}`);
 
-    // Note: SendEmail only works for existing app users.
-    // Welcome email is sent by admin after inviting the partner via AdminPartners.
+    // Send welcome email via Resend
+    const teenLink = `https://app.judgemydriving.com/student-drivers?ref=${ref_code}`;
+    const seniorLink = `https://app.judgemydriving.com/senior-drivers?ref=${ref_code}`;
+    const portalLink = `https://app.judgemydriving.com/PartnerPortal`;
+
+    const emailHtml = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+  <div style="background: #18181b; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h1 style="color: #facc15; margin: 0; font-size: 22px; letter-spacing: 2px;">JUDGE MY DRIVING</h1>
+    <p style="color: #a1a1aa; margin: 4px 0 0; font-size: 13px;">Partner Program</p>
+  </div>
+  <div style="background: #ffffff; padding: 32px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb; border-top: none;">
+    <h2 style="margin-top: 0;">Welcome, ${contact_name}! 🎉</h2>
+    <p>We're excited to have <strong>${partner_name}</strong> as a referral partner. Here's everything you need to get started.</p>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+    <h3 style="color: #18181b;">Your Referral Code</h3>
+    <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #18181b;">
+      ${ref_code}
+    </div>
+
+    <h3 style="color: #18181b; margin-top: 24px;">Your Referral Links</h3>
+    <p style="margin: 0 0 8px;"><strong>👦 Teen / Student Drivers:</strong><br/>
+      <a href="${teenLink}" style="color: #facc15;">${teenLink}</a>
+    </p>
+    <p style="margin: 0 0 8px;"><strong>👴 Senior Drivers:</strong><br/>
+      <a href="${seniorLink}" style="color: #facc15;">${seniorLink}</a>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+    <h3 style="color: #18181b;">How You Earn</h3>
+    <p>You earn <strong>$10</strong> for every Individual or Family plan subscription that comes through your referral link. Payouts are processed quarterly (minimum $25 balance).</p>
+
+    <h3 style="color: #18181b;">What to Share</h3>
+    <p>Judge My Driving puts a QR sticker on a car. When other drivers scan it, they rate the driver — and the family gets real-time alerts. Parents use it to monitor teen drivers. Adult children use it to keep tabs on aging parents. Plans start at $49/year with a 30-day money-back guarantee.</p>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+    <div style="text-align: center;">
+      <a href="${portalLink}" style="display: inline-block; background: #facc15; color: #18181b; font-weight: bold; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 16px;">Go to My Partner Dashboard →</a>
+      <p style="color: #a1a1aa; font-size: 12px; margin-top: 12px;">Log in with this email address to access your dashboard.</p>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+    <p style="color: #6b7280; font-size: 13px; text-align: center;">Questions? <a href="mailto:hello@judgemydriving.com" style="color: #facc15;">hello@judgemydriving.com</a></p>
+  </div>
+</div>`;
+
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Judge My Driving <partners@judgemydriving.com>',
+        to: contact_email,
+        subject: `Welcome to the JMD Partner Program — your code is ${ref_code}`,
+        html: emailHtml,
+      }),
+    });
+
+    if (!resendRes.ok) {
+      const resendError = await resendRes.text();
+      console.error('[partnerSignup] Resend email failed:', resendError);
+    } else {
+      console.log(`[partnerSignup] Welcome email sent to ${contact_email}`);
+    }
 
     return Response.json({ success: true, partner, ref_code });
   } catch (error) {
