@@ -257,7 +257,7 @@ export default function FleetDashboard() {
           />
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Driver Leaderboard</h2>
-            <FleetDriverLeaderboard drivers={driverRows} fleetAvgRating={fleetAvg} unresolvedIncidents={unresolvedIncidents} allCorrectiveActions={allCorrectiveActions} />
+            <FleetDriverLeaderboard drivers={driverRows} />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Feedback Themes</h2>
