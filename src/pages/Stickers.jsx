@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Pencil, QrCode, Star, MessageSquare, Power, ExternalLink, PackageCheck, Palette, RefreshCw, PlusCircle } from 'lucide-react';
+import { Loader2, Pencil, QrCode, Star, MessageSquare, Globe, ExternalLink, PackageCheck, Palette, RefreshCw, PlusCircle, MoreHorizontal, Power, Eye, EyeOff } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
 import StickerDesignPicker from '../components/stickers/StickerDesignPicker';
@@ -253,11 +254,6 @@ export default function Stickers() {
                   <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setQrSticker(sticker)}>
                     <QrCode className="w-4 h-4 mr-1" /> QR Code
                   </Button>
-                  <a href={`/scan/${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm" className="rounded-lg">
-                      <ExternalLink className="w-4 h-4 mr-1" /> Preview
-                    </Button>
-                  </a>
                   <Button
                     variant={sticker.printful_order_id ? 'outline' : 'default'}
                     size="sm"
@@ -273,34 +269,53 @@ export default function Stickers() {
                   >
                     <Palette className="w-4 h-4 mr-1" /> {sticker.printful_order_id ? 'Design' : 'Claim'}
                   </Button>
+                  {/* Public Leaderboard Toggle */}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-lg"
-                    onClick={() => { setEditLabel(sticker.driver_label || ''); setEditDialog(sticker); }}
+                    className={cn('rounded-lg', sticker.public_scorecard ? 'border-green-500/40 text-green-600 bg-green-500/5 hover:bg-green-500/10' : 'text-muted-foreground')}
+                    onClick={() => updateMutation.mutate({ id: sticker.id, data: { public_scorecard: !sticker.public_scorecard } })}
                   >
-                    <Pencil className="w-4 h-4 mr-1" /> Rename
+                    {sticker.public_scorecard ? <Eye className="w-4 h-4 mr-1" /> : <EyeOff className="w-4 h-4 mr-1" />}
+                    {sticker.public_scorecard ? 'Public' : 'Private'}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-lg text-muted-foreground hover:text-foreground"
-                    onClick={() => setReplacementSticker(sticker)}
-                  >
-                    <RefreshCw className="w-4 h-4 mr-1" /> Replace
-                  </Button>
-                  <Button
-                    variant={sticker.status === 'active' ? 'outline' : 'default'}
-                    size="sm"
-                    className="rounded-lg"
-                    onClick={() => updateMutation.mutate({
-                      id: sticker.id,
-                      data: { status: sticker.status === 'active' ? 'deactivated' : 'active' }
-                    })}
-                  >
-                    <Power className="w-4 h-4 mr-1" />
-                    {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
-                  </Button>
+                  {/* View Public Profile */}
+                  {sticker.public_scorecard && (
+                    <a href={`/driver-profile?code=${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="rounded-lg text-primary border-primary/30 hover:bg-primary/5">
+                        <Globe className="w-4 h-4 mr-1" /> Profile
+                      </Button>
+                    </a>
+                  )}
+                  {/* More Actions Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="rounded-lg px-2">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => { setEditLabel(sticker.driver_label || ''); setEditDialog(sticker); }}>
+                        <Pencil className="w-4 h-4 mr-2" /> Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setReplacementSticker(sticker)}>
+                        <RefreshCw className="w-4 h-4 mr-2" /> Order Replacement
+                      </DropdownMenuItem>
+                      <a href={`/scan/${sticker.unique_code}`} target="_blank" rel="noopener noreferrer">
+                        <DropdownMenuItem>
+                          <ExternalLink className="w-4 h-4 mr-2" /> Preview Scan Page
+                        </DropdownMenuItem>
+                      </a>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className={sticker.status === 'active' ? 'text-destructive focus:text-destructive' : ''}
+                        onClick={() => updateMutation.mutate({ id: sticker.id, data: { status: sticker.status === 'active' ? 'deactivated' : 'active' } })}
+                      >
+                        <Power className="w-4 h-4 mr-2" />
+                        {sticker.status === 'active' ? 'Deactivate' : 'Activate'}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>

@@ -22,6 +22,7 @@ import Support from './pages/Support';
 import GetStarted from './pages/GetStarted';
 import Liability from './pages/Liability';
 import AdminUsers from './pages/AdminUsers';
+import DriverProfile from './pages/DriverProfile';
 
 const PublicRoutes = () => {
   return (
@@ -40,13 +41,15 @@ const AuthenticatedApp = () => {
   const isGetStartedRoute = window.location.pathname.startsWith('/get-started');
   const isLiabilityRoute = window.location.pathname.startsWith('/liability');
   const isPricingRoute = window.location.pathname.startsWith('/Pricing') || window.location.pathname.startsWith('/pricing');
-  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute) {
+  const isDriverProfileRoute = window.location.pathname.startsWith('/driver-profile');
+  if (isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute) {
     return (
       <Routes>
         <Route path="/scan/:code" element={<ScanSticker />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/liability" element={<Liability />} />
         <Route path="/Pricing" element={<Pricing />} />
+        <Route path="/driver-profile" element={<DriverProfile />} />
       </Routes>
     );
   }
@@ -91,6 +94,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/liability" element={<Liability />} />
+      <Route path="/driver-profile" element={<DriverProfile />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
