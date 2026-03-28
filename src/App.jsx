@@ -30,6 +30,7 @@ import PartnerPortal from './pages/PartnerPortal';
 import AdminPartners from './pages/AdminPartners';
 import AdminConversions from './pages/AdminConversions';
 import AdminPayoutReports from './pages/AdminPayoutReports';
+import AdminSales from './pages/AdminSales';
 
 const PublicRoutes = () => {
   return (
@@ -125,6 +126,7 @@ const AuthenticatedApp = () => {
         <Route path="/AdminPartners" element={<AdminPartners />} />
         <Route path="/AdminConversions" element={<AdminConversions />} />
         <Route path="/AdminPayoutReports" element={<AdminPayoutReports />} />
+        <Route path="/AdminSales" element={<AdminSales />} />
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />
