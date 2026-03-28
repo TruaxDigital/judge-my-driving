@@ -48,7 +48,10 @@ export default function AdminSales() {
     );
   }
 
-  const { metrics, allSales, activeSales } = salesData?.data || { metrics: {}, allSales: [], activeSales: [] };
+  const responseData = salesData?.data?.data || salesData?.data || {};
+  const metrics = responseData.metrics || {};
+  const allSales = responseData.allSales || [];
+  const activeSales = responseData.activeSales || [];
 
   const statCards = [
     {
