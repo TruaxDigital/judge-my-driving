@@ -34,7 +34,6 @@ export default function PartnerSignup() {
     contact_name: '',
     contact_email: '',
     contact_phone: '',
-    password: '',
     partner_name: '',
     channel_type: '',
     location: '',
@@ -53,23 +52,8 @@ export default function PartnerSignup() {
     setError('');
     setLoading(true);
 
-    // 1. Create user account
-    const signupRes = await base44.auth.signUp({
-      email: form.contact_email,
-      password: form.password,
-      full_name: form.contact_name,
-      role: 'partner',
-    });
-
-    if (!signupRes?.id) {
-      setError('Failed to create account. The email may already be in use.');
-      setLoading(false);
-      return;
-    }
-
-    // 2. Create partner record via backend function
+    // Create partner record
     const res = await base44.functions.invoke('partnerSignup', {
-      user_id: signupRes.id,
       partner_name: form.partner_name,
       channel_type: form.channel_type,
       location: form.location,
@@ -220,18 +204,6 @@ export default function PartnerSignup() {
               placeholder="(optional)"
               value={form.contact_phone}
               onChange={e => handleChange('contact_phone', e.target.value)}
-              className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-zinc-300 text-sm">Password *</Label>
-            <Input
-              required
-              type="password"
-              placeholder="Create a password"
-              value={form.password}
-              onChange={e => handleChange('password', e.target.value)}
               className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
             />
           </div>

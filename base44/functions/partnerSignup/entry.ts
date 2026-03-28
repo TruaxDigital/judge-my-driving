@@ -90,10 +90,9 @@ Deno.serve(async (req) => {
       contact_phone,
       payout_method,
       payout_details,
-      user_id,
     } = body;
 
-    if (!partner_name || !channel_type || !contact_name || !contact_email || !user_id) {
+    if (!partner_name || !channel_type || !contact_name || !contact_email) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -103,9 +102,9 @@ Deno.serve(async (req) => {
     // Generate QR codes
     const qrCodes = await generateQRCodes(base44, ref_code);
 
-    // Create partner record
+    // Create partner record (user_id linked later when they log in via PartnerPortal)
     const partner = await base44.asServiceRole.entities.ReferralPartner.create({
-      user_id,
+      user_id: null,
       partner_name,
       channel_type,
       location: location || '',
@@ -121,6 +120,13 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[partnerSignup] Created partner ${partner_name} with ref_code ${ref_code}`);
+
+    // Send welcome email to new partner
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: contact_email,
+      subject: 'Welcome to the Judge My Driving Partner Program!',
+      body: `Hi ${contact_name},\n\nYou're in! Your partner account has been created with referral code: ${ref_code}\n\nOur team will send you a login invite shortly so you can access your partner dashboard at https://app.judgemydriving.com/PartnerPortal\n\nQuestions? hello@judgemydriving.com\n\nThe JMD Team`,
+    });
 
     return Response.json({ success: true, partner, ref_code });
   } catch (error) {
