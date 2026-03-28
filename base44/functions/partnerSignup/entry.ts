@@ -179,7 +179,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Judge My Driving <partners@judgemydriving.com>',
+        from: 'Judge My Driving <partners@mail.judgemydriving.com>',
         to: contact_email,
         subject: `Welcome to the JMD Partner Program — your code is ${ref_code}`,
         html: emailHtml,
