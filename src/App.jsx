@@ -40,37 +40,41 @@ const PublicRoutes = () => {
   );
 };
 
+const PUBLIC_ROUTES = [
+  '/scan/',
+  '/get-started',
+  '/liability',
+  '/Pricing',
+  '/pricing',
+  '/driver-profile',
+  '/partner-signup',
+  '/student-drivers',
+  '/senior-drivers',
+  '/PartnerPortal',
+];
+
+const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
+
+const PublicPages = () => (
+  <Routes>
+    <Route path="/scan/:code" element={<ScanSticker />} />
+    <Route path="/get-started" element={<GetStarted />} />
+    <Route path="/liability" element={<Liability />} />
+    <Route path="/Pricing" element={<Pricing />} />
+    <Route path="/driver-profile" element={<DriverProfile />} />
+    <Route path="/partner-signup" element={<PartnerSignup />} />
+    <Route path="/student-drivers" element={<StudentDrivers />} />
+    <Route path="/senior-drivers" element={<SeniorDrivers />} />
+    <Route path="/PartnerPortal" element={<PartnerPortal />} />
+  </Routes>
+);
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Check if we're on a public scan route
-  const isScanRoute = window.location.pathname.startsWith('/scan/');
-  const isGetStartedRoute = window.location.pathname.startsWith('/get-started');
-  const isLiabilityRoute = window.location.pathname.startsWith('/liability');
-  const isPricingRoute = window.location.pathname.startsWith('/Pricing') || window.location.pathname.startsWith('/pricing');
-  const isDriverProfileRoute = window.location.pathname.startsWith('/driver-profile');
-  const isPartnerSignupRoute = window.location.pathname.startsWith('/partner-signup');
-  const isStudentDriversRoute = window.location.pathname.startsWith('/student-drivers');
-  const isSeniorDriversRoute = window.location.pathname.startsWith('/senior-drivers');
-  const isPartnerPortalRoute = window.location.pathname.startsWith('/PartnerPortal');
-
-  const isPublicRoute = isScanRoute || isGetStartedRoute || isLiabilityRoute || isPricingRoute || isDriverProfileRoute || isPartnerSignupRoute || isStudentDriversRoute || isSeniorDriversRoute || isPartnerPortalRoute;
-
-  // Always render public routes immediately — no auth gate, no loading spinner
-  if (isPublicRoute) {
-    return (
-      <Routes>
-        <Route path="/scan/:code" element={<ScanSticker />} />
-        <Route path="/get-started" element={<GetStarted />} />
-        <Route path="/liability" element={<Liability />} />
-        <Route path="/Pricing" element={<Pricing />} />
-        <Route path="/driver-profile" element={<DriverProfile />} />
-        <Route path="/partner-signup" element={<PartnerSignup />} />
-        <Route path="/student-drivers" element={<StudentDrivers />} />
-        <Route path="/senior-drivers" element={<SeniorDrivers />} />
-        <Route path="/PartnerPortal" element={<PartnerPortal />} />
-      </Routes>
-    );
+  // Always render public routes immediately — no auth gate, no loading spinner, regardless of auth state
+  if (isPublicPath()) {
+    return <PublicPages />;
   }
 
   // Show loading spinner while checking app public settings or auth

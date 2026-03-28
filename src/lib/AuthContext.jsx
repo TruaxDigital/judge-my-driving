@@ -18,15 +18,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
-    // Skip platform auth check for known public routes — load them immediately
-    const publicPaths = ['/scan/', '/get-started', '/liability', '/pricing', '/Pricing', '/driver-profile', '/partner-signup', '/student-drivers', '/senior-drivers', '/PartnerPortal'];
-    const isKnownPublicPath = publicPaths.some(p => window.location.pathname.startsWith(p));
-    if (isKnownPublicPath) {
-      setIsLoadingPublicSettings(false);
-      setIsLoadingAuth(false);
-      return;
-    }
-
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
