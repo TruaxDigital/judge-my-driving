@@ -1,77 +1,93 @@
 import React from 'react';
-import { MessageSquare, Star, HelpCircle, DollarSign } from 'lucide-react';
+import { MessageSquare, Star, HelpCircle, Zap, Link as LinkIcon } from 'lucide-react';
 
-const SELLING_POINTS = [
-  'No hardware, no GPS, no installation. It\'s a sticker.',
-  'Real-time email alerts when someone rates the driver.',
-  'Plans start at $49/year for individuals, $99/year for families (up to 3 vehicles).',
-  '30-day money-back guarantee.',
-  'Takes 10 seconds to set up.',
-  'Works on any vehicle.',
+const HOW_IT_WORKS = [
+  'Share your referral link or print your flyer from the My Referral Tools tab. You have separate links for teen drivers and senior drivers.',
+  'The parent signs up through your link. The referral is tracked automatically.',
+  'You earn $10 for every paid signup. Payouts monthly.',
+];
+
+const WHY_PARENTS_SAY_YES = [
+  '30-day money-back guarantee. Zero risk to try it.',
+  'No hardware, no installation. It\'s a sticker. Takes 10 seconds.',
+  'Real-time alerts every time someone rates the driver.',
+  'Full driver dashboard, reporting, maps, and community leaderboards through the iPhone and Android app.',
+  '$49/year for individuals. $99/year for families (up to 3 vehicles).',
+  'Works on any vehicle. Car, truck, minivan, golf cart.',
 ];
 
 const FAQ = [
   {
     q: 'How does the sticker work?',
-    a: 'Other drivers scan the QR code on the sticker using their phone camera. They\'re taken to a quick feedback form where they rate the driver and leave optional comments. The vehicle owner gets an email alert.',
+    a: 'Someone near the vehicle scans the QR code with their phone camera. They land on a short feedback form, rate the driver 1-5 stars, and leave an optional comment. The vehicle owner gets an alert within minutes.',
   },
   {
     q: 'Is it safe for other drivers to scan while driving?',
-    a: 'The sticker is designed to be scanned by passengers or by drivers when the vehicle is parked or stopped. The QR code is readable from a reasonable distance and doesn\'t require tailgating.',
+    a: 'The sticker is designed for passengers or for drivers when the vehicle is parked or stopped. The QR code is readable from several feet away and doesn\'t require getting close to the vehicle.',
   },
   {
     q: 'What if someone leaves fake or mean reviews?',
-    a: 'The platform has abuse prevention measures. Feedback is moderated and users are limited in how frequently they can submit reviews.',
+    a: 'Each device is limited in how often it can submit feedback. The system flags suspicious patterns (rapid-fire submissions, identical comments, same device). Flagged reviews are held for moderation before they reach the vehicle owner. Abuse is rare, but the system is built to catch it.',
   },
   {
-    q: 'Do I need to install an app?',
-    a: 'No app required. Everything works through the web browser and email.',
+    q: 'Is there an app?',
+    a: 'Yes. Judge My Driving has a free app on iPhone and Android. The app gives you your driver dashboard, feedback reports, maps showing where ratings came from, and community leaderboards. Feedback scanners don\'t need the app. They just scan the QR code with their phone camera.',
   },
   {
-    q: 'What if I want to cover multiple vehicles?',
-    a: 'The Family plan covers up to 3 vehicles for $99/year. Additional vehicles can be added.',
+    q: 'What if the parent wants to cover multiple vehicles?',
+    a: 'The Family plan covers up to 3 vehicles for $99/year. Additional vehicles can be added for $39/year each.',
   },
+];
+
+const REFERRAL_TOOLS = [
+  'Your unique QR codes and referral links for teen drivers and senior drivers (see My Referral Tools tab)',
+  'Printable flyers for each audience, ready to post or hand out',
+  'Access to all 15 bumper sticker designs to share with parents so they can preview what goes on the car',
 ];
 
 export default function PartnerPitchScripts() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Pitch Scripts & Benefits</h1>
-        <p className="text-muted-foreground mt-1">Everything you need to explain Judge My Driving to your audience.</p>
+        <h1 className="text-3xl font-bold text-foreground tracking-tight">Pitch Scripts & Selling Tools</h1>
+        <p className="text-muted-foreground mt-1">Everything you need to refer parents to Judge My Driving and earn $10 per signup.</p>
+      </div>
+
+      {/* How It Works */}
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <h2 className="font-semibold text-foreground text-lg">How It Works for You</h2>
+        <ol className="space-y-3">
+          {HOW_IT_WORKS.map((item, i) => (
+            <li key={i} className="flex items-start gap-3 text-sm text-foreground">
+              <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-xs font-bold shrink-0">{i + 1}</span>
+              {item}
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* Teen Script */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Quick Pitch — Teen Drivers (30 seconds)</h2>
-        </div>
-        <blockquote className="border-l-4 border-primary pl-4 text-foreground italic leading-relaxed">
-          "Before your new driver hits the road alone, put a Judge My Driving sticker on the car. Other drivers can scan the QR code and rate how your teen is driving. You get real-time alerts straight to your email. It's like having eyes on the road even when you're not in the car. Plans start at $49 a year."
+        <h2 className="font-semibold text-foreground text-lg">Quick Pitch - Teen Drivers (30 seconds)</h2>
+        <blockquote className="border-l-4 border-primary pl-4 text-foreground italic leading-relaxed bg-muted/30 py-4">
+          "Before your new driver hits the road alone, put a Judge My Driving sticker on the car. Other drivers scan the QR code and rate how your teen is driving. You get real-time alerts, a driver dashboard, maps, and reporting through the app on iPhone or Android. It's like having eyes on the road even when you're not in the car. $49 a year with a 30-day money-back guarantee."
         </blockquote>
       </div>
 
       {/* Senior Script */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-3">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Quick Pitch — Senior Drivers (30 seconds)</h2>
-        </div>
-        <blockquote className="border-l-4 border-primary pl-4 text-foreground italic leading-relaxed">
-          "Worried about mom or dad behind the wheel? Judge My Driving gives you a way to know how they're doing on the road without the awkward conversation. A QR-coded sticker goes on the car, other drivers rate their driving, and you get the feedback in real time. Plans start at $49 a year."
+        <h2 className="font-semibold text-foreground text-lg">Quick Pitch - Senior Drivers (30 seconds)</h2>
+        <blockquote className="border-l-4 border-primary pl-4 text-foreground italic leading-relaxed bg-muted/30 py-4">
+          "Worried about mom or dad behind the wheel? Judge My Driving gives you a way to know how they're doing on the road without the awkward conversation. A QR-coded sticker goes on the car, other drivers rate their driving, and you get the feedback in real time. Track everything through the app, including a driver dashboard, feedback maps, and reports. $49 a year with a 30-day money-back guarantee."
         </blockquote>
       </div>
 
-      {/* Key Selling Points */}
+      {/* Why Parents Say Yes */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Star className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Key Selling Points</h2>
-        </div>
+        <h2 className="font-semibold text-foreground text-lg">Why Parents Say Yes</h2>
         <ul className="space-y-2">
-          {SELLING_POINTS.map(point => (
-            <li key={point} className="flex items-start gap-2 text-sm text-foreground">
+          {WHY_PARENTS_SAY_YES.map((point, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
               <span className="text-primary mt-0.5">✓</span>
               {point}
             </li>
@@ -81,29 +97,31 @@ export default function PartnerPitchScripts() {
 
       {/* FAQ */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Handling Common Questions</h2>
-        </div>
-        <div className="space-y-4">
+        <h2 className="font-semibold text-foreground text-lg">Handling Common Questions</h2>
+        <div className="space-y-5">
           {FAQ.map(item => (
-            <div key={item.q} className="space-y-1">
-              <p className="font-medium text-foreground text-sm">"{item.q}"</p>
+            <div key={item.q} className="space-y-2">
+              <p className="font-semibold text-foreground text-sm">{item.q}</p>
               <p className="text-muted-foreground text-sm leading-relaxed">{item.a}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Commission */}
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
-        <div className="flex items-center gap-2 mb-2">
-          <DollarSign className="w-5 h-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Your Commission</h2>
+      {/* Your Referral Tools */}
+      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <LinkIcon className="w-5 h-5 text-primary" />
+          <h2 className="font-semibold text-foreground text-lg">Your Referral Tools</h2>
         </div>
-        <p className="text-sm text-foreground">
-          You earn <strong>$10</strong> for every individual or family plan signup that comes through your referral link. Payouts are processed quarterly with a $25 minimum.
-        </p>
+        <ul className="space-y-2">
+          {REFERRAL_TOOLS.map((item, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+              <span className="text-primary mt-0.5">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
