@@ -60,8 +60,8 @@ const PLANS = [
 
 export default function Pricing() {
   const [loading, setLoading] = useState(null);
-  const [contactSent, setContactSent] = useState(false);
   const [enterpriseFormOpen, setEnterpriseFormOpen] = useState(false);
+  const [enterprisePlanName, setEnterprisePlanName] = useState('');
   const [isAuthed, setIsAuthed] = useState(false);
 
   const { data: user } = useQuery({
@@ -96,7 +96,8 @@ export default function Pricing() {
     setLoading(null);
   };
 
-  const handleEnterprise = () => {
+  const handleEnterprise = (planName = '') => {
+    setEnterprisePlanName(planName);
     setEnterpriseFormOpen(true);
   };
 
@@ -158,6 +159,7 @@ export default function Pricing() {
               loading={loading === plan.id}
               current={isAuthed && user?.plan_tier === plan.id}
               onSubscribe={handleSubscribe}
+              onContactSales={handleEnterprise}
               isAuthed={isAuthed}
             />
           ))}
@@ -181,7 +183,7 @@ export default function Pricing() {
         </div>
       </div>
 
-      <EnterpriseContactForm open={enterpriseFormOpen} onClose={() => setEnterpriseFormOpen(false)} />
+      <EnterpriseContactForm open={enterpriseFormOpen} onClose={() => setEnterpriseFormOpen(false)} planName={enterprisePlanName} />
 
       {/* Replacement note */}
       <p className="text-center text-sm text-muted-foreground">
@@ -191,7 +193,7 @@ export default function Pricing() {
   );
 }
 
-function PlanCard({ plan, loading, current, onSubscribe, isAuthed }) {
+function PlanCard({ plan, loading, current, onSubscribe, onContactSales, isAuthed }) {
   const Icon = plan.icon;
   return (
     <div className={cn(
@@ -239,6 +241,16 @@ function PlanCard({ plan, loading, current, onSubscribe, isAuthed }) {
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : current ? 'Current Plan' : !isAuthed ? 'Get Started' : 'Subscribe'}
       </Button>
+
+      {plan.fleet && onContactSales && (
+        <Button
+          variant="ghost"
+          className="w-full h-9 rounded-xl text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => onContactSales(plan.name)}
+        >
+          <Mail className="w-3.5 h-3.5 mr-1.5" /> Request a Demo or Talk to Sales
+        </Button>
+      )}
     </div>
   );
 }
