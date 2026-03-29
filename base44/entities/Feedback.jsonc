@@ -1,0 +1,50 @@
+{
+  "name": "Feedback",
+  "type": "object",
+  "properties": {
+    "sticker_id": {
+      "type": "string",
+      "description": "ID of the sticker this feedback is for"
+    },
+    "sticker_code": {
+      "type": "string",
+      "description": "Unique code of the sticker"
+    },
+    "rating": {
+      "type": "number",
+      "description": "1 to 5 star rating"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Free-text feedback"
+    },
+    "safety_flag": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if safety concern reported"
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Reverse-geocoded address"
+    },
+    "is_flagged": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if AI moderation flagged this comment as abusive"
+    },
+    "moderation_reason": {
+      "type": "string",
+      "description": "Brief reason why the comment was flagged by AI moderation"
+    }
+  },
+  "required": [
+    "sticker_id",
+    "rating"
+  ]
+}

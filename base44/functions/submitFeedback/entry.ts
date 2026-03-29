@@ -31,6 +31,35 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.FeedbackCooldown.create({ ip_address: ip, sticker_id, last_submission: new Date().toISOString() });
     }
 
+    // AI moderation: check comment for abusive language
+    let is_flagged = false;
+    let moderation_reason = undefined;
+    if (comment && comment.trim().length > 0) {
+      try {
+        const modResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt: `You are a content moderator. Analyze this driving feedback comment and determine if it contains abusive, threatening, harassing, racist, sexually explicit, or otherwise harmful language. Be lenient with strong but legitimate criticism (e.g. "terrible driver", "almost hit me") — only flag genuinely abusive or harmful content.
+
+Comment: "${comment}"
+
+Respond with JSON only.`,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              is_abusive: { type: 'boolean' },
+              reason: { type: 'string' }
+            }
+          }
+        });
+        if (modResult?.is_abusive === true) {
+          is_flagged = true;
+          moderation_reason = modResult.reason || 'Flagged by AI moderation';
+          console.log(`[submitFeedback] Comment flagged: "${comment}" — reason: ${moderation_reason}`);
+        }
+      } catch (modErr) {
+        console.warn('[submitFeedback] Moderation check failed, allowing comment through:', modErr.message);
+      }
+    }
+
     // Create feedback using service role (public action - no auth needed)
     const feedback = await base44.asServiceRole.entities.Feedback.create({
       sticker_id,
@@ -41,6 +70,8 @@ Deno.serve(async (req) => {
       latitude: latitude || undefined,
       longitude: longitude || undefined,
       location_name: location_name || undefined,
+      is_flagged,
+      moderation_reason,
     });
 
     // Trigger geolocation reverse geocoding (async, non-blocking)
@@ -65,7 +96,7 @@ Deno.serve(async (req) => {
     const stickers = await base44.asServiceRole.entities.Sticker.filter({ id: sticker_id });
     const sticker = stickers[0];
 
-    if (sticker?.owner_email) {
+    if (sticker?.owner_email && !is_flagged) {
       const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
       const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
       await base44.asServiceRole.integrations.Core.SendEmail({
