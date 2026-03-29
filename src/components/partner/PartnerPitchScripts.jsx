@@ -31,7 +31,7 @@ const FAQ = [
   },
   {
     q: 'Is there an app?',
-    a: 'Yes. Judge My Driving has a free app on iPhone and Android. The app gives you your driver dashboard, feedback reports, maps showing where ratings came from, and community leaderboards. Feedback scanners don\'t need the app. They just scan the QR code with their phone camera.',
+    a: 'Yes. Judge My Driving has a free app on iPhone and Android. The app gives you your driver dashboard, feedback reports, maps showing where ratings came from, and community leaderboards. You don\'t need the app though — you\'ll get real-time email alerts automatically every time someone rates the driver. Feedback scanners don\'t need the app either. They just scan the QR code with their phone camera.',
   },
   {
     q: 'What if the parent wants to cover multiple vehicles?',
