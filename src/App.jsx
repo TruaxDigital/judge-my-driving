@@ -31,6 +31,7 @@ import AdminPartners from './pages/AdminPartners';
 import AdminConversions from './pages/AdminConversions';
 import AdminPayoutReports from './pages/AdminPayoutReports';
 import AdminSales from './pages/AdminSales';
+import FleetDrivers from './pages/FleetDrivers';
 
 const PublicRoutes = () => {
   return (
@@ -52,6 +53,7 @@ const PUBLIC_ROUTES = [
   '/student-drivers',
   '/senior-drivers',
   '/PartnerPortal',
+  '/fleet-drivers',
 ];
 
 const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
@@ -67,6 +69,7 @@ const PublicPages = () => (
     <Route path="/student-drivers" element={<StudentDrivers />} />
     <Route path="/senior-drivers" element={<SeniorDrivers />} />
     <Route path="/PartnerPortal" element={<PartnerPortal />} />
+    <Route path="/fleet-drivers" element={<FleetDrivers />} />
   </Routes>
 );
 
