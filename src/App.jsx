@@ -56,6 +56,8 @@ const PUBLIC_ROUTES = [
   '/senior-drivers',
   '/PartnerPortal',
   '/fleet-drivers',
+  '/terms-of-service',
+  '/privacy',
 ];
 
 const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
