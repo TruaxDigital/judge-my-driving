@@ -57,6 +57,7 @@ export default function SeniorDrivers() {
   const [isAuthed, setIsAuthed] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showDesignModal, setShowDesignModal] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(authed => {
@@ -167,10 +168,10 @@ export default function SeniorDrivers() {
           <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Choose from 15+ designs</p>
           <div className="grid grid-cols-3 gap-2 mb-3">
             {FEATURED_DESIGNS.map(d => (
-              <div key={d.id} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
+              <button key={d.id} type="button" onClick={() => setLightbox({ src: DESIGN_URLS[d.id], alt: d.label })} className="rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800 text-left hover:border-primary/50 transition-colors cursor-zoom-in">
                 <img src={DESIGN_URLS[d.id]} alt={d.label} className="w-full h-16 object-cover" onError={e => e.target.style.display = 'none'} />
                 <p className="text-zinc-400 text-[9px] text-center py-1 px-1 leading-tight">{d.label}</p>
-              </div>
+              </button>
             ))}
           </div>
           <button onClick={() => setShowDesignModal(true)} className="flex items-center justify-center gap-1.5 text-xs text-primary hover:underline w-full">
@@ -178,6 +179,11 @@ export default function SeniorDrivers() {
           </button>
         </div>
         <DesignCatalogModal open={showDesignModal} onClose={() => setShowDesignModal(false)} />
+        {lightbox && (
+          <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
+            <img src={lightbox.src} alt={lightbox.alt} className="max-w-full max-h-[90vh] object-contain rounded-xl" onClick={e => e.stopPropagation()} />
+          </div>
+        )}
 
         {/* Plan selector */}
         <p className="text-xs text-zinc-500 uppercase tracking-widest text-center mb-3">Less than $1/week</p>
