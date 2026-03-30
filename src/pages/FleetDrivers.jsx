@@ -355,12 +355,12 @@ export default function FleetDrivers() {
               {
                 tier: 'Starter Fleet', price: '$999', period: '/yr', meta: '10 stickers included\nAdditional vehicles: $89/yr each',
                 features: ['Fleet analytics dashboard', 'Driver leaderboard (internal + public opt-in)', 'Safety incident log', 'Real-time notifications', 'Email support', '1 admin seat', '15 standard sticker designs'],
-                cta: 'Get Started', ctaHref: 'https://app.judgemydriving.com/get-started', featured: false,
+                cta: 'Get Started', ctaHref: '/Pricing', featured: false,
               },
               {
                 tier: 'Professional Fleet', price: '$1,999', period: '/yr', meta: '25 stickers included\nAdditional vehicles: $79/yr each',
                 features: ['Everything in Starter Fleet', 'Insurance-ready safety reports (PDF)', 'Corrective action tracking', 'Custom sticker branding', 'Priority email support', '3 admin seats'],
-                cta: 'Get Started', ctaHref: 'https://app.judgemydriving.com/get-started', featured: true,
+                cta: 'Get Started', ctaHref: '/Pricing', featured: true,
               },
               {
                 tier: 'Enterprise Fleet', price: '$3,499+', period: '/yr', meta: '50+ vehicles\nCustom pricing',
@@ -387,7 +387,7 @@ export default function FleetDrivers() {
             ))}
           </div>
           <p style={{ textAlign: 'center', marginTop: 32, fontSize: '0.82rem', color: '#6B675F' }}>
-            Annual billing via Stripe. Looking for personal or family plans? <a href="/get-started" style={{ color: '#B8860B', textDecoration: 'none', fontWeight: 600 }}>View personal pricing</a>
+            Annual billing via Stripe. Looking for personal or family plans? <a href="/Pricing" style={{ color: '#B8860B', textDecoration: 'none', fontWeight: 600 }}>View personal pricing</a>
           </p>
         </div>
       </section>
