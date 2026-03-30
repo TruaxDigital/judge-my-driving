@@ -6,7 +6,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { firstName, lastName, company, fleetSize, industry, email, phone, inquiryType, planContext } = body;
 
-    if (!firstName || !lastName || !email || !company) {
+    if (!firstName || !lastName || !email) {
       return Response.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
@@ -78,8 +78,20 @@ Deno.serve(async (req) => {
 
     // Create a deal linked to the contact
     const inquiryLabel = inquiryType === 'demo' ? 'Demo Request' : 'Sales Inquiry';
+    const companyLabel = company || `${firstName} ${lastName}`;
     const planLabel = planContext ? ` – ${planContext}` : '';
-    const dealName = `${inquiryLabel}: ${company}${planLabel}`;
+    const dealName = `${inquiryLabel}: ${companyLabel}${planLabel}`;
+
+    const dealDescription = [
+      `Name: ${firstName} ${lastName}`,
+      company ? `Company: ${company}` : null,
+      `Email: ${email}`,
+      phone ? `Phone: ${phone}` : null,
+      fleetSize ? `Fleet Size: ${fleetSize}` : null,
+      industry ? `Industry: ${industry}` : null,
+      planContext ? `Plan Interest: ${planContext}` : null,
+      `Source: Fleet Landing Page`,
+    ].filter(Boolean).join('\n');
 
     const dealRes = await fetch('https://api.hubapi.com/crm/v3/objects/deals', {
       method: 'POST',
@@ -90,6 +102,7 @@ Deno.serve(async (req) => {
           dealstage: 'appointmentscheduled',
           pipeline: 'default',
           closedate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          description: dealDescription,
           ...(fleetSize ? { fleet_size: fleetSize } : {}),
           ...(industry ? { industry } : {}),
           ...(ownerId ? { hubspot_owner_id: ownerId } : {}),
