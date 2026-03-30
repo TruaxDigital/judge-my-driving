@@ -109,7 +109,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 max-w-5xl mx-auto px-6">
       {!isAuthed && (
         <div className="flex items-center justify-between">
           <a href="/get-started" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
