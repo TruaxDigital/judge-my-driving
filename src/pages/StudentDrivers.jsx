@@ -255,8 +255,13 @@ export default function StudentDrivers() {
           </p>
         )}
 
-        <div className="text-center mt-10 pt-6 border-t border-zinc-800">
+        <div className="text-center mt-10 pt-6 border-t border-zinc-800 space-y-1">
           <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} Judge My Driving. Privacy-first feedback.</p>
+          <p className="text-zinc-700 text-xs">
+            <a href="/terms-of-service" className="hover:text-zinc-500 transition-colors">Terms of Service</a>
+            {' | '}
+            <a href="/privacy" className="hover:text-zinc-500 transition-colors">Privacy Policy</a>
+          </p>
         </div>
       </div>
     </div>

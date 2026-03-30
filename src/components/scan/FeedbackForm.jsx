@@ -144,7 +144,14 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
         )}
       </Button>
 
-      <p className="text-center text-zinc-500 text-xs leading-relaxed pt-2">
+      <p className="text-center text-xs pt-1" style={{ color: '#999999' }}>
+        By submitting feedback, you agree to our{' '}
+        <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" style={{ color: '#999999', textDecoration: 'underline' }}>Terms of Service</a>
+        {' '}and{' '}
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#999999', textDecoration: 'underline' }}>Privacy Policy</a>.
+      </p>
+
+      <p className="text-center text-zinc-500 text-xs leading-relaxed">
         🚗 <strong className="text-zinc-400">Pull over before you post.</strong> Using a mobile device while driving is illegal. Stop in a safe location or ask a passenger to submit this review. By tapping Submit, you confirm you are not operating a vehicle.{' '}
         <a href="/liability" target="_blank" rel="noopener noreferrer" className="text-zinc-400 underline underline-offset-2">
           Driver safety is our number one priority.
