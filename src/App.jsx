@@ -76,9 +76,15 @@ const PublicPages = () => (
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
 
-  // Fleet subdomain — serve FleetDrivers directly
+  // Subdomain routing
   if (window.location.hostname === 'fleet.judgemydriving.com') {
     return <FleetDrivers />;
+  }
+  if (window.location.hostname === 'teens.judgemydriving.com') {
+    return <StudentDrivers />;
+  }
+  if (window.location.hostname === 'seniors.judgemydriving.com') {
+    return <SeniorDrivers />;
   }
 
   // Always render public routes immediately — no auth gate, no loading spinner, regardless of auth state
