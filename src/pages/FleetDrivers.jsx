@@ -1,6 +1,22 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 
+const mobileStyles = `
+  @media (max-width: 768px) {
+    .fd-nav-links { display: none !important; }
+    .fd-nav-cta { padding: 9px 16px !important; font-size: 0.78rem !important; }
+    .fd-hero-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .fd-hero-mock { display: none !important; }
+    .fd-section-pad { padding: 60px 20px !important; }
+    .fd-section-pad-sm { padding: 32px 20px !important; }
+    .fd-insurance-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .fd-lead-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .fd-stat-bar { gap: 8px !important; }
+    .fd-stat-bar > div { width: calc(50% - 4px) !important; flex: none !important; }
+    .fd-footer-inner { flex-direction: column !important; align-items: flex-start !important; }
+  }
+`;
+
 const FLEET_SIZE_OPTIONS = ['1-9 vehicles', '10-24 vehicles', '25-49 vehicles', '50+ vehicles'];
 const INDUSTRY_OPTIONS = ['HVAC', 'Plumbing', 'Electrical', 'Landscaping', 'Delivery / Courier', 'Property Management', 'Pest Control', 'Cleaning Services', 'Construction', 'Towing', 'Mobile Healthcare', 'Waste Management', 'Other'];
 
@@ -57,6 +73,7 @@ export default function FleetDrivers() {
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#0A0A0A', color: '#fff', minHeight: '100vh' }}>
+      <style>{mobileStyles}</style>
 
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,160,23,0.08)', padding: '0 28px' }}>
@@ -65,11 +82,13 @@ export default function FleetDrivers() {
             Judge My <em style={{ color: '#D4A017', fontStyle: 'italic', fontWeight: 400 }}>Driving</em>
           </a>
           <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-            <a href="#how-it-works" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>How It Works</a>
-            <a href="#insurance" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>Insurance</a>
-            <a href="#pricing" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>Pricing</a>
-            <a href="#faq" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>FAQ</a>
-            <a href="#get-demo" style={{ background: 'linear-gradient(135deg,#D4A017,#B8860B)', color: '#0A0A0A', padding: '10px 22px', borderRadius: 4, fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none' }}>Request a Demo</a>
+            <div className="fd-nav-links" style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
+              <a href="#how-it-works" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>How It Works</a>
+              <a href="#insurance" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>Insurance</a>
+              <a href="#pricing" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>Pricing</a>
+              <a href="#faq" style={{ color: '#8A8680', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 500 }}>FAQ</a>
+            </div>
+            <a className="fd-nav-cta" href="#get-demo" style={{ background: 'linear-gradient(135deg,#D4A017,#B8860B)', color: '#0A0A0A', padding: '10px 22px', borderRadius: 4, fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none' }}>Request a Demo</a>
           </div>
         </div>
       </header>
@@ -78,7 +97,7 @@ export default function FleetDrivers() {
       <section style={{ paddingTop: 160, paddingBottom: 100, paddingLeft: 28, paddingRight: 28, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -200, right: -200, width: 700, height: 700, borderRadius: '50%', background: '#D4A017', filter: 'blur(130px)', opacity: 0.06, pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 72, alignItems: 'center' }}>
+          <div className="fd-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 72, alignItems: 'center' }}>
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 28, padding: '7px 18px 7px 12px', background: 'rgba(212,160,23,0.06)', border: '1px solid rgba(212,160,23,0.12)', borderRadius: 100 }}>
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#D4A017', boxShadow: '0 0 12px #D4A017' }} />
@@ -111,7 +130,7 @@ export default function FleetDrivers() {
             </div>
 
             {/* DASHBOARD MOCK */}
-            <div style={{ background: 'rgba(20,19,18,0.9)', border: '1px solid rgba(212,160,23,0.12)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5)' }}>
+            <div className="fd-hero-mock" style={{ background: 'rgba(20,19,18,0.9)', border: '1px solid rgba(212,160,23,0.12)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5)' }}>
               <div style={{ padding: '16px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(212,160,23,0.08)', background: 'rgba(212,160,23,0.02)' }}>
                 <span style={{ fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#D4A017' }}>Fleet Dashboard</span>
                 <span style={{ fontSize: '0.58rem', fontWeight: 600, color: '#4CAF6A' }}>● Live</span>
@@ -142,7 +161,7 @@ export default function FleetDrivers() {
 
       {/* STATS BAR */}
       <div style={{ borderTop: '1px solid rgba(212,160,23,0.06)', borderBottom: '1px solid rgba(212,160,23,0.06)', padding: '28px', background: 'linear-gradient(180deg,rgba(212,160,23,0.02) 0%,transparent 100%)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <div className="fd-stat-bar" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
           {[['Zero hardware', 'Peel, stick, monitor'], ['Insurance reports', 'PDF export for your broker'], ['Works with GPS', 'Complementary, not competitive'], ['5 min setup', 'Per vehicle, no tools needed']].map(([strong, rest]) => (
             <div key={strong} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 22px', background: 'rgba(212,160,23,0.04)', border: '1px solid rgba(212,160,23,0.08)', borderRadius: 6, fontSize: '0.78rem', color: '#B0ADA4' }}>
               <strong style={{ color: '#D4A017', fontFamily: 'Georgia, serif' }}>{strong}</strong> {rest}
@@ -152,14 +171,14 @@ export default function FleetDrivers() {
       </div>
 
       {/* WHO IT'S FOR */}
-      <div style={{ padding: '44px 28px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="fd-section-pad-sm" style={{ padding: '44px 28px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <p style={{ color: '#8A8680', maxWidth: 760, margin: '0 auto', fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8 }}>
           <strong style={{ color: '#fff', fontWeight: 600 }}>Built for fleet operators with 5–50+ vehicles</strong> in HVAC, plumbing, electrical, landscaping, delivery, property management, pest control, cleaning, construction, towing, and mobile healthcare. If your company name is on a truck and you manage drivers you can't ride with, this is for you.
         </p>
       </div>
 
       {/* PAIN */}
-      <section style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
+      <section className="fd-section-pad" style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ marginBottom: 56 }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#C45C4A', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -187,7 +206,7 @@ export default function FleetDrivers() {
       </section>
 
       {/* SOLUTION */}
-      <section style={{ background: '#0A0A0A', padding: '100px 28px' }}>
+      <section className="fd-section-pad" style={{ background: '#0A0A0A', padding: '100px 28px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ marginBottom: 56, maxWidth: 660 }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#D4A017', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -216,7 +235,7 @@ export default function FleetDrivers() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
+      <section id="how-it-works" className="fd-section-pad" style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 540, margin: '0 auto 72px' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#D4A017', marginBottom: 16 }}>How It Works</p>
@@ -242,9 +261,9 @@ export default function FleetDrivers() {
       </section>
 
       {/* INSURANCE */}
-      <section id="insurance" style={{ background: '#0A0A0A', padding: '100px 28px' }}>
+      <section id="insurance" className="fd-section-pad" style={{ background: '#0A0A0A', padding: '100px 28px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 72, alignItems: 'start' }}>
+          <div className="fd-insurance-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 72, alignItems: 'start' }}>
             <div>
               <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#D4A017', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ display: 'inline-block', width: 24, height: 1, background: '#D4A017' }} /> Insurance Reporting Tool
@@ -309,7 +328,7 @@ export default function FleetDrivers() {
       </section>
 
       {/* COMPARISON TABLE */}
-      <section style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
+      <section className="fd-section-pad" style={{ background: '#F5F3EE', padding: '100px 28px', color: '#0A0A0A' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ marginBottom: 44 }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#B8860B', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -354,7 +373,7 @@ export default function FleetDrivers() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing" style={{ background: '#FDFCF9', padding: '100px 28px', color: '#0A0A0A' }}>
+      <section id="pricing" className="fd-section-pad" style={{ background: '#FDFCF9', padding: '100px 28px', color: '#0A0A0A' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#B8860B', marginBottom: 16 }}>Fleet Pricing</p>
@@ -404,7 +423,7 @@ export default function FleetDrivers() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" style={{ background: '#0A0A0A', padding: '100px 28px' }}>
+      <section id="faq" className="fd-section-pad" style={{ background: '#0A0A0A', padding: '100px 28px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 500, margin: '0 auto 48px' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: '#D4A017', marginBottom: 16 }}>FAQ</p>
@@ -427,9 +446,9 @@ export default function FleetDrivers() {
       </section>
 
       {/* LEAD FORM */}
-      <section id="get-demo" style={{ background: '#0A0A0A', padding: '100px 28px', borderTop: '1px solid rgba(212,160,23,0.06)' }}>
+      <section id="get-demo" className="fd-section-pad" style={{ background: '#0A0A0A', padding: '100px 28px', borderTop: '1px solid rgba(212,160,23,0.06)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 72, alignItems: 'center' }}>
+          <div className="fd-lead-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 440px', gap: 72, alignItems: 'center' }}>
             <div>
               <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.8rem, 3.2vw, 2.8rem)', fontWeight: 400, lineHeight: 1.12, marginBottom: 18 }}>
                 Find out what impression your fleet <span style={{ color: '#D4A017', fontStyle: 'italic' }}>is actually leaving on the road.</span>
@@ -510,7 +529,7 @@ export default function FleetDrivers() {
 
       {/* FOOTER */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.04)', padding: '40px 28px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
+        <div className="fd-footer-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
           <div style={{ fontSize: '0.76rem', color: '#4A4842', lineHeight: 1.7 }}>
             © 2026 Judge My Driving, a product of Truax Marketing Solutions. Alexandria, VA.<br />
             <a href="mailto:hello@judgemydriving.com" style={{ color: '#B8860B', textDecoration: 'none' }}>hello@judgemydriving.com</a>
