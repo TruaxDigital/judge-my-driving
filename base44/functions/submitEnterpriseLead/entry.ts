@@ -12,6 +12,24 @@ Deno.serve(async (req) => {
 
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('hubspot');
 
+    // Map display values to HubSpot enum values
+    const fleetSizeMap = {
+      '1-9 vehicles': '1-9',
+      '10-24 vehicles': '10-24',
+      '25-49 vehicles': '25-49',
+      '50+ vehicles': '50+',
+    };
+    const industryMap = {
+      'HVAC': 'hvac', 'Plumbing': 'plumbing', 'Electrical': 'electrical',
+      'Landscaping': 'landscaping', 'Delivery / Courier': 'delivery',
+      'Property Management': 'property-mgmt', 'Pest Control': 'pest-control',
+      'Cleaning Services': 'cleaning', 'Construction': 'construction',
+      'Towing': 'towing', 'Mobile Healthcare': 'healthcare',
+      'Waste Management': 'waste-mgmt', 'Other': 'other',
+    };
+    const fleetSizeEnum = fleetSizeMap[fleetSize] || fleetSize;
+    const industryEnum = industryMap[industry] || industry;
+
     // Look up Aaron's owner ID
     let ownerId = null;
     try {
@@ -19,7 +37,7 @@ Deno.serve(async (req) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const ownersData = await ownersRes.json();
-      const ownersList = ownersData.results || ownersData || [];
+      const ownersList = Array.isArray(ownersData.results) ? ownersData.results : Array.isArray(ownersData) ? ownersData : [];
       const aaron = ownersList.find(
         (o) => o.email?.toLowerCase() === 'aaron@judgemydriving.com'
       );
@@ -52,8 +70,8 @@ Deno.serve(async (req) => {
       company,
       email,
       ...(phone ? { phone } : {}),
-      ...(fleetSize ? { fleet_size: fleetSize } : {}),
-      ...(industry ? { industry } : {}),
+      ...(fleetSize ? { fleet_size: fleetSizeEnum } : {}),
+      ...(industry ? { industry: industryEnum } : {}),
       lifecyclestage: 'lead',
       hs_lead_status: 'NEW',
       ...(ownerId ? { hubspot_owner_id: ownerId } : {}),
@@ -73,6 +91,10 @@ Deno.serve(async (req) => {
         body: JSON.stringify({ properties: contactProperties }),
       });
       const created = await createRes.json();
+      if (!createRes.ok) {
+        console.error('Contact create error:', JSON.stringify(created));
+        throw new Error(`Failed to create contact: ${created.message || createRes.statusText}`);
+      }
       contactId = created.id;
       console.log(`Created HubSpot contact ${contactId} for ${email}`);
     }
@@ -104,8 +126,8 @@ Deno.serve(async (req) => {
           pipeline: 'default',
           closedate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           description: dealDescription,
-          ...(fleetSize ? { fleet_size: fleetSize } : {}),
-          ...(industry ? { industry } : {}),
+          ...(fleetSize ? { fleet_size: fleetSizeEnum } : {}),
+          ...(industry ? { industry: industryEnum } : {}),
           ...(ownerId ? { hubspot_owner_id: ownerId } : {}),
         },
         associations: [{
