@@ -19,11 +19,12 @@ Deno.serve(async (req) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const ownersData = await ownersRes.json();
-      const aaron = (ownersData.results || []).find(
+      const ownersList = ownersData.results || ownersData || [];
+      const aaron = ownersList.find(
         (o) => o.email?.toLowerCase() === 'aaron@judgemydriving.com'
       );
       if (aaron) ownerId = aaron.id;
-      console.log(`HubSpot owner lookup: found ${ownersData.results?.length} owners, aaron=${ownerId}`);
+      console.log(`HubSpot owner lookup: found ${ownersList.length} owners, aaron=${ownerId}`);
     } catch (e) {
       console.error('Owner lookup failed:', e.message);
     }
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
           ...(ownerId ? { hubspot_owner_id: ownerId } : {}),
         },
         associations: [{
-          to: { id: contactId },
+          to: { id: String(contactId) },
           types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }],
         }],
       }),
