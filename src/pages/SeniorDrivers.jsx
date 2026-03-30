@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +45,12 @@ const HOW_IT_WORKS = [
 ];
 
 export default function SeniorDrivers() {
+  useSEO({
+    title: 'Senior Driver Safety Sticker | Monitor Elderly Parent Driving',
+    description: "Get real-time public feedback on your aging parent's driving. Judge My Driving's QR sticker lets the community flag concerns before problems escalate.",
+    canonical: 'https://app.judgemydriving.com/senior-drivers',
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get('ref');
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { base44 } from '@/api/base44Client';
 
 const mobileStyles = `
@@ -21,6 +22,12 @@ const FLEET_SIZE_OPTIONS = ['1-9 vehicles', '10-24 vehicles', '25-49 vehicles', 
 const INDUSTRY_OPTIONS = ['HVAC', 'Plumbing', 'Electrical', 'Landscaping', 'Delivery / Courier', 'Property Management', 'Pest Control', 'Cleaning Services', 'Construction', 'Towing', 'Mobile Healthcare', 'Waste Management', 'Other'];
 
 export default function FleetDrivers() {
+  useSEO({
+    title: 'Fleet Driver Feedback Stickers | Insurance-Ready Safety Reports',
+    description: 'QR-coded bumper stickers for your entire fleet. Real-time public ratings, corrective action tracking, and insurance-ready PDF reports. Plans from $999/yr.',
+    canonical: 'https://app.judgemydriving.com/fleet-drivers',
+  });
+
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', fleetSize: '', industry: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);

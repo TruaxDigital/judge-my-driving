@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { ShieldAlert } from 'lucide-react';
 
 const SECTIONS = [
@@ -96,6 +97,12 @@ const SECTIONS = [
 ];
 
 export default function Liability() {
+  useSEO({
+    title: 'Fleet Safety Documentation & Liability | Judge My Driving',
+    description: "Judge My Driving generates insurance-ready safety reports and corrective action records. Document your fleet's safety program and protect against liability claims.",
+    canonical: 'https://app.judgemydriving.com/liability',
+  });
+
   return (
     <div className="min-h-screen bg-zinc-900 font-inter px-5 py-12">
       <div className="max-w-2xl mx-auto space-y-8">

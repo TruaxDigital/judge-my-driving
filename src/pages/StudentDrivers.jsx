@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +45,12 @@ const HOW_IT_WORKS = [
 ];
 
 export default function StudentDrivers() {
+  useSEO({
+    title: 'Teen Driver Safety Sticker | Monitor New Drivers | JMD',
+    description: "Put a Judge My Driving sticker on your teen's car and get real-time public feedback on their driving. Build accountability from day one. Starts at $49/year.",
+    canonical: 'https://app.judgemydriving.com/student-drivers',
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get('ref');
 

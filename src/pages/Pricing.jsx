@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,12 @@ const PLANS = [
 ];
 
 export default function Pricing() {
+  useSEO({
+    title: 'Pricing | Driver Feedback Plans for Individuals and Fleets',
+    description: 'Individual plans start at $49/year. Fleet plans from $999/year. See what\'s included in each Judge My Driving plan and choose the right fit for your needs.',
+    canonical: 'https://app.judgemydriving.com/pricing',
+  });
+
   const [loading, setLoading] = useState(null);
   const [enterpriseFormOpen, setEnterpriseFormOpen] = useState(false);
   const [enterprisePlanName, setEnterprisePlanName] = useState('');
@@ -185,10 +192,7 @@ export default function Pricing() {
 
       <EnterpriseContactForm open={enterpriseFormOpen} onClose={() => setEnterpriseFormOpen(false)} planName={enterprisePlanName} />
 
-      {/* Replacement note */}
-      <p className="text-center text-sm text-muted-foreground">
-        Need a replacement sticker? $19.00 flat fee. Manage from your Stickers page.
-      </p>
+
     </div>
   );
 }

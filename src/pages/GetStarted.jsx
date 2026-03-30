@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useSEO from '@/hooks/useSEO';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -60,6 +61,12 @@ const AUDIENCE = [
 
 
 export default function GetStarted() {
+  useSEO({
+    title: 'Get Started with Judge My Driving | Driver Feedback Sticker',
+    description: 'Sign up for Judge My Driving and get your QR-coded bumper sticker. Real-time public ratings, incident logs, and safety reports. Takes minutes to set up.',
+    canonical: 'https://app.judgemydriving.com/get-started',
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const discountCode = urlParams.get('discount');
   const hasDiscount = discountCode === 'DRIVE20';
