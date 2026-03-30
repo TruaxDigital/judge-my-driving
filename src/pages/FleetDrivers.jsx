@@ -19,6 +19,15 @@ export default function FleetDrivers() {
       setError('Please fill in all required fields.');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (form.phone && form.phone.replace(/\D/g, '').length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
+      return;
+    }
     setLoading(true);
     setError('');
     const res = await base44.functions.invoke('submitEnterpriseLead', {
