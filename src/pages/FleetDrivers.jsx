@@ -89,11 +89,13 @@ export default function FleetDrivers() {
                 <a href="#get-demo" style={{ background: 'linear-gradient(135deg,#D4A017,#B8860B)', color: '#0A0A0A', padding: '15px 34px', borderRadius: 4, fontSize: '0.88rem', fontWeight: 700, textDecoration: 'none' }}>Request a Demo</a>
                 <a href="#pricing" style={{ background: 'transparent', color: '#D4A017', border: '1px solid rgba(212,160,23,0.3)', padding: '15px 32px', borderRadius: 4, fontSize: '0.88rem', fontWeight: 600, textDecoration: 'none' }}>View Fleet Pricing</a>
               </div>
-              <div style={{ display: 'flex', gap: 40, marginTop: 48, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                {[['$999', '/yr', 'Starter Fleet, 10 vehicles'], ['0', '', 'Hardware to install'], ['5 min', '', 'Setup per vehicle']].map(([val, sup, lbl]) => (
-                  <div key={lbl}>
-                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.6rem', color: '#D4A017', fontWeight: 600 }}>{val}<small style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.6rem', color: '#6B675F', fontWeight: 400 }}>{sup}</small></div>
-                    <div style={{ fontSize: '0.7rem', color: '#6B675F', marginTop: 3 }}>{lbl}</div>
+              <div style={{ display: 'flex', gap: 0, marginTop: 48, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                {[['$999', '/yr', 'Starter Fleet, 10 vehicles'], ['Zero', '', 'Hardware to install'], ['5 min', '', 'Setup per vehicle']].map(([val, sup, lbl], i) => (
+                  <div key={lbl} style={{ flex: 1, textAlign: 'center', padding: '0 20px', borderRight: i < 2 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.7rem', color: '#D4A017', fontWeight: 600, lineHeight: 1 }}>
+                      {val}<small style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.65rem', color: '#6B675F', fontWeight: 400, marginLeft: 2 }}>{sup}</small>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#6B675F', marginTop: 5, lineHeight: 1.4 }}>{lbl}</div>
                   </div>
                 ))}
               </div>
