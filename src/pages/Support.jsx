@@ -1,28 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Send, LifeBuoy, ChevronDown } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import EscalateDialog from '@/components/support/EscalateDialog';
 
-const PLAN_OPTIONS = [
-  'Individual',
-  'Family',
-  'Starter Fleet',
-  'Professional Fleet',
-  'Enterprise Fleet',
-];
-
-const ISSUE_OPTIONS = [
-  'Sticker / Shipping',
-  'Account & Billing',
-  'Dashboard / App Issue',
-  'Feedback Not Received',
-  'Other',
-];
+const AGENT_NAME = 'customer_support';
 
 export default function Support() {
   const { data: user } = useQuery({
@@ -30,146 +14,176 @@ export default function Support() {
     queryFn: () => base44.auth.me(),
   });
 
-  const [form, setForm] = useState({
-    name: '',
-    email: user?.email || '',
-    planType: '',
-    issueType: '',
-    message: '',
-  });
-  const [status, setStatus] = useState(null); // null | 'loading' | 'success' | 'error'
-  const [errors, setErrors] = useState({});
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const [escalateOpen, setEscalateOpen] = useState(false);
+  const bottomRef = useRef(null);
 
-  // Sync email once user loads
-  React.useEffect(() => {
-    if (user?.email && !form.email) {
-      setForm(prev => ({ ...prev, email: user.email }));
-    }
-  }, [user]);
+  // Create conversation on mount
+  useEffect(() => {
+    base44.agents.createConversation({
+      agent_name: AGENT_NAME,
+      metadata: { name: 'Support Chat' },
+    }).then(conv => {
+      setConversation(conv);
+      setMessages(conv.messages || []);
+    });
+  }, []);
 
-  const validate = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = 'Name is required';
-    if (!form.email.trim()) e.email = 'Email is required';
-    if (!form.planType) e.planType = 'Please select a plan type';
-    if (!form.issueType) e.issueType = 'Please select an issue type';
-    if (!form.message.trim()) e.message = 'Message is required';
-    else if (form.message.trim().length < 20) e.message = 'Message must be at least 20 characters';
-    return e;
+  // Subscribe to conversation updates
+  useEffect(() => {
+    if (!conversation?.id) return;
+    const unsub = base44.agents.subscribeToConversation(conversation.id, (data) => {
+      setMessages(data.messages || []);
+    });
+    return unsub;
+  }, [conversation?.id]);
+
+  // Auto-scroll
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim() || !conversation || sending) return;
+    const text = input.trim();
+    setInput('');
+    setSending(true);
+    await base44.agents.addMessage(conversation, { role: 'user', content: text });
+    setSending(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return;
-    }
-    setErrors({});
-    setStatus('loading');
-
-    try {
-      const res = await base44.functions.invoke('createSupportTicket', form);
-      if (res.data?.success) {
-        setStatus('success');
-        setForm({ name: '', email: user?.email || '', planType: '', issueType: '', message: '' });
-      } else {
-        setStatus('error');
-      }
-    } catch {
-      setStatus('error');
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
-  const set = (field) => (e) => {
-    setForm(prev => ({ ...prev, [field]: typeof e === 'string' ? e : e.target.value }));
-    setErrors(prev => ({ ...prev, [field]: undefined }));
-  };
+  const visibleMessages = messages.filter(m => m.role === 'user' || m.role === 'assistant');
+  const isThinking = messages.length > 0 && messages[messages.length - 1]?.role === 'user';
 
   return (
-    <div className="max-w-xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">Get Help</h1>
-        <p className="text-muted-foreground mt-1">We typically respond within 1 business day.</p>
+    <div className="flex flex-col h-[calc(100vh-120px)] max-w-2xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Support</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Ask anything — I'll answer or connect you with our team.</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-xl gap-2 text-muted-foreground"
+          onClick={() => setEscalateOpen(true)}
+        >
+          <LifeBuoy className="w-4 h-4" />
+          Contact Support
+        </Button>
       </div>
 
-      {status === 'success' && (
-        <div className="flex items-start gap-3 bg-green-500/10 border border-green-500/20 rounded-2xl p-4">
-          <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-          <p className="text-sm text-green-700 font-medium">Your message was sent. We'll be in touch within 1 business day.</p>
-        </div>
-      )}
-
-      {status === 'error' && (
-        <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
-          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-600">
-            Something went wrong. Please email us directly at{' '}
-            <a href="mailto:support@judgemydriving.com" className="underline font-medium">support@judgemydriving.com</a>.
-          </p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-5">
-        {/* Name */}
-        <div className="space-y-1.5">
-          <Label>Name <span className="text-destructive">*</span></Label>
-          <Input placeholder="Your full name" value={form.name} onChange={set('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-        </div>
-
-        {/* Email */}
-        <div className="space-y-1.5">
-          <Label>Email <span className="text-destructive">*</span></Label>
-          <Input type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} />
-          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-        </div>
-
-        {/* Plan Type */}
-        <div className="space-y-1.5">
-          <Label>Plan Type <span className="text-destructive">*</span></Label>
-          <Select value={form.planType} onValueChange={set('planType')}>
-            <SelectTrigger><SelectValue placeholder="Select your plan" /></SelectTrigger>
-            <SelectContent>
-              {PLAN_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          {errors.planType && <p className="text-xs text-destructive">{errors.planType}</p>}
-        </div>
-
-        {/* Issue Type */}
-        <div className="space-y-1.5">
-          <Label>Issue Type <span className="text-destructive">*</span></Label>
-          <Select value={form.issueType} onValueChange={set('issueType')}>
-            <SelectTrigger><SelectValue placeholder="Select issue type" /></SelectTrigger>
-            <SelectContent>
-              {ISSUE_OPTIONS.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          {errors.issueType && <p className="text-xs text-destructive">{errors.issueType}</p>}
-        </div>
-
-        {/* Message */}
-        <div className="space-y-1.5">
-          <Label>Message <span className="text-destructive">*</span></Label>
-          <Textarea
-            placeholder="Describe your issue and we'll get back to you shortly."
-            className="min-h-[120px] resize-none"
-            value={form.message}
-            onChange={set('message')}
-          />
-          <div className="flex justify-between">
-            {errors.message
-              ? <p className="text-xs text-destructive">{errors.message}</p>
-              : <span />}
-            <p className="text-xs text-muted-foreground ml-auto">{form.message.length} chars</p>
+      {/* Chat area */}
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-2">
+        {/* Welcome message */}
+        {visibleMessages.length === 0 && (
+          <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+            <p className="text-sm font-semibold text-foreground">👋 Hi{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}! How can I help?</p>
+            <p className="text-sm text-muted-foreground">I can answer questions about your stickers, plan, feedback, fleet dashboard, and more. If I can't resolve it, I'll connect you with our team.</p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {[
+                'How do I get a replacement sticker?',
+                'How does feedback work?',
+                'What plan is right for me?',
+                'How do I add more vehicles?',
+              ].map(q => (
+                <button
+                  key={q}
+                  onClick={() => setInput(q)}
+                  className="text-xs bg-muted hover:bg-muted/80 text-foreground rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <Button type="submit" className="w-full h-11 rounded-xl font-semibold" disabled={status === 'loading'}>
-          {status === 'loading' ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</> : 'Send Message'}
-        </Button>
-      </form>
+        {visibleMessages.map((msg, i) => (
+          <MessageBubble key={i} message={msg} />
+        ))}
+
+        {isThinking && (
+          <div className="flex gap-2 items-center text-muted-foreground text-sm px-1">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <span>Thinking…</span>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input */}
+      <div className="pt-3 border-t border-border">
+        <div className="flex gap-2 items-end">
+          <textarea
+            className="flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[44px] max-h-32"
+            rows={1}
+            placeholder="Ask a question…"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={!conversation || sending}
+          />
+          <Button
+            size="icon"
+            className="h-11 w-11 rounded-xl shrink-0"
+            onClick={handleSend}
+            disabled={!input.trim() || !conversation || sending}
+          >
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Need to speak with someone?{' '}
+          <button className="underline hover:text-foreground" onClick={() => setEscalateOpen(true)}>
+            Submit a support ticket
+          </button>
+        </p>
+      </div>
+
+      <EscalateDialog open={escalateOpen} onClose={() => setEscalateOpen(false)} user={user} />
+    </div>
+  );
+}
+
+function MessageBubble({ message }) {
+  const isUser = message.role === 'user';
+  return (
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+        isUser
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-card border border-border text-foreground'
+      }`}>
+        {isUser ? (
+          <p className="leading-relaxed">{message.content}</p>
+        ) : (
+          <ReactMarkdown
+            className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+            components={{
+              a: ({ children, ...props }) => (
+                <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary underline">{children}</a>
+              ),
+              p: ({ children }) => <p className="my-1 leading-relaxed">{children}</p>,
+              ul: ({ children }) => <ul className="my-1 ml-4 list-disc">{children}</ul>,
+              li: ({ children }) => <li className="my-0.5">{children}</li>,
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
+      </div>
     </div>
   );
 }

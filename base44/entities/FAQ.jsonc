@@ -1,0 +1,31 @@
+{
+  "name": "FAQ",
+  "type": "object",
+  "properties": {
+    "question": {
+      "type": "string",
+      "description": "The frequently asked question"
+    },
+    "answer": {
+      "type": "string",
+      "description": "The detailed answer to the question"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "General",
+        "Stickers",
+        "Billing",
+        "Fleet",
+        "Partners",
+        "Technical"
+      ],
+      "description": "Category for the FAQ"
+    }
+  },
+  "required": [
+    "question",
+    "answer",
+    "category"
+  ]
+}
