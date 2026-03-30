@@ -156,6 +156,8 @@ const AuthenticatedApp = () => {
       <Route path="/student-drivers" element={<StudentDrivers />} />
       <Route path="/senior-drivers" element={<SeniorDrivers />} />
       <Route path="/PartnerPortal" element={<PartnerPortal />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
