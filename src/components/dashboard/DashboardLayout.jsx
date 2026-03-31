@@ -69,7 +69,7 @@ export default function DashboardLayout() {
       )}>
         <div className="p-6 border-b border-border">
           <img
-            src="https://cdn.jsdelivr.net/gh/TruaxDigital/judge-my-driving@main/judge-my-driving-horizontal-logo-dark.svg"
+            src="https://cdn.jsdelivr.net/gh/TruaxDigital/judge-my-driving@main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
             className="h-28 w-auto"
           />
