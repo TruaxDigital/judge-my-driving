@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import Logo from '@/components/Logo';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, QrCode, BookOpen, Palette, Settings, AlertTriangle, Upload, Loader2, LogOut } from 'lucide-react';
@@ -82,10 +81,9 @@ export default function PartnerPortal() {
     <div className="min-h-screen bg-background font-inter">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Logo theme="dark" className="h-8 w-auto" />
-          <span className="text-muted-foreground text-sm font-normal">Partner</span>
-        </div>
+        <h1 className="font-extrabold text-lg tracking-tight">
+          <span className="text-primary">JMD</span> <span className="text-muted-foreground text-sm font-normal">Partner</span>
+        </h1>
         <button onClick={() => base44.auth.logout()} className="text-muted-foreground text-sm flex items-center gap-1">
           <LogOut className="w-4 h-4" />
         </button>
@@ -94,8 +92,10 @@ export default function PartnerPortal() {
       {/* Sidebar */}
       <aside className="hidden lg:flex fixed top-0 left-0 h-full w-64 bg-card border-r border-border flex-col">
         <div className="p-6 border-b border-border">
-          <Logo theme="dark" className="h-9 w-auto" />
-          <p className="text-xs text-muted-foreground mt-2">Partner Portal</p>
+          <h1 className="font-extrabold text-xl tracking-tight">
+            <span className="text-primary">JUDGE MY</span><span className="text-foreground"> DRIVING</span>
+          </h1>
+          <p className="text-xs text-muted-foreground mt-1">Partner Portal</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV_ITEMS.map(item => (

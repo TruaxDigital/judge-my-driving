@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import useSEO from '@/hooks/useSEO';
-import Logo from '@/components/Logo';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -111,9 +110,6 @@ export default function Pricing() {
 
   return (
     <div className="space-y-10 max-w-5xl mx-auto px-6">
-      <div className="flex justify-center pt-2">
-        <Logo theme="dark" className="h-10 w-auto" />
-      </div>
       {!isAuthed && (
         <div className="flex items-center justify-between">
           <a href="/get-started" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">

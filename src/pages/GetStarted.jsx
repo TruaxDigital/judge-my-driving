@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import useSEO from '@/hooks/useSEO';
-import Logo from '@/components/Logo';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -126,8 +125,8 @@ export default function GetStarted() {
       <div className="max-w-lg mx-auto px-5 py-10">
 
         {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <Logo theme="white" className="h-10 w-auto" />
+        <div className="text-center mb-8">
+          <h2 className="text-primary font-extrabold text-xl tracking-tight">JUDGE MY DRIVING</h2>
         </div>
 
         {/* Hero */}

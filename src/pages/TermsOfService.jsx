@@ -17,8 +17,8 @@ export default function TermsOfService() {
 
       {/* Nav */}
       <div style={{ borderBottom: '1px solid rgba(212,160,23,0.12)', padding: '16px 24px' }}>
-        <a href="/get-started">
-          <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg.svg" alt="Judge My Driving" style={{ height: '32px', width: 'auto' }} />
+        <a href="/get-started" style={{ color: '#D4A017', textDecoration: 'none', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em' }}>
+          JUDGE MY DRIVING
         </a>
       </div>
 
