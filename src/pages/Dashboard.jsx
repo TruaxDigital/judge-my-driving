@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Star, MessageSquare, Tag, ShieldAlert } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import StatCard from '../components/dashboard/StatCard';
 import FeedbackCard from '../components/dashboard/FeedbackCard';
 import SubscriptionBanner from '../components/dashboard/SubscriptionBanner';
+import usePullToRefresh from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '../components/dashboard/PullToRefreshIndicator';
 
 export default function Dashboard() {
   const [stickerFilter, setStickerFilter] = useState('all');
   const [ratingFilter, setRatingFilter] = useState('all');
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
+    await queryClient.invalidateQueries({ queryKey: ['all-feedback'] });
+  };
+  const { containerRef, pullDistance, refreshing } = usePullToRefresh(handleRefresh);
 
   const { data: stickers = [], isLoading: stickersLoading } = useQuery({
     queryKey: ['my-stickers'],
@@ -59,7 +68,8 @@ export default function Dashboard() {
   const isLoading = stickersLoading || (stickers.length > 0 && feedbackLoading);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={containerRef}>
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
       <div>
         <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Your driving feedback at a glance.</p>

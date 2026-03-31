@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Map, Tag, Settings, 
-  LogOut, Menu, X, ChevronRight, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle, Users, GitMerge, DollarSign
+  LogOut, ChevronRight, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle, Users, GitMerge, DollarSign
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 import BottomTabBar from './BottomTabBar';
+import UnifiedHeader from './UnifiedHeader';
 
 const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -47,17 +49,8 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-background font-inter">
-      {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between safe-area-top select-none">
-        <img
-          src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-          alt="Judge My Driving"
-          className="h-12 w-auto"
-        />
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
+      {/* Mobile header — unified with back button support */}
+      <UnifiedHeader mobileOpen={mobileOpen} onMenuToggle={() => setMobileOpen(!mobileOpen)} />
 
       {/* Mobile overlay */}
       {mobileOpen && (
@@ -116,10 +109,19 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen overscroll-y-none">
-        <div className="p-6 lg:p-10 max-w-7xl mx-auto pb-safe lg:pb-10">
-          <Outlet />
-        </div>
+      <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen overscroll-y-none">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="p-6 lg:p-10 max-w-7xl mx-auto pb-safe lg:pb-10"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <BottomTabBar />

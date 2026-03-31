@@ -1,0 +1,59 @@
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Routes that are "root" tab destinations — show logo, no back button
+const ROOT_ROUTES = ['/Dashboard', '/Stickers', '/FleetDashboard', '/Settings', '/Leaderboard', '/MapView'];
+
+const ROUTE_LABELS = {
+  '/Analytics': 'Analytics',
+  '/Reporting': 'Reports',
+  '/Support': 'Support',
+  '/Pricing': 'Plans',
+  '/AdminUsers': 'Users',
+  '/AdminPartners': 'Partners',
+  '/AdminConversions': 'Conversions',
+  '/AdminPayoutReports': 'Payout Reports',
+  '/AdminSales': 'Sales',
+  '/PreviewScan': 'Reporter View',
+};
+
+export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isRoot = ROOT_ROUTES.includes(location.pathname);
+  const label = ROUTE_LABELS[location.pathname];
+
+  return (
+    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border h-14 flex items-center justify-between px-4 safe-area-top select-none">
+      {/* Left: Back button or logo */}
+      <div className="flex items-center gap-2 min-w-0">
+        {!isRoot && label ? (
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1 text-primary font-medium text-sm py-1 -ml-1 pr-2"
+          >
+            <ChevronLeft className="w-5 h-5 shrink-0" />
+            <span className="truncate">{label}</span>
+          </button>
+        ) : (
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            alt="Judge My Driving"
+            className="h-10 w-auto"
+          />
+        )}
+      </div>
+
+      {/* Right: Hamburger for full nav */}
+      <button
+        onClick={onMenuToggle}
+        className="p-2 -mr-1 text-foreground"
+        aria-label="Menu"
+      >
+        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+    </div>
+  );
+}

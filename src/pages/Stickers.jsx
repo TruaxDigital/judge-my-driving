@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import usePullToRefresh from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '../components/dashboard/PullToRefreshIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +19,11 @@ import { cn, isInIframe } from '@/lib/utils';
 
 export default function Stickers() {
   const queryClient = useQueryClient();
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
+  };
+  const { containerRef, pullDistance, refreshing } = usePullToRefresh(handleRefresh);
   const [editDialog, setEditDialog] = useState(null);
   const [editLabel, setEditLabel] = useState('');
   const [qrSticker, setQrSticker] = useState(null);
@@ -125,7 +132,8 @@ export default function Stickers() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={containerRef}>
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>
