@@ -39,7 +39,7 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
             <span className="truncate">{label}</span>
           </button>
         ) : (
-          <ThemeAwareLogo className="h-10 w-auto" />
+          <ThemeAwareLogo className="h-7 w-auto max-w-[180px] object-contain" />
         )}
       </div>
 
