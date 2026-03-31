@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Trophy, Star, MessageSquare, TrendingUp, Medal, Crown, Shield } from 'lucide-react';
+import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -129,11 +130,7 @@ export default function Leaderboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-            alt="Judge My Driving"
-            className="h-20 w-auto mb-2"
-          />
+          <ThemeAwareLogo className="h-20 w-auto mb-2" />
           <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
             <Trophy className="w-7 h-7 text-primary" /> Leaderboard
           </h1>

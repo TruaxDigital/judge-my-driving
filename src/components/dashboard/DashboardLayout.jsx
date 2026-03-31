@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomTabBar from './BottomTabBar';
 import UnifiedHeader from './UnifiedHeader';
+import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 
 const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -67,11 +68,7 @@ export default function DashboardLayout() {
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="p-6 border-b border-border">
-          <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-            alt="Judge My Driving"
-            className="h-28 w-auto"
-          />
+          <ThemeAwareLogo className="h-28 w-auto" />
         </div>
 
         <nav className="flex-1 p-4 space-y-1">

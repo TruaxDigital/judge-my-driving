@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Loader2, FileText, Send, CheckCircle, Calendar, ShieldAlert, Star, Mail } from 'lucide-react';
+import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 import { toast } from 'sonner';
 import moment from 'moment';
 
@@ -64,11 +65,7 @@ export default function Reporting() {
     <div className="space-y-8">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-            alt="Judge My Driving"
-            className="h-20 w-auto mb-2"
-          />
+          <ThemeAwareLogo className="h-20 w-auto mb-2" />
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Reporting</h1>
           <p className="text-muted-foreground mt-1">Monthly PDF reports are auto-emailed to you on the 1st of each month.</p>
         </div>

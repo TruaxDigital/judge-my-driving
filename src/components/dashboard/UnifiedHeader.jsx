@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 
 // Routes that are "root" tab destinations — show logo, no back button
 const ROOT_ROUTES = ['/Dashboard', '/Stickers', '/FleetDashboard', '/Settings', '/Leaderboard', '/MapView'];
@@ -38,11 +39,7 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
             <span className="truncate">{label}</span>
           </button>
         ) : (
-          <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-            alt="Judge My Driving"
-            className="h-10 w-auto"
-          />
+          <ThemeAwareLogo className="h-10 w-auto" />
         )}
       </div>
 

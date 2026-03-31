@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Loader2, Truck, User, Users, Star, Mail } from 'lucide-react';
+import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 import { cn, isInIframe } from '@/lib/utils';
 import EnterpriseContactForm from '@/components/pricing/EnterpriseContactForm';
 
@@ -125,11 +126,7 @@ export default function Pricing() {
       )}
       <div className="text-center space-y-3">
         <div className="flex justify-center mb-4">
-          <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
-            alt="Judge My Driving"
-            className="h-28 w-auto"
-          />
+          <ThemeAwareLogo className="h-28 w-auto" />
         </div>
         <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Simple, transparent pricing</h1>
         <p className="text-muted-foreground text-lg">Annual billing. Cancel anytime.</p>
