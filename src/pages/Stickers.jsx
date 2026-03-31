@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Pencil, QrCode, Star, MessageSquare, Globe, ExternalLink, PackageCheck, Palette, RefreshCw, PlusCircle, MoreHorizontal, Power, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Pencil, QrCode, Star, MessageSquare, Globe, ExternalLink, PackageCheck, Palette, RefreshCw, PlusCircle, MoreHorizontal, Power, Eye, EyeOff, Search, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import moment from 'moment';
 import QRCodeModal from '../components/stickers/QRCodeModal';
@@ -34,6 +34,7 @@ export default function Stickers() {
   const [claimLoading, setClaimLoading] = useState(false);
   const [claimWizardStickers, setClaimWizardStickers] = useState([]);
   const [showHidden, setShowHidden] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -105,7 +106,19 @@ export default function Stickers() {
 
   // Filter stickers based on visibility and user role (fleet users can hide/show)
   const isFleetUser = ['fleet_admin', 'starter_fleet', 'professional_fleet'].includes(user?.role) || user?.plan === 'fleet';
-  const visibleStickers = isFleetUser && !showHidden ? stickers.filter(s => !s.is_hidden) : stickers;
+  const baseVisible = isFleetUser && !showHidden ? stickers.filter(s => !s.is_hidden) : stickers;
+  const visibleStickers = isFleetUser && searchQuery.trim()
+    ? baseVisible.filter(s => {
+        const q = searchQuery.toLowerCase();
+        return (
+          (s.driver_label || '').toLowerCase().includes(q) ||
+          (s.driver_name || '').toLowerCase().includes(q) ||
+          (s.vehicle_id || '').toLowerCase().includes(q) ||
+          (s.unique_code || '').toLowerCase().includes(q) ||
+          (s.fleet_group || '').toLowerCase().includes(q)
+        );
+      })
+    : baseVisible;
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
@@ -155,6 +168,22 @@ export default function Stickers() {
             <p className="text-muted-foreground mt-1">Stickers linked to your account.</p>
           </div>
           <div className="hidden sm:flex items-center gap-2">
+            {isFleetUser && (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder="Filter by name, plate, driver…"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-8 w-56 rounded-xl h-9"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
             {user?.plan_tier === 'individual' && (
               <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl">
                 {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
@@ -169,8 +198,24 @@ export default function Stickers() {
             )}
           </div>
         </div>
-        {/* Mobile-only centered buttons */}
-        <div className="flex sm:hidden justify-center">
+        {/* Mobile: fleet search + action buttons */}
+        <div className="flex sm:hidden flex-col gap-2">
+          {isFleetUser && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                placeholder="Filter by name, plate, driver…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-9 pr-8 rounded-xl w-full"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
           {user?.plan_tier === 'individual' && (
             <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl w-full">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
