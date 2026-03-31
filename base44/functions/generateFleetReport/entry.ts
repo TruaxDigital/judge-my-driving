@@ -36,7 +36,7 @@ function drawHeader(doc, periodLabel) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   setColor(doc, '#FFFFFF');
-  doc.text('JUDGE MY DRIVING', 10, 9);
+  doc.text('Judge My Driving', 10, 9);
   setColor(doc, GOLD);
   doc.setFont('helvetica', 'bold');
   doc.text('FLEET SAFETY REPORT', 210 - 10, 6, { align: 'right' });

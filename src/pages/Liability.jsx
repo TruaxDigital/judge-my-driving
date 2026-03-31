@@ -110,7 +110,7 @@ export default function Liability() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
-            className="h-24 w-auto"
+            className="h-28 w-auto"
           />
           <div className="flex items-center gap-3">
             <ShieldAlert className="w-7 h-7 text-primary shrink-0" />

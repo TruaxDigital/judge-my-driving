@@ -91,10 +91,11 @@ export default function DriverProfile() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
-        <div className="font-extrabold text-lg tracking-tight">
-          <span className="text-primary">JUDGE MY</span>
-          <span className="text-foreground"> DRIVING</span>
-        </div>
+        <img
+          src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+          alt="Judge My Driving"
+          className="h-10 w-auto"
+        />
         <a href="https://judgemydriving.com/get-started" target="_blank" rel="noopener noreferrer"
           className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
           Get your sticker <ExternalLink className="w-3 h-3" />

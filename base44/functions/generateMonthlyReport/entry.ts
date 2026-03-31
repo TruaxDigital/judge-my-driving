@@ -69,7 +69,7 @@ async function generateAndSendReport(serviceBase44, ownerEmail, ownerName) {
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(20, 20, 20);
-  doc.text('JUDGE MY DRIVING', 15, 13);
+  doc.text('Judge My Driving', 15, 13);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text(`Monthly Driving Report — ${monthLabel}`, 15, 22);
@@ -171,7 +171,7 @@ async function generateAndSendReport(serviceBase44, ownerEmail, ownerName) {
     body: `
       <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
         <div style="background: #FACC15; padding: 24px 32px; border-radius: 12px 12px 0 0;">
-          <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #111;">JUDGE MY DRIVING</h1>
+          <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style="height:50px;width:auto;display:block;margin-bottom:6px;" />
           <p style="margin: 4px 0 0; font-size: 14px; color: #333;">Monthly Driving Report — ${monthLabel}</p>
         </div>
         <div style="background: #f9f9f9; padding: 32px; border-radius: 0 0 12px 12px; border: 1px solid #e5e5e5; border-top: none;">

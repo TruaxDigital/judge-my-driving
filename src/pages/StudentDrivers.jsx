@@ -115,7 +115,7 @@ export default function StudentDrivers() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
-            className="h-24 w-auto mx-auto"
+            className="h-28 w-auto mx-auto"
           />
           {refCode && (
             <p className="text-zinc-500 text-xs mt-1">Referred by a partner</p>

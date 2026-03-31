@@ -132,7 +132,7 @@ export default function Leaderboard() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
-            className="h-16 w-auto mb-2"
+            className="h-20 w-auto mb-2"
           />
           <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
             <Trophy className="w-7 h-7 text-primary" /> Leaderboard

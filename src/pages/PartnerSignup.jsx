@@ -109,7 +109,7 @@ export default function PartnerSignup() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
-            className="h-24 w-auto mx-auto mb-4"
+            className="h-28 w-auto mx-auto mb-4"
           />
           <h1 className="text-3xl font-extrabold text-white mt-2">Sign Up as a Referral Partner</h1>
           <p className="text-zinc-400 text-sm mt-2">Earn $10 for every individual or family plan signup through your link.</p>

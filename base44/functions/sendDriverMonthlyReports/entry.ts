@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
         </div>
         ${recentComments ? `<h3>Recent Feedback</h3><ul style="padding-left:16px">${recentComments}</ul>` : ''}
         <p style="color:#888;font-size:12px;margin-top:24px;border-top:1px solid #eee;padding-top:12px">
-          Sent by <a href="https://judgemydriving.com" style="color:#f5c000;text-decoration:none;font-weight:600">Judge My Driving</a> — Real feedback from real drivers on the road.
+          <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style="height:40px;width:auto;display:block;margin-bottom:4px;" /><br/>Real feedback from real drivers on the road.
         </p>
       </div>
     `;

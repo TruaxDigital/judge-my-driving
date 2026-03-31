@@ -129,7 +129,7 @@ export default function GetStarted() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
-            className="h-24 w-auto mx-auto"
+            className="h-28 w-auto mx-auto"
           />
         </div>
 

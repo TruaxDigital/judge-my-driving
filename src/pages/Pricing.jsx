@@ -128,7 +128,7 @@ export default function Pricing() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
-            className="h-24 w-auto"
+            className="h-28 w-auto"
           />
         </div>
         <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Simple, transparent pricing</h1>

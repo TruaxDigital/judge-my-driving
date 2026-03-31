@@ -21,7 +21,7 @@ export default function TermsOfService() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
-            style={{ height: '48px', width: 'auto' }}
+            style={{ height: '60px', width: 'auto' }}
           />
         </a>
       </div>
