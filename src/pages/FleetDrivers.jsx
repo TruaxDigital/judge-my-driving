@@ -85,8 +85,12 @@ export default function FleetDrivers() {
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,160,23,0.08)', padding: '0 28px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/get-started" style={{ fontFamily: 'Georgia, serif', fontSize: '1.15rem', color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
-            Judge My <em style={{ color: '#D4A017', fontStyle: 'italic', fontWeight: 400 }}>Driving</em>
+          <a href="/get-started">
+            <img
+              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+              alt="Judge My Driving"
+              style={{ height: '48px', width: 'auto' }}
+            />
           </a>
           <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
             <div className="fd-nav-links" style={{ display: 'flex', gap: 28, alignItems: 'center' }}>

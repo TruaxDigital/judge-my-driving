@@ -198,7 +198,7 @@ function buildFlyerHTML(f, c, qrImageUrl, referralUrl) {
 
     <!-- Footer -->
     <div style="padding:14px 40px 18px;text-align:center;border-top:1px solid ${c.cardBorder};margin-top:4px;">
-      <p style="font-size:17px;font-weight:900;color:${c.text};margin:0 0 2px;letter-spacing:-0.3px;">Judge My Driving</p>
+      <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style="height:40px;width:auto;margin:0 auto 6px;display:block;" />
       <p style="font-size:10.5px;color:${c.textMuted};margin:0 0 3px;letter-spacing:0.3px;">Real feedback from real drivers. Delivered to you.</p>
       <p style="font-size:9.5px;color:${c.sourceText || c.textMuted};margin:0;font-style:italic;">${f.trustLine}</p>
     </div>

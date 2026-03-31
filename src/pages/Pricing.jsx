@@ -124,6 +124,13 @@ export default function Pricing() {
         </div>
       )}
       <div className="text-center space-y-3">
+        <div className="flex justify-center mb-4">
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
+            alt="Judge My Driving"
+            className="h-24 w-auto"
+          />
+        </div>
         <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Simple, transparent pricing</h1>
         <p className="text-muted-foreground text-lg">Annual billing. Cancel anytime.</p>
         {isAuthed && user?.subscription_status === 'active' && (

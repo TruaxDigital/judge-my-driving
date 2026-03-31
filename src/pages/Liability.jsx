@@ -106,11 +106,18 @@ export default function Liability() {
   return (
     <div className="min-h-screen bg-zinc-900 font-inter px-5 py-12">
       <div className="max-w-2xl mx-auto space-y-8">
-        <div className="flex items-center gap-3">
-          <ShieldAlert className="w-7 h-7 text-primary shrink-0" />
-          <h1 className="text-2xl font-extrabold text-white">
-            Safety Notice, Liability Disclaimer, Indemnification, and Data Practices
-          </h1>
+        <div className="flex flex-col gap-4">
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            alt="Judge My Driving"
+            className="h-24 w-auto"
+          />
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="w-7 h-7 text-primary shrink-0" />
+            <h1 className="text-2xl font-extrabold text-white">
+              Safety Notice, Liability Disclaimer, Indemnification, and Data Practices
+            </h1>
+          </div>
         </div>
 
         {SECTIONS.map((section, i) => (
