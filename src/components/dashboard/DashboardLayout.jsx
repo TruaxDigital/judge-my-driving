@@ -51,7 +51,7 @@ export default function DashboardLayout() {
         <img
           src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
           alt="Judge My Driving"
-          className="h-8 w-auto"
+          className="h-10 w-auto"
         />
         <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -76,7 +76,7 @@ export default function DashboardLayout() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
-            className="h-9 w-auto"
+            className="h-14 w-auto"
           />
         </div>
 
