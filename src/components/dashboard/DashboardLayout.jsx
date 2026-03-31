@@ -48,9 +48,11 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-background font-inter">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
-        <h1 className="font-extrabold text-lg tracking-tight">
-          <span className="text-primary">JMD</span>
-        </h1>
+        <img
+          src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+          alt="Judge My Driving"
+          className="h-8 w-auto"
+        />
         <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -71,10 +73,11 @@ export default function DashboardLayout() {
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="p-6 border-b border-border">
-          <h1 className="font-extrabold text-xl tracking-tight">
-            <span className="text-primary">JUDGE MY</span>
-            <span className="text-foreground"> DRIVING</span>
-          </h1>
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            alt="Judge My Driving"
+            className="h-9 w-auto"
+          />
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
