@@ -104,13 +104,18 @@ Respond with JSON only.`,
         subject: `New driving feedback for ${sticker.driver_label || 'your vehicle'}`,
         body: `
           <div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #FACC15;">New Feedback Received</h2>
-            <p style="font-size: 24px;">${stars}</p>
+          <div style="background: #18181b; padding: 20px 24px; border-radius: 10px 10px 0 0; text-align: center;">
+            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style="height:50px;width:auto;" />
+          </div>
+          <div style="background:#fff;padding:24px;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 10px 10px;">
+          <h2 style="margin-top:0;color:#111;">New Feedback Received</h2>
+          <p style="font-size: 24px;">${stars}</p>
             <p><strong>Rating:</strong> ${rating}/5</p>
             ${comment ? `<p><strong>Comment:</strong> ${comment}</p>` : ''}
             ${location_name ? `<p><strong>Location:</strong> ${location_name}</p>` : ''}
             <p><strong>Time:</strong> ${now}</p>
             ${safety_flag ? '<p style="color: red;"><strong>⚠️ Safety concern reported</strong></p>' : ''}
+            </div>
           </div>
         `,
       });

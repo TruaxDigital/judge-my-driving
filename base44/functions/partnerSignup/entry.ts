@@ -153,8 +153,8 @@ Deno.serve(async (req) => {
     const emailHtml = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
   <div style="background: #18181b; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;">
-    <h1 style="color: #facc15; margin: 0; font-size: 22px; letter-spacing: 2px;">JUDGE MY DRIVING</h1>
-    <p style="color: #a1a1aa; margin: 4px 0 0; font-size: 13px;">Partner Program</p>
+    <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style="height:50px;width:auto;display:block;margin:0 auto 8px;" />
+    <p style="color: #a1a1aa; margin: 0; font-size: 13px;">Partner Program</p>
   </div>
   <div style="background: #ffffff; padding: 32px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb; border-top: none;">
     <h2 style="margin-top: 0;">Welcome, ${contact_name}! 🎉</h2>
