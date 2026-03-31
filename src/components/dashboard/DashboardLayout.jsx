@@ -76,7 +76,7 @@ export default function DashboardLayout() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
-            className="h-14 w-auto"
+            className="h-20 w-auto"
           />
         </div>
 
