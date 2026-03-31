@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Loader2 } from 'lucide-react';
+import Logo from '@/components/Logo';
 import FeedbackForm from '../components/scan/FeedbackForm';
 import RegistrationForm from '../components/scan/RegistrationForm';
 import ThankYouScreen from '../components/scan/ThankYouScreen';
@@ -69,10 +70,8 @@ export default function ScanSticker() {
     <div className="min-h-screen bg-zinc-900 font-inter">
       <div className="max-w-md mx-auto px-5 py-8">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h2 className="text-primary font-extrabold text-xl tracking-tight">
-            JUDGE MY DRIVING
-          </h2>
+        <div className="flex justify-center mb-8">
+          <Logo theme="white" className="h-10 w-auto" />
         </div>
 
         {loading && (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useSEO from '@/hooks/useSEO';
+import Logo from '@/components/Logo';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -111,8 +112,8 @@ export default function SeniorDrivers() {
       <div className="max-w-lg mx-auto px-5 py-10">
 
         {/* Logo */}
-        <div className="text-center mb-6">
-          <h2 className="text-primary font-extrabold text-xl tracking-tight">JUDGE MY DRIVING</h2>
+        <div className="flex flex-col items-center mb-6">
+          <Logo theme="white" className="h-10 w-auto" />
           {refCode && (
             <p className="text-zinc-500 text-xs mt-1">Referred by a partner</p>
           )}

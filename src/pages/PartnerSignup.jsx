@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -106,7 +107,9 @@ export default function PartnerSignup() {
     <div className="min-h-screen bg-zinc-900 font-inter">
       <div className="max-w-lg mx-auto px-5 py-10">
         <div className="text-center mb-8">
-          <h2 className="text-primary font-extrabold text-xl tracking-tight">JUDGE MY DRIVING</h2>
+          <div className="flex justify-center mb-3">
+            <Logo theme="white" className="h-10 w-auto" />
+          </div>
           <h1 className="text-3xl font-extrabold text-white mt-2">Sign Up as a Referral Partner</h1>
           <p className="text-zinc-400 text-sm mt-2">Earn $10 for every individual or family plan signup through your link.</p>
         </div>

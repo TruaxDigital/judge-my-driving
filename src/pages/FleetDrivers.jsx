@@ -85,8 +85,8 @@ export default function FleetDrivers() {
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(212,160,23,0.08)', padding: '0 28px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/get-started" style={{ fontFamily: 'Georgia, serif', fontSize: '1.15rem', color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
-            Judge My <em style={{ color: '#D4A017', fontStyle: 'italic', fontWeight: 400 }}>Driving</em>
+          <a href="/get-started">
+            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg.svg" alt="Judge My Driving" style={{ height: '36px', width: 'auto' }} />
           </a>
           <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
             <div className="fd-nav-links" style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
@@ -538,6 +538,7 @@ export default function FleetDrivers() {
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.04)', padding: '40px 28px' }}>
         <div className="fd-footer-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
           <div style={{ fontSize: '0.76rem', color: '#4A4842', lineHeight: 1.7 }}>
+            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg.svg" alt="Judge My Driving" style={{ height: '28px', width: 'auto', marginBottom: '6px' }} /><br />
             © 2026 Judge My Driving, a product of Truax Marketing Solutions. Alexandria, VA.<br />
             <a href="mailto:hello@judgemydriving.com" style={{ color: '#B8860B', textDecoration: 'none' }}>hello@judgemydriving.com</a>
           </div>
