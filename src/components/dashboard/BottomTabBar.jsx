@@ -1,21 +1,40 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Map, Tag, Settings } from 'lucide-react';
+import { LayoutDashboard, Tag, Settings, Trophy, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 
-const TAB_ITEMS = [
-  { path: '/Dashboard', label: 'Home', icon: LayoutDashboard },
-  { path: '/MapView', label: 'Map', icon: Map },
+const FLEET_PLANS = ['starter_fleet', 'professional_fleet', 'enterprise', 'enterprise_fleet'];
+
+const CONSUMER_TABS = [
+  { path: '/Dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
+  { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
+  { path: '/Settings', label: 'Settings', icon: Settings },
+];
+
+const FLEET_TABS = [
+  { path: '/Dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/Stickers', label: 'Stickers', icon: Tag },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
 
 export default function BottomTabBar() {
   const location = useLocation();
 
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
+
+  const isFleet = FLEET_PLANS.includes(user?.plan_tier) || user?.role === 'fleet_admin';
+  const tabs = isFleet ? FLEET_TABS : CONSUMER_TABS;
+
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex safe-area-bottom select-none">
-      {TAB_ITEMS.map((item) => {
+      {tabs.map((item) => {
         const isActive = location.pathname === item.path;
         return (
           <Link
