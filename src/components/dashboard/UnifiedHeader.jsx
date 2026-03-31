@@ -39,7 +39,11 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
             <span className="truncate">{label}</span>
           </button>
         ) : (
-          <ThemeAwareLogo className="h-7 w-auto max-w-[180px] object-contain" />
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
+            alt="Judge My Driving"
+            className="h-7 w-auto max-w-[180px] object-contain"
+          />
         )}
       </div>
 
