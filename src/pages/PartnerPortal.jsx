@@ -81,9 +81,11 @@ export default function PartnerPortal() {
     <div className="min-h-screen bg-background font-inter">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
-        <h1 className="font-extrabold text-lg tracking-tight">
-          <span className="text-primary">JMD</span> <span className="text-muted-foreground text-sm font-normal">Partner</span>
-        </h1>
+        <img
+          src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+          alt="Judge My Driving"
+          className="h-10 w-auto"
+        />
         <button onClick={() => base44.auth.logout()} className="text-muted-foreground text-sm flex items-center gap-1">
           <LogOut className="w-4 h-4" />
         </button>
@@ -92,10 +94,12 @@ export default function PartnerPortal() {
       {/* Sidebar */}
       <aside className="hidden lg:flex fixed top-0 left-0 h-full w-64 bg-card border-r border-border flex-col">
         <div className="p-6 border-b border-border">
-          <h1 className="font-extrabold text-xl tracking-tight">
-            <span className="text-primary">JUDGE MY</span><span className="text-foreground"> DRIVING</span>
-          </h1>
-          <p className="text-xs text-muted-foreground mt-1">Partner Portal</p>
+          <img
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            alt="Judge My Driving"
+            className="h-14 w-auto mb-1"
+          />
+          <p className="text-xs text-muted-foreground">Partner Portal</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV_ITEMS.map(item => (
