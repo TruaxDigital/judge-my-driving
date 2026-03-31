@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Loader2, Save, User, CreditCard, ExternalLink, Gift, AlertCircle, CheckCircle2, Smartphone } from 'lucide-react';
+import { Loader2, Save, User, CreditCard, ExternalLink, Gift, AlertCircle, CheckCircle2, Smartphone, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { isInIframe } from '@/lib/utils';
 import moment from 'moment';
@@ -21,6 +21,8 @@ export default function Settings() {
 
   const [notificationPref, setNotificationPref] = useState('');
   const [freeReplacementStatus, setFreeReplacementStatus] = useState(null); // null | 'loading' | 'sent' | 'error'
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   React.useEffect(() => {
     if (user) {
@@ -197,6 +199,58 @@ export default function Settings() {
               <ExternalLink className="w-4 h-4 mr-2" /> Manage Billing
             </Button>
           </div>
+        </CardContent>
+      </Card>
+      {/* Delete Account */}
+      <Card className="rounded-2xl border-destructive/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <Trash2 className="w-5 h-5" /> Delete Account
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Permanently delete your account and all associated data. This cannot be undone.
+          </p>
+          {!deleteConfirm ? (
+            <Button
+              variant="outline"
+              className="mt-4 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10"
+              onClick={() => setDeleteConfirm(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" /> Delete My Account
+            </Button>
+          ) : (
+            <div className="mt-4 bg-destructive/5 border border-destructive/20 rounded-xl p-4 space-y-3">
+              <p className="text-sm font-medium text-destructive">Are you absolutely sure? This will permanently delete your account and all data.</p>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleteLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                  disabled={deleteLoading}
+                  onClick={async () => {
+                    setDeleteLoading(true);
+                    await base44.integrations.Core.SendEmail({
+                      to: 'hello@judgemydriving.com',
+                      subject: `Account Deletion Request`,
+                      body: `User ${user?.full_name} (${user?.email}) has requested account deletion. Please process this request.`,
+                    });
+                    base44.auth.logout('/get-started');
+                  }}
+                >
+                  {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                  Yes, Delete My Account
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

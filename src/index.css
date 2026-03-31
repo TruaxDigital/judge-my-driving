@@ -87,5 +87,21 @@
 
   body {
     @apply bg-background text-foreground font-inter;
+    /* Prevent bounce scroll on iOS */
+    overscroll-behavior-y: none;
   }
+}
+
+/* iOS Safe Area utilities */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+.pb-safe {
+  padding-bottom: max(4rem, calc(env(safe-area-inset-bottom) + 4rem));
 }

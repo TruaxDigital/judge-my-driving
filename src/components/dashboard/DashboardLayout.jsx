@@ -7,6 +7,7 @@ import {
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import BottomTabBar from './BottomTabBar';
 
 const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -47,7 +48,7 @@ export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background font-inter">
       {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-16 flex items-center justify-between safe-area-top select-none">
         <img
           src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
           alt="Judge My Driving"
@@ -89,7 +90,7 @@ export default function DashboardLayout() {
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all select-none",
                   isActive
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -115,11 +116,13 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
-        <div className="p-6 lg:p-10 max-w-7xl mx-auto">
+      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen overscroll-y-none">
+        <div className="p-6 lg:p-10 max-w-7xl mx-auto pb-safe lg:pb-10">
           <Outlet />
         </div>
       </main>
+
+      <BottomTabBar />
     </div>
   );
 }
