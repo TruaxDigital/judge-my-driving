@@ -92,6 +92,15 @@
   }
 }
 
+/* 44px minimum tap targets for touch inputs on mobile */
+@media (max-width: 1024px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
 /* iOS Safe Area utilities */
 .safe-area-top {
   padding-top: env(safe-area-inset-top);

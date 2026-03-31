@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Tag, Settings, Trophy, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { base44 } from '@/api/base44Client';
@@ -23,6 +23,7 @@ const FLEET_TABS = [
 
 export default function BottomTabBar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -32,14 +33,25 @@ export default function BottomTabBar() {
   const isFleet = FLEET_PLANS.includes(user?.plan_tier) || user?.role === 'fleet_admin';
   const tabs = isFleet ? FLEET_TABS : CONSUMER_TABS;
 
+  const handleTabPress = (e, tabPath) => {
+    e.preventDefault();
+    // If already on this tab's root or a sub-route, navigate to root to reset
+    if (location.pathname === tabPath || location.pathname.startsWith(tabPath + '/')) {
+      navigate(tabPath, { replace: true });
+    } else {
+      navigate(tabPath);
+    }
+  };
+
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex safe-area-bottom select-none">
       {tabs.map((item) => {
-        const isActive = location.pathname === item.path;
+        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
         return (
-          <Link
+          <a
             key={item.path}
-            to={item.path}
+            href={item.path}
+            onClick={(e) => handleTabPress(e, item.path)}
             className={cn(
               'flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[10px] font-medium transition-colors',
               isActive ? 'text-primary' : 'text-muted-foreground'
@@ -47,7 +59,7 @@ export default function BottomTabBar() {
           >
             <item.icon className={cn('w-5 h-5', isActive && 'fill-primary/10')} />
             <span>{item.label}</span>
-          </Link>
+          </a>
         );
       })}
     </nav>

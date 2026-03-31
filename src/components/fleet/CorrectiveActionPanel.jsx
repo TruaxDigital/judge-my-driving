@@ -59,6 +59,17 @@ export default function CorrectiveActionPanel({ incident, fleetId, userId }) {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.CorrectiveAction.update(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['corrective-action', incident.id] });
+      const previous = queryClient.getQueryData(['corrective-action', incident.id]);
+      queryClient.setQueryData(['corrective-action', incident.id], (old = []) =>
+        old.map(a => a.id === id ? { ...a, ...data } : a)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(['corrective-action', incident.id], context.previous);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['corrective-action', incident.id] });
       queryClient.invalidateQueries({ queryKey: ['all-corrective-actions'] });
