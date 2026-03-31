@@ -198,24 +198,8 @@ export default function Stickers() {
             )}
           </div>
         </div>
-        {/* Mobile: fleet search + action buttons */}
+        {/* Mobile: action buttons only (filter appears below banners) */}
         <div className="flex sm:hidden flex-col gap-2">
-          {isFleetUser && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-              <Input
-                placeholder="Filter by name, plate, driver…"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-8 rounded-xl w-full"
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          )}
           {user?.plan_tier === 'individual' && (
             <Button variant="outline" onClick={handleUpgrade} disabled={addonLoading} className="rounded-xl w-full">
               {addonLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
@@ -264,6 +248,24 @@ export default function Stickers() {
               Use the Design button on each sticker below to choose a design and enter your shipping address.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Mobile-only fleet filter — below banners, above sticker list */}
+      {isFleetUser && stickers.length > 0 && (
+        <div className="sm:hidden relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Filter by name, plate, driver…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9 pr-8 rounded-xl w-full"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       )}
 
