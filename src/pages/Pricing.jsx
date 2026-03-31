@@ -126,7 +126,7 @@ export default function Pricing() {
       <div className="text-center space-y-3">
         <div className="flex justify-center mb-4">
           <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
             className="h-24 w-auto"
           />

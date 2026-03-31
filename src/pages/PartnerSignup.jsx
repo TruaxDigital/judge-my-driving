@@ -107,7 +107,7 @@ export default function PartnerSignup() {
       <div className="max-w-lg mx-auto px-5 py-10">
         <div className="text-center mb-8">
           <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
             className="h-24 w-auto mx-auto mb-4"
           />

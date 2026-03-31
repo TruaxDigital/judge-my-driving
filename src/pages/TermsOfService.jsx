@@ -19,7 +19,7 @@ export default function TermsOfService() {
       <div style={{ borderBottom: '1px solid rgba(212,160,23,0.12)', padding: '16px 24px' }}>
         <a href="/get-started">
           <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
             style={{ height: '48px', width: 'auto' }}
           />

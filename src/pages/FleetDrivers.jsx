@@ -87,7 +87,7 @@ export default function FleetDrivers() {
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <a href="/get-started">
             <img
-              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
               alt="Judge My Driving"
               style={{ height: '48px', width: 'auto' }}
             />

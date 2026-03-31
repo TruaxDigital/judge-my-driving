@@ -108,7 +108,7 @@ export default function Liability() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="flex flex-col gap-4">
           <img
-            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+            src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
             className="h-24 w-auto"
           />
