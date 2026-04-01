@@ -65,7 +65,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
         <motion.div variants={itemVariants} className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 space-y-4">
           <ShieldAlert className="w-8 h-8 text-red-400 mx-auto" />
           <p className="text-red-300 font-medium">If this is an emergency, contact local authorities.</p>
-          <a href="tel:911">
+          <a href="tel:911" className="block mt-6">
             <Button variant="destructive" className="w-full rounded-xl h-12 font-semibold">
               <Phone className="w-5 h-5 mr-2" /> Call 911
             </Button>
