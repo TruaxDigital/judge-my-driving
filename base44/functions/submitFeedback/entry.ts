@@ -31,26 +31,44 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.FeedbackCooldown.create({ ip_address: ip, sticker_id, last_submission: new Date().toISOString() });
     }
 
-    // AI moderation: check comment for abusive language
+    // AI moderation: check comment for abusive/bullying language
     let is_flagged = false;
     let moderation_reason = undefined;
+    let is_blocked = false; // severe content that should be rejected outright
     if (comment && comment.trim().length > 0) {
       try {
         const modResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
-          prompt: `You are a content moderator. Analyze this driving feedback comment and determine if it contains abusive, threatening, harassing, racist, sexually explicit, or otherwise harmful language. Be lenient with strong but legitimate criticism (e.g. "terrible driver", "almost hit me") — only flag genuinely abusive or harmful content.
+          prompt: `You are a content safety moderator for a driving feedback platform used by teen drivers, senior drivers, and fleet employees. Your job is to protect potentially vulnerable users (especially teens) from bullying, harassment, and hate speech.
 
-Comment: "${comment}"
+Analyze the following feedback comment. Return a JSON object with:
+- "severity": one of "ok", "flag", or "block"
+  - "ok"    = legitimate driving feedback (even if harsh, e.g. "terrible driver", "almost hit me", "driving too fast")
+  - "flag"  = borderline or mildly inappropriate — save but mark for admin review (e.g. mild profanity, vague insults unrelated to driving)
+  - "block" = must be rejected entirely — do NOT save (e.g. personal attacks, bullying, threats, hate speech based on age/race/gender, sexual comments, doxxing, slurs)
+- "reason": a short explanation if severity is "flag" or "block", otherwise empty string
 
-Respond with JSON only.`,
+Be STRICT about protecting teen and senior drivers from bullying. A comment that mocks someone's age, appearance, gender, or identity — rather than their driving — should be "block". A comment calling out genuinely dangerous driving behavior is "ok" even if strongly worded.
+
+Comment: "${comment.replace(/"/g, '\\"')}"`,
           response_json_schema: {
             type: 'object',
             properties: {
-              is_abusive: { type: 'boolean' },
+              severity: { type: 'string' },
               reason: { type: 'string' }
             }
           }
         });
-        if (modResult?.is_abusive === true) {
+
+        const severity = modResult?.severity;
+        if (severity === 'block') {
+          is_blocked = true;
+          moderation_reason = modResult.reason || 'Blocked by AI moderation';
+          console.log(`[submitFeedback] Comment BLOCKED: "${comment}" — reason: ${moderation_reason}`);
+          return Response.json({
+            error: 'Your comment was not submitted because it appears to contain harmful, bullying, or hateful language. Please keep feedback focused on driving behavior.',
+            blocked: true
+          }, { status: 422 });
+        } else if (severity === 'flag') {
           is_flagged = true;
           moderation_reason = modResult.reason || 'Flagged by AI moderation';
           console.log(`[submitFeedback] Comment flagged: "${comment}" — reason: ${moderation_reason}`);

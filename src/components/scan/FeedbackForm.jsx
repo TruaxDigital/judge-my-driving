@@ -15,6 +15,8 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
   const [locationName, setLocationName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [locationLoading, setLocationLoading] = useState(true);
+  const [blockedMessage, setBlockedMessage] = useState('');
+  const [cooldownMessage, setCooldownMessage] = useState('');
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -44,7 +46,9 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
   const handleSubmit = async () => {
     if (rating === 0) return;
     setSubmitting(true);
-    
+    setBlockedMessage('');
+    setCooldownMessage('');
+
     const res = await base44.functions.invoke('submitFeedback', {
       sticker_id: sticker.id,
       sticker_code: sticker.unique_code,
@@ -57,9 +61,20 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
       is_preview: isPreview || undefined,
     });
 
+    setSubmitting(false);
+
+    if (res.data?.blocked) {
+      setBlockedMessage(res.data.error || 'Your comment was not submitted because it appears to contain harmful or bullying language. Please keep feedback focused on driving behavior.');
+      return;
+    }
+
     if (res.data?.error) {
-      console.error('Feedback submission error:', res.data.error);
-    } else if (!isPreview) {
+      // Cooldown or other server error
+      setCooldownMessage(res.data.error);
+      return;
+    }
+
+    if (!isPreview) {
       base44.analytics.track({
         eventName: 'feedback_submitted',
         properties: {
@@ -131,6 +146,20 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
           </div>
         ) : null}
       </div>
+
+      {blockedMessage && (
+        <div className="flex items-start gap-3 bg-red-500/15 border border-red-500/30 rounded-xl p-4">
+          <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-300">{blockedMessage}</p>
+        </div>
+      )}
+
+      {cooldownMessage && (
+        <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+          <Clock className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-yellow-300">{cooldownMessage}</p>
+        </div>
+      )}
 
       <Button
         onClick={handleSubmit}
