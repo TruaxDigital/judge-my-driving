@@ -29,7 +29,7 @@ export default function SalesBox({ discountCode, rating }) {
       ) : (
         <p className="text-zinc-400 text-sm">Get a Judge My Driving sticker for your vehicle.</p>
       )}
-      <a href={href} onClick={handleClick}>
+      <a href={href} onClick={handleClick} className="block mt-6">
         <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl h-12">
           {discountCode ? 'Get 20% Off — Claim Now' : 'Get Your Sticker'}
         </Button>
