@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import FeedbackForm from '../components/scan/FeedbackForm';
 import RegistrationForm from '../components/scan/RegistrationForm';
 import ThankYouScreen from '../components/scan/ThankYouScreen';
 import RegisteredConfirmation from '../components/scan/RegisteredConfirmation';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+  exit:    { opacity: 0, y: -12, transition: { duration: 0.2, ease: 'easeIn' } },
+};
 
 export default function ScanSticker() {
   const [sticker, setSticker] = useState(null);
@@ -69,47 +76,78 @@ export default function ScanSticker() {
     <div className="min-h-screen bg-zinc-900 font-inter">
       <div className="max-w-md mx-auto px-5 py-8">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
             alt="Judge My Driving"
             className="h-24 w-auto mx-auto"
           />
-        </div>
+        </motion.div>
 
-        {loading && (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {loading && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-20 gap-4"
+            >
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <p className="text-zinc-500 text-sm animate-pulse">Looking up sticker…</p>
+            </motion.div>
+          )}
 
-        {error && (
-          <div className="text-center py-20 space-y-4">
-            <p className="text-zinc-400 text-lg">{error}</p>
-            <a href="https://judgemydriving.com" className="text-primary underline text-sm">
-              Visit judgemydriving.com
-            </a>
-          </div>
-        )}
+          {!loading && error && (
+            <motion.div
+              key="error"
+              {...pageVariants}
+              className="text-center py-20 space-y-4"
+            >
+              <p className="text-zinc-400 text-lg">{error}</p>
+              <a href="https://judgemydriving.com" className="text-primary underline text-sm">
+                Visit judgemydriving.com
+              </a>
+            </motion.div>
+          )}
 
-        {view === 'register' && sticker && (
-          <RegistrationForm sticker={sticker} onRegistered={handleRegistered} />
-        )}
+          {view === 'register' && sticker && (
+            <motion.div key="register" {...pageVariants}>
+              <RegistrationForm sticker={sticker} onRegistered={handleRegistered} />
+            </motion.div>
+          )}
 
-        {view === 'feedback' && sticker && (
-          <FeedbackForm sticker={sticker} onSubmitted={handleFeedbackSubmitted} />
-        )}
+          {view === 'feedback' && sticker && (
+            <motion.div key="feedback" {...pageVariants}>
+              <FeedbackForm sticker={sticker} onSubmitted={handleFeedbackSubmitted} />
+            </motion.div>
+          )}
 
-        {view === 'thankyou' && (
-          <ThankYouScreen rating={thankYouData.rating} safetyFlag={thankYouData.safetyFlag} />
-        )}
+          {view === 'thankyou' && (
+            <motion.div key="thankyou" {...pageVariants}>
+              <ThankYouScreen rating={thankYouData.rating} safetyFlag={thankYouData.safetyFlag} />
+            </motion.div>
+          )}
 
-        {view === 'registered' && (
-          <RegisteredConfirmation driverLabel={registeredLabel} />
-        )}
+          {view === 'registered' && (
+            <motion.div key="registered" {...pageVariants}>
+              <RegisteredConfirmation driverLabel={registeredLabel} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Footer */}
-        <div className="text-center mt-12 pt-6 border-t border-zinc-800 space-y-1">
+        <motion.div
+          className="text-center mt-12 pt-6 border-t border-zinc-800 space-y-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
           <p className="text-zinc-600 text-xs">
             © {new Date().getFullYear()} Judge My Driving. Privacy-first feedback.
           </p>
@@ -118,7 +156,7 @@ export default function ScanSticker() {
             {' | '}
             <a href="/privacy" className="hover:text-zinc-500 transition-colors">Privacy Policy</a>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
