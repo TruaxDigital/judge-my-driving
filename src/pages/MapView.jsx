@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { Loader2, Star, MapPin } from 'lucide-react';
 import moment from 'moment';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+function FitBounds({ points }) {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length === 0) return;
+    if (points.length === 1) {
+      map.setView(points[0], 13);
+      return;
+    }
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+  }, [points.length]);
+  return null;
+}
 
 const ratingColor = (r) => {
   if (r >= 4) return '#22c55e';
@@ -35,9 +50,8 @@ export default function MapView() {
     enabled: stickers.length > 0,
   });
 
-  const center = feedback.length > 0
-    ? [feedback[0].latitude, feedback[0].longitude]
-    : [39.8283, -98.5795];
+  const points = feedback.map(f => [f.latitude, f.longitude]);
+  const center = points.length > 0 ? points[0] : [39.8283, -98.5795];
 
   if (isLoading) {
     return (
@@ -60,12 +74,13 @@ export default function MapView() {
           <p className="text-muted-foreground">No geolocated feedback yet.</p>
         </div>
       ) : (
-        <div className="rounded-2xl overflow-hidden border border-border" style={{ height: 'calc(100vh - 200px)' }}>
-          <MapContainer center={center} zoom={5} className="h-full w-full">
+        <div className="rounded-2xl overflow-hidden border border-border" style={{ height: 'calc(100dvh - 220px)', minHeight: '320px' }}>
+          <MapContainer center={center} zoom={5} className="h-full w-full" style={{ zIndex: 0 }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; OpenStreetMap'
             />
+            <FitBounds points={points} />
             {feedback.map(f => (
               <CircleMarker
                 key={f.id}
