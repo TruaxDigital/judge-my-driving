@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
       } else {
         // New user — invite them with partner role
         try {
-          await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
+          await base44.users.inviteUser(contact_email, 'partner');
           console.log(`[partnerSignup] Invited new user ${contact_email} with partner role`);
         } catch (inviteErr) {
           console.log(`[partnerSignup] User invite failed for ${contact_email}: ${inviteErr.message}`);

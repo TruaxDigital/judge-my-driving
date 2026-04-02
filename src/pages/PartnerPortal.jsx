@@ -61,7 +61,13 @@ export default function PartnerPortal() {
     );
   }
 
-  // Partner role but no ReferralPartner record — show inline setup
+  // Not logged in — redirect to login, then come back here
+  if (!user) {
+    base44.auth.redirectToLogin('/PartnerPortal');
+    return null;
+  }
+
+  // Logged in but no ReferralPartner record — show inline setup
   if (!partner) {
     return <PartnerSetup user={user} onComplete={() => queryClient.invalidateQueries({ queryKey: ['my-partner'] })} />;
   }
