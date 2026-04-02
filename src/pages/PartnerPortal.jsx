@@ -142,12 +142,12 @@ export default function PartnerPortal() {
           </div>
         )}
 
-        <div className="p-6 lg:p-10 max-w-5xl mx-auto">
+        <div className="p-6 lg:p-10 max-w-5xl mx-auto pb-24 lg:pb-10">
           {renderTab()}
         </div>
 
         {/* Mobile Nav */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex safe-area-bottom">
           {NAV_ITEMS.map(item => (
             <button
               key={item.id}
