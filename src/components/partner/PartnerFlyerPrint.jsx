@@ -72,28 +72,28 @@ const FLYERS = {
 
 function buildFlyerHTML(f, c, qrImageUrl, referralUrl, partner) {
   const stepsHTML = f.steps.map(step => `
-    <div style="display:flex;gap:12px;align-items:flex-start;">
-      <div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:${c.stepCircleBg};border:2px solid ${c.stepCircleBorder};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${c.primary};flex-shrink:0;line-height:30px;text-align:center;">
+    <div style="display:flex;gap:10px;align-items:flex-start;">
+      <div style="width:24px;height:24px;min-width:24px;border-radius:50%;background:${c.stepCircleBg};border:2px solid ${c.stepCircleBorder};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${c.primary};flex-shrink:0;line-height:24px;text-align:center;">
         ${step.num}
       </div>
       <div>
-        <div style="font-size:14px;font-weight:700;color:${c.text};">${step.title}</div>
-        <div style="font-size:12.5px;color:${c.textMuted};margin-top:2px;line-height:1.5;">${step.desc}</div>
+        <div style="font-size:12.5px;font-weight:700;color:${c.text};">${step.title}</div>
+        <div style="font-size:11px;color:${c.textMuted};margin-top:1px;line-height:1.4;">${step.desc}</div>
       </div>
     </div>
   `).join('');
 
   const statsHTML = f.stats.map(s => `
-    <div style="flex:1;background:${c.card};border:1px solid ${c.cardBorder};border-radius:8px;padding:10px 12px;">
-      <div style="font-size:22px;font-weight:900;color:${c.primary};">${s.number}</div>
-      <div style="font-size:10.5px;line-height:1.4;color:${c.textMuted};margin-top:2px;">${s.label}</div>
-      <div style="font-size:9px;color:${c.sourceText};margin-top:4px;font-style:italic;">${s.source}</div>
+    <div style="flex:1;background:${c.card};border:1px solid ${c.cardBorder};border-radius:8px;padding:8px 10px;">
+      <div style="font-size:20px;font-weight:900;color:${c.primary};">${s.number}</div>
+      <div style="font-size:10px;line-height:1.35;color:${c.textMuted};margin-top:2px;">${s.label}</div>
+      <div style="font-size:8.5px;color:${c.sourceText};margin-top:3px;font-style:italic;">${s.source}</div>
     </div>
   `).join('');
 
   const qrSection = qrImageUrl
-    ? `<img src="${qrImageUrl}" style="width:100px;height:100px;display:block;margin:0 auto 10px;" />`
-    : `<div style="width:100px;height:100px;margin:0 auto 10px;background:#f3f4f6;border-radius:6px;border:1.5px solid ${c.cardBorder};display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;text-align:center;padding:8px;">QR Code</div>`;
+    ? `<img src="${qrImageUrl}" style="width:85px;height:85px;display:block;margin:0 auto 8px;" />`
+    : `<div style="width:85px;height:85px;margin:0 auto 8px;background:#f3f4f6;border-radius:6px;border:1.5px solid ${c.cardBorder};display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;text-align:center;padding:8px;">QR Code</div>`;
 
   return `<!DOCTYPE html>
 <html>
@@ -111,7 +111,7 @@ function buildFlyerHTML(f, c, qrImageUrl, referralUrl, partner) {
     }
     @page {
       size: 5.5in 8.5in;
-      margin: 0;
+      margin: 0.2in;
     }
     @media print {
       body { background: white; }
@@ -145,63 +145,63 @@ function buildFlyerHTML(f, c, qrImageUrl, referralUrl, partner) {
 
   <div class="flyer">
     <!-- Top Badge -->
-    <div style="background:${c.primary};color:#fff;text-align:center;padding:9px 16px;font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;">
+    <div style="background:${c.primary};color:#fff;text-align:center;padding:6px 16px;font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">
       For ${f.audience}
     </div>
 
     <!-- Hero -->
-    <div style="padding:22px 40px 12px;">
-      <h1 style="font-family:'Merriweather',Georgia,serif;font-size:24px;font-weight:900;line-height:1.2;color:${c.text};">
+    <div style="padding:14px 32px 8px;">
+      <h1 style="font-family:'Merriweather',Georgia,serif;font-size:21px;font-weight:900;line-height:1.2;color:${c.text};">
         ${f.headline}
       </h1>
-      <p style="font-family:'Merriweather',Georgia,serif;font-size:18px;font-weight:700;color:${c.primary};margin:4px 0 0;font-style:italic;">
+      <p style="font-family:'Merriweather',Georgia,serif;font-size:16px;font-weight:700;color:${c.primary};margin:3px 0 0;font-style:italic;">
         ${f.subhead}
       </p>
-      <p style="font-size:13px;line-height:1.55;color:${c.textMuted};margin-top:10px;">
+      <p style="font-size:12px;line-height:1.5;color:${c.textMuted};margin-top:7px;">
         ${f.hook}
       </p>
     </div>
 
     <!-- Stats -->
-    <div style="display:flex;gap:10px;padding:0 40px 16px;">
+    <div style="display:flex;gap:8px;padding:0 32px 10px;">
       ${statsHTML}
     </div>
 
     <!-- Divider -->
-    <div style="height:1px;background:${c.cardBorder};margin:0 40px;"></div>
+    <div style="height:1px;background:${c.cardBorder};margin:0 32px;"></div>
 
     <!-- How It Works -->
-    <div style="padding:14px 40px;">
-      <p style="font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${c.primary};margin:0 0 12px;">
+    <div style="padding:10px 32px;">
+      <p style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${c.primary};margin:0 0 8px;">
         How It Works
       </p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;flex-direction:column;gap:7px;">
         ${stepsHTML}
       </div>
     </div>
 
     <!-- QR Section -->
-    <div style="margin:0 40px;background:${c.card};border:1.5px solid ${c.cardBorder};border-radius:10px;padding:16px;text-align:center;">
+    <div style="margin:0 32px;background:${c.card};border:1.5px solid ${c.cardBorder};border-radius:8px;padding:12px;text-align:center;">
       ${qrSection}
-      <p style="font-size:14px;font-weight:800;color:${c.text};margin:0 0 2px;">Scan to get started</p>
-      <p style="font-size:11px;color:${c.textMuted};margin:0 0 3px;">judgemydriving.com</p>
-      ${partner.partner_name ? `<p style="font-size:10.5px;color:${c.primary};font-weight:700;margin:3px 0 1px;">Recommended by ${partner.partner_name}</p>` : ''}
-      ${referralUrl ? `<p style="font-size:9px;color:${c.sourceText};font-family:monospace;">${referralUrl}</p>` : ''}
+      <p style="font-size:13px;font-weight:800;color:${c.text};margin:0 0 2px;">Scan to get started</p>
+      <p style="font-size:10.5px;color:${c.textMuted};margin:0 0 2px;">judgemydriving.com</p>
+      ${partner.partner_name ? `<p style="font-size:10px;color:${c.primary};font-weight:700;margin:2px 0 1px;">Recommended by ${partner.partner_name}</p>` : ''}
+      ${referralUrl ? `<p style="font-size:8.5px;color:${c.sourceText};font-family:monospace;">${referralUrl}</p>` : ''}
     </div>
 
     <!-- CTA -->
-    <div style="padding:14px 40px 6px;text-align:center;">
-      <div style="display:inline-block;background:${c.primary};color:#fff;padding:10px 28px;border-radius:8px;font-size:16px;font-weight:800;letter-spacing:0.3px;">
+    <div style="padding:10px 32px 4px;text-align:center;">
+      <div style="display:inline-block;background:${c.primary};color:#fff;padding:8px 24px;border-radius:8px;font-size:15px;font-weight:800;letter-spacing:0.3px;">
         ${f.cta}
       </div>
-      <p style="font-size:12px;color:${c.textMuted};margin-top:6px;">${f.ctaSub}</p>
+      <p style="font-size:11px;color:${c.textMuted};margin-top:5px;">${f.ctaSub}</p>
     </div>
 
     <!-- Footer -->
-    <div style="padding:10px 40px 14px;text-align:center;border-top:1px solid ${c.cardBorder};margin-top:4px;">
-      <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style="height:34px;width:auto;margin:0 auto 4px;display:block;" />
-      <p style="font-size:10px;color:${c.textMuted};margin:0 0 2px;letter-spacing:0.3px;">Real feedback from real drivers. Delivered to you.</p>
-      <p style="font-size:9px;color:${c.sourceText || c.textMuted};margin:0;font-style:italic;">${f.trustLine}</p>
+    <div style="padding:8px 32px 10px;text-align:center;border-top:1px solid ${c.cardBorder};margin-top:4px;">
+      <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style="height:28px;width:auto;margin:0 auto 3px;display:block;" />
+      <p style="font-size:9.5px;color:${c.textMuted};margin:0 0 1px;letter-spacing:0.3px;">Real feedback from real drivers. Delivered to you.</p>
+      <p style="font-size:8.5px;color:${c.sourceText || c.textMuted};margin:0;font-style:italic;">${f.trustLine}</p>
     </div>
   </div>
 </body>
