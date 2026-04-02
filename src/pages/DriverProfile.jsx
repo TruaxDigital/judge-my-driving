@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Star, MessageSquare, Shield, Trophy, Award, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import useSEO from '@/hooks/useSEO';
 
 function getRatingColor(rating) {
   if (rating >= 4.5) return 'text-green-600';
@@ -21,6 +22,12 @@ function getRatingLabel(rating) {
 }
 
 export default function DriverProfile() {
+  useSEO({
+    title: 'Driver Scorecard | Judge My Driving',
+    description: 'View this driver\'s public scorecard — community ratings, recent feedback, and driving achievements from Judge My Driving.',
+    canonical: 'https://app.judgemydriving.com/driver-profile',
+  });
+
   // Get unique_code from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');

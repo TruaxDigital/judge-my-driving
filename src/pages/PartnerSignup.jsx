@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import useSEO from '@/hooks/useSEO';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,12 @@ const PAYOUT_OPTIONS = [
 ];
 
 export default function PartnerSignup() {
+  useSEO({
+    title: 'Become a Referral Partner | Judge My Driving',
+    description: 'Join the Judge My Driving referral partner program. Earn $10 per individual or family plan signup. Perfect for driving schools, PTAs, insurance agencies, and dealerships.',
+    canonical: 'https://app.judgemydriving.com/partner-signup',
+  });
+
   const [step, setStep] = useState(1); // 1=form, 2=done
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
