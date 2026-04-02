@@ -124,8 +124,8 @@ export default function SeniorDrivers() {
             className="h-28 w-auto mx-auto"
           />
           {refCode && (
-            <p className="text-zinc-500 text-xs mt-2">
-              {partnerName ? `Recommended by ${partnerName}` : 'Referred by a partner'}
+            <p className="text-primary text-sm font-semibold mt-3">
+              Referred by {partnerName || 'a partner'}
             </p>
           )}
         </div>
