@@ -98,7 +98,7 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-border pb-safe">
+        <div className="p-4 border-t border-border" style={{ paddingBottom: 'max(4.5rem, calc(env(safe-area-inset-bottom) + 4.5rem))' }}>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground w-full transition-all"
@@ -118,7 +118,7 @@ export default function DashboardLayout() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="p-6 lg:p-10 max-w-7xl mx-auto pb-safe lg:pb-10"
+            className="p-6 lg:p-10 max-w-7xl mx-auto pb-24 lg:pb-10"
           >
             <Outlet />
           </motion.div>
