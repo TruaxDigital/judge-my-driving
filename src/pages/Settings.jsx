@@ -153,49 +153,71 @@ export default function Settings() {
               <span className="font-medium">{moment(user.subscription_end_date).format('MMM D, YYYY')}</span>
             </div>
           )}
-          {user?.subscription_status === 'active' && (
-            <div className="border border-border rounded-xl p-4 space-y-2">
-              <div className="flex items-start gap-3">
-                <Gift className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm text-foreground">Free Replacement Sticker</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    As an active subscriber, you can request one free replacement sticker per renewal year. We'll send a new one with the same QR code.
-                  </p>
+          {(() => {
+            if (user?.subscription_status !== 'active') return null;
+
+            const startDate = user?.subscription_start_date ? new Date(user.subscription_start_date) : null;
+            const now = new Date();
+            const oneYearAfterStart = startDate ? new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate()) : null;
+            const isEligibleYear = oneYearAfterStart && now >= oneYearAfterStart;
+
+            // Check if already requested in the current subscription year
+            const lastRequest = user?.last_replacement_request_date ? new Date(user.last_replacement_request_date) : null;
+            const alreadyRequested = lastRequest && startDate && lastRequest >= startDate;
+
+            if (!isEligibleYear) return null;
+
+            return (
+              <div className="border border-border rounded-xl p-4 space-y-2">
+                <div className="flex items-start gap-3">
+                  <Gift className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm text-foreground">Free Replacement Sticker</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      As a returning subscriber, you can request one free replacement sticker per renewal year. We'll send a new one with the same QR code.
+                    </p>
+                  </div>
                 </div>
+                {alreadyRequested ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" /> You've already requested your free replacement for this subscription year.
+                  </div>
+                ) : freeReplacementStatus === 'sent' ? (
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CheckCircle2 className="w-4 h-4" /> Request submitted! We'll ship your replacement shortly.
+                  </div>
+                ) : freeReplacementStatus === 'error' ? (
+                  <div className="flex items-center gap-2 text-sm text-destructive">
+                    <AlertCircle className="w-4 h-4" /> Something went wrong. Please contact support.
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg"
+                    disabled={freeReplacementStatus === 'loading'}
+                    onClick={async () => {
+                      setFreeReplacementStatus('loading');
+                      try {
+                        const newCredits = (user.sticker_credits || 0) + 1;
+                        await base44.auth.updateMe({
+                          sticker_credits: newCredits,
+                          last_replacement_request_date: new Date().toISOString(),
+                        });
+                        queryClient.invalidateQueries({ queryKey: ['me'] });
+                        setFreeReplacementStatus('sent');
+                      } catch {
+                        setFreeReplacementStatus('error');
+                      }
+                    }}
+                  >
+                    {freeReplacementStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
+                    Request Free Replacement
+                  </Button>
+                )}
               </div>
-              {freeReplacementStatus === 'sent' ? (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle2 className="w-4 h-4" /> Request submitted! We'll ship your replacement shortly.
-                </div>
-              ) : freeReplacementStatus === 'error' ? (
-                <div className="flex items-center gap-2 text-sm text-destructive">
-                  <AlertCircle className="w-4 h-4" /> Something went wrong. Please contact support.
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-lg"
-                  disabled={freeReplacementStatus === 'loading'}
-                  onClick={async () => {
-                    setFreeReplacementStatus('loading');
-                    try {
-                      const newCredits = (user.sticker_credits || 0) + 1;
-                      await base44.auth.updateMe({ sticker_credits: newCredits });
-                      queryClient.invalidateQueries({ queryKey: ['me'] });
-                      setFreeReplacementStatus('sent');
-                    } catch {
-                      setFreeReplacementStatus('error');
-                    }
-                  }}
-                >
-                  {freeReplacementStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
-                  Request Free Replacement
-                </Button>
-              )}
-            </div>
-          )}
+            );
+          })()}
           <div className="flex gap-3 pt-2 flex-wrap">
             <Button
               variant="outline"

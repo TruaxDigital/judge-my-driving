@@ -7,8 +7,8 @@
       "enum": [
         "admin",
         "user",
-        "fleet_admin",
-        "partner"
+        "partner",
+        "fleet_admin"
       ],
       "default": "user"
     },
@@ -18,9 +18,11 @@
         "individual",
         "family",
         "starter_fleet",
-        "professional_fleet"
+        "professional_fleet",
+        "enterprise",
+        "enterprise_fleet"
       ],
-      "description": "The user's current subscription plan tier"
+      "description": "Current subscription plan"
     },
     "plan": {
       "type": "string",
@@ -28,17 +30,7 @@
         "personal",
         "fleet"
       ],
-      "description": "Broad plan type"
-    },
-    "subscription_status": {
-      "type": "string",
-      "enum": [
-        "active",
-        "past_due",
-        "canceled",
-        "trialing"
-      ],
-      "description": "Current Stripe subscription status"
+      "description": "Category of the plan (personal or fleet)"
     },
     "stripe_customer_id": {
       "type": "string",
@@ -48,20 +40,50 @@
       "type": "string",
       "description": "Stripe subscription ID"
     },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled",
+        "trialing",
+        "unpaid"
+      ],
+      "default": "unpaid",
+      "description": "Status of the Stripe subscription"
+    },
     "subscription_start_date": {
       "type": "string",
       "format": "date-time",
-      "description": "When the current subscription period started"
+      "description": "When the current subscription started"
     },
     "subscription_end_date": {
       "type": "string",
       "format": "date-time",
-      "description": "When the current subscription period ends / renews"
+      "description": "When the current subscription ends"
     },
     "sticker_credits": {
       "type": "number",
       "default": 0,
-      "description": "Number of unclaimed sticker credits available to the user"
+      "description": "Available credits for ordering new stickers"
+    },
+    "is_partner": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user is a referral partner"
+    },
+    "payout_method": {
+      "type": "string",
+      "enum": [
+        "venmo",
+        "paypal",
+        "eft"
+      ],
+      "description": "How the partner wants to be paid"
+    },
+    "payout_details": {
+      "type": "string",
+      "description": "Venmo handle, PayPal email, or bank info for partner payouts"
     },
     "notification_pref": {
       "type": "string",
@@ -71,38 +93,12 @@
         "weekly"
       ],
       "default": "instant",
-      "description": "How often the user wants feedback notifications"
+      "description": "User's preference for feedback notifications"
     },
-    "home_state": {
+    "last_replacement_request_date": {
       "type": "string",
-      "description": "User's home state (for leaderboard scoping)"
-    },
-    "home_state_slug": {
-      "type": "string",
-      "description": "URL-friendly state slug"
-    },
-    "home_metro_slug": {
-      "type": "string",
-      "description": "URL-friendly metro area slug"
-    },
-    "is_partner": {
-      "type": "boolean",
-      "default": false,
-      "description": "Whether this user has opted into the Partner Program"
-    },
-    "payout_method": {
-      "type": "string",
-      "enum": [
-        "venmo",
-        "paypal",
-        "eft"
-      ],
-      "description": "Preferred payout method for in-app partners"
-    },
-    "payout_details": {
-      "type": "string",
-      "description": "Venmo handle, PayPal email, or bank info for in-app partners"
+      "format": "date-time",
+      "description": "Timestamp of the last free replacement sticker request"
     }
-  },
-  "required": []
+  }
 }
