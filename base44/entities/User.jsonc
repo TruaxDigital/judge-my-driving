@@ -84,6 +84,24 @@
     "home_metro_slug": {
       "type": "string",
       "description": "URL-friendly metro area slug"
+    },
+    "is_partner": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this user has opted into the Partner Program"
+    },
+    "payout_method": {
+      "type": "string",
+      "enum": [
+        "venmo",
+        "paypal",
+        "eft"
+      ],
+      "description": "Preferred payout method for in-app partners"
+    },
+    "payout_details": {
+      "type": "string",
+      "description": "Venmo handle, PayPal email, or bank info for in-app partners"
     }
   },
   "required": []

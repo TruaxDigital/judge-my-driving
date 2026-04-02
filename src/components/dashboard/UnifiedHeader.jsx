@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeAwareLogo from '@/components/ThemeAwareLogo';
+import PartnerToggle from './PartnerToggle';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 
 // Routes that are "root" tab destinations — show logo, no back button
 const ROOT_ROUTES = ['/Dashboard', '/Stickers', '/FleetDashboard', '/Settings', '/Leaderboard', '/MapView'];
@@ -17,6 +20,7 @@ const ROUTE_LABELS = {
   '/AdminConversions': 'Conversions',
   '/AdminPayoutReports': 'Payout Reports',
   '/AdminSales': 'Sales',
+  '/AdminFleetReferrals': 'Fleet Referrals',
   '/PreviewScan': 'Reporter View',
 };
 
@@ -25,6 +29,11 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
   const navigate = useNavigate();
   const isRoot = ROOT_ROUTES.includes(location.pathname);
   const label = ROUTE_LABELS[location.pathname];
+
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
 
   return (
     <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border h-14 flex items-center justify-between px-4 safe-area-top select-none">
@@ -47,14 +56,17 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
         )}
       </div>
 
-      {/* Right: Hamburger for full nav */}
-      <button
-        onClick={onMenuToggle}
-        className="p-2 -mr-1 text-foreground"
-        aria-label="Menu"
-      >
-        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+      {/* Right: Partner toggle + Hamburger */}
+      <div className="flex items-center gap-2">
+        <PartnerToggle user={user} />
+        <button
+          onClick={onMenuToggle}
+          className="p-2 -mr-1 text-foreground"
+          aria-label="Menu"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
     </div>
   );
 }

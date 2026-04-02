@@ -35,6 +35,7 @@ import FleetDrivers from './pages/FleetDrivers';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import PartnerTerms from './pages/PartnerTerms';
+import AdminFleetReferrals from './pages/AdminFleetReferrals';
 
 const PublicRoutes = () => {
   return (
@@ -151,6 +152,7 @@ const AuthenticatedApp = () => {
         <Route path="/AdminConversions" element={<AdminConversions />} />
         <Route path="/AdminPayoutReports" element={<AdminPayoutReports />} />
         <Route path="/AdminSales" element={<AdminSales />} />
+        <Route path="/AdminFleetReferrals" element={<AdminFleetReferrals />} />
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />

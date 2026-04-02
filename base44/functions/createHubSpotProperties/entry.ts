@@ -88,6 +88,42 @@ Deno.serve(async (req) => {
       groupName: 'dealinformation',
     });
 
+    // Partner-specific properties on Contacts
+    results.contact_referred_by_partner = await createProperty(accessToken, 'contacts', {
+      name: 'referred_by_partner',
+      label: 'Referred By Partner',
+      type: 'string',
+      fieldType: 'text',
+      groupName: 'contactinformation',
+      description: 'Name of the JMD partner who referred this fleet contact',
+    });
+    results.contact_lead_source_detail = await createProperty(accessToken, 'contacts', {
+      name: 'lead_source_detail',
+      label: 'Lead Source Detail',
+      type: 'string',
+      fieldType: 'text',
+      groupName: 'contactinformation',
+      description: 'Detailed source of this lead',
+    });
+
+    // Partner-specific properties on Deals
+    results.deal_referred_by_partner = await createProperty(accessToken, 'deals', {
+      name: 'referred_by_partner',
+      label: 'Referred By Partner',
+      type: 'string',
+      fieldType: 'text',
+      groupName: 'dealinformation',
+      description: 'Name of the JMD partner who referred this fleet deal',
+    });
+    results.deal_partner_ref_code = await createProperty(accessToken, 'deals', {
+      name: 'partner_ref_code',
+      label: 'Partner Ref Code',
+      type: 'string',
+      fieldType: 'text',
+      groupName: 'dealinformation',
+      description: 'Ref code of the referring partner, for cross-reference back to Base44',
+    });
+
     return Response.json({ success: true, results });
   } catch (err) {
     console.error('createHubSpotProperties error:', err);

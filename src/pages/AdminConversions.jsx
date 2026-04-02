@@ -44,6 +44,9 @@ export default function AdminConversions() {
     queryFn: () => base44.entities.ReferralConversion.list('-created_date'),
   });
 
+  // Fleet referrals that have reached Commission Approved will appear as ReferralConversion records
+  // with subscription_type = 'fleet_referral' — they show up automatically in this list
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ReferralConversion.create(data),
     onSuccess: () => {
@@ -208,7 +211,7 @@ export default function AdminConversions() {
             <div className="space-y-1">
               <Label>Subscription Type *</Label>
               <div className="flex gap-2">
-                {['individual', 'family'].map(t => (
+                {['individual', 'family', 'fleet_referral'].map(t => (
                   <button key={t} type="button" onClick={() => setForm(p => ({ ...p, subscription_type: t }))}
                     className={cn('flex-1 py-2 rounded-xl border text-sm font-medium capitalize transition-all', form.subscription_type === t ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-muted')}>
                     {t}

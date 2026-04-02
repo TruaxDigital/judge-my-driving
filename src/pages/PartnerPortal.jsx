@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, QrCode, BookOpen, Palette, Settings, AlertTriangle, Upload, Loader2, LogOut } from 'lucide-react';
+import { LayoutDashboard, QrCode, BookOpen, Palette, Settings, AlertTriangle, Upload, Loader2, LogOut, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PartnerDashboard from '@/components/partner/PartnerDashboard';
 import PartnerReferralTools from '@/components/partner/PartnerReferralTools';
@@ -10,10 +10,12 @@ import PartnerPitchScripts from '@/components/partner/PartnerPitchScripts';
 import PartnerDesigns from '@/components/partner/PartnerDesigns';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 import PartnerSetup from '@/components/partner/PartnerSetup';
+import PartnerFleetReferrals from '@/components/partner/PartnerFleetReferrals';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'tools', label: 'Referral Tools', icon: QrCode },
+  { id: 'fleet', label: 'Fleet Referrals', icon: Truck },
   { id: 'scripts', label: 'Pitch Scripts', icon: BookOpen },
   { id: 'designs', label: 'Sticker Designs', icon: Palette },
   { id: 'settings', label: 'Account Settings', icon: Settings },
@@ -71,6 +73,7 @@ export default function PartnerPortal() {
       case 'dashboard': return <PartnerDashboard partner={partner} user={user} />;
       case 'tools': return <PartnerReferralTools partner={partner} />;
       case 'scripts': return <PartnerPitchScripts partner={partner} />;
+      case 'fleet': return <PartnerFleetReferrals partner={partner} />;
       case 'designs': return <PartnerDesigns partner={partner} />;
       case 'settings': return <PartnerSettings partner={partner} user={user} onUpdate={() => queryClient.invalidateQueries({ queryKey: ['my-partner'] })} />;
       default: return <PartnerDashboard partner={partner} user={user} />;

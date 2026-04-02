@@ -22,14 +22,15 @@
       "type": "string",
       "enum": [
         "individual",
-        "family"
+        "family",
+        "fleet_referral"
       ],
-      "description": "Plan type purchased"
+      "description": "Plan type purchased or commission type"
     },
     "commission_amount": {
       "type": "number",
       "default": 10,
-      "description": "Fixed $10 commission"
+      "description": "Commission amount ($10 for B2C, $100 for fleet)"
     },
     "commission_status": {
       "type": "string",

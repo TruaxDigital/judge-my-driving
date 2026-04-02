@@ -1,0 +1,157 @@
+{
+  "name": "FleetReferral",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "User ID of the partner who submitted this referral"
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Display name of the partner at time of submission"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Full name of the fleet contact"
+    },
+    "company_name": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email address of the fleet contact"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Phone number (optional)"
+    },
+    "estimated_fleet_size": {
+      "type": "number",
+      "description": "Estimated number of vehicles"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Freeform notes from the partner"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Submitted",
+        "Contacted",
+        "Deal Closed",
+        "90-Day Hold",
+        "Commission Approved",
+        "Paid",
+        "Rejected"
+      ],
+      "default": "Submitted",
+      "description": "Current status of this fleet referral"
+    },
+    "deal_value": {
+      "type": "number",
+      "description": "Deal value \u2014 admin editable, blank until deal closes"
+    },
+    "stripe_payment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of fleet customer's first Stripe payment. Starts the 90-day clock."
+    },
+    "ninety_day_eligible_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Auto-calculated: stripe_payment_date + 90 days"
+    },
+    "commission_amount": {
+      "type": "number",
+      "default": 100,
+      "description": "Commission amount \u2014 admin editable for edge cases"
+    },
+    "hubspot_contact_id": {
+      "type": "string",
+      "description": "HubSpot contact ID after successful sync"
+    },
+    "hubspot_deal_id": {
+      "type": "string",
+      "description": "HubSpot deal ID after successful sync"
+    },
+    "hubspot_sync_status": {
+      "type": "string",
+      "enum": [
+        "synced",
+        "failed",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Status of HubSpot synchronization"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the referral was submitted"
+    },
+    "status_updated_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the status was last changed"
+    },
+    "ref_code": {
+      "type": "string",
+      "description": "Partner's ref code at time of submission"
+    }
+  },
+  "required": [
+    "partner_id",
+    "contact_name",
+    "company_name",
+    "contact_email"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "partner"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "fleet_admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.partner_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@ import { Loader2, Save, User, CreditCard, ExternalLink, Gift, AlertCircle, Check
 import { toast } from 'sonner';
 import { isInIframe } from '@/lib/utils';
 import moment from 'moment';
+import PartnerOptInSection from '@/components/partner/PartnerOptInSection';
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -17,6 +18,15 @@ export default function Settings() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
+  });
+
+  const { data: partner } = useQuery({
+    queryKey: ['my-partner'],
+    queryFn: async () => {
+      const res = await base44.functions.invoke('getMyPartnerRecord', {});
+      return res.data?.partner || null;
+    },
+    enabled: !!user,
   });
 
   const [notificationPref, setNotificationPref] = useState('');
@@ -201,6 +211,8 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+      <PartnerOptInSection user={user} partner={partner} />
+
       {/* Delete Account */}
       <Card className="rounded-2xl border-destructive/20">
         <CardHeader>

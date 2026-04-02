@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BottomTabBar from './BottomTabBar';
 import UnifiedHeader from './UnifiedHeader';
 import ThemeAwareLogo from '@/components/ThemeAwareLogo';
+import PartnerToggle from './PartnerToggle';
 
 const allNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const allNavItems = [
   { path: '/AdminUsers', label: 'Users', icon: Users, roles: ['admin'] },
   { path: '/AdminPartners', label: 'Partners', icon: GitMerge, roles: ['admin'] },
   { path: '/AdminConversions', label: 'Conversions', icon: BarChart2, roles: ['admin'] },
+  { path: '/AdminFleetReferrals', label: 'Fleet Referrals', icon: Truck, roles: ['admin'] },
   { path: '/AdminPayoutReports', label: 'Payout Reports', icon: DollarSign, roles: ['admin'] },
   { path: '/Support', label: 'Support', icon: HelpCircle },
   { path: '/Pricing', label: 'Plans', icon: CreditCard },
@@ -67,12 +69,13 @@ export default function DashboardLayout() {
         "lg:translate-x-0",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-6 border-b border-border">
+        <div className="p-6 border-b border-border space-y-3">
           <img
             src="https://cdn.jsdelivr.net/gh/TruaxDigital/judge-my-driving@main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
             className="h-28 w-auto"
           />
+          <PartnerToggle user={user} />
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
