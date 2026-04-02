@@ -19,8 +19,10 @@ Deno.serve(async (req) => {
     // Fallback: match by contact_email (signed up via public form before logging in)
     records = await base44.asServiceRole.entities.ReferralPartner.filter({ contact_email: user.email });
     if (records.length > 0) {
-      // Link user_id now
+      // Link user_id and ensure role is set to partner
       const updated = await base44.asServiceRole.entities.ReferralPartner.update(records[0].id, { user_id: user.id });
+      await base44.asServiceRole.entities.User.update(user.id, { role: 'partner', is_partner: true });
+      console.log(`[getMyPartnerRecord] Linked partner record to user ${user.email} and set role=partner`);
       return Response.json({ partner: { ...records[0], ...updated, user_id: user.id } });
     }
 

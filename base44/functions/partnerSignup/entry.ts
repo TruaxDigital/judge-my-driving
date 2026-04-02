@@ -123,6 +123,7 @@ Deno.serve(async (req) => {
         console.log(`[partnerSignup] Found existing user ${contact_email} (id: ${resolvedUserId}), linking as partner`);
         // Update is_partner flag and payout details on the existing user record
         await base44.asServiceRole.entities.User.update(existingUser.id, {
+          role: 'partner',
           is_partner: true,
           payout_method: payout_method || existingUser.payout_method || '',
           payout_details: payout_details || existingUser.payout_details || '',

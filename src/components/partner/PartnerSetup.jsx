@@ -40,6 +40,20 @@ export default function PartnerSetup({ user, onComplete }) {
     setError('');
     setLoading(true);
 
+    // Check if a partner record already exists for this user (e.g. signed up via public form)
+    const existing = await base44.functions.invoke('getMyPartnerRecord', {});
+    if (existing.data?.partner) {
+      // Already exists — just update payout info and mark as partner
+      await base44.auth.updateMe({
+        is_partner: true,
+        payout_method: form.payout_method || existing.data.partner.payout_method,
+        payout_details: form.payout_details || existing.data.partner.payout_details,
+      });
+      setLoading(false);
+      onComplete();
+      return;
+    }
+
     const res = await base44.functions.invoke('partnerSignup', {
       user_id: user.id,
       partner_name: form.partner_name,
@@ -58,7 +72,6 @@ export default function PartnerSetup({ user, onComplete }) {
       return;
     }
 
-    // Ensure is_partner flag and payout info are saved on the user record
     await base44.auth.updateMe({
       is_partner: true,
       payout_method: form.payout_method,
