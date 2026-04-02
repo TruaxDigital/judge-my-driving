@@ -102,10 +102,9 @@ export default function PartnerPortal() {
             alt="Judge My Driving"
             className="h-14 w-auto mb-2"
           />
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold tracking-widest uppercase text-primary">Partner</span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs text-muted-foreground">Portal</span>
+          <div className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mt-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+            <span className="text-xs font-semibold text-primary tracking-wide">Partner Portal</span>
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
