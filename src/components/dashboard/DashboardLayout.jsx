@@ -118,7 +118,7 @@ export default function DashboardLayout() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="p-6 lg:p-10 max-w-7xl mx-auto pb-safe lg:pb-10"
+            className="p-6 lg:p-10 max-w-7xl mx-auto pb-24 lg:pb-10"
           >
             <Outlet />
           </motion.div>
