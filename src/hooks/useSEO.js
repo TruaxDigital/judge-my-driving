@@ -4,7 +4,9 @@ import { useEffect } from 'react';
  * Sets page-level SEO metadata: title, description, robots, canonical, and Open Graph tags.
  * Call this at the top of any page component.
  */
-export default function useSEO({ title, description, canonical, robots = 'index, follow' }) {
+const DEFAULT_OG_IMAGE = 'https://media.base44.com/images/public/69b8646a9cc3aed112928d77/47292e0a5_generated_image.png';
+
+export default function useSEO({ title, description, canonical, robots = 'index, follow', image }) {
   useEffect(() => {
     // Title
     document.title = title;
@@ -40,6 +42,18 @@ export default function useSEO({ title, description, canonical, robots = 'index,
       el.setAttribute('content', content);
     };
 
+    const setTwitter = (name, content) => {
+      let el = document.querySelector(`meta[name="${name}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('name', name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    const ogImage = image || DEFAULT_OG_IMAGE;
+
     setMeta('meta[name="description"]', description);
     setMeta('meta[name="robots"]', robots);
     if (canonical) setLink('canonical', canonical);
@@ -50,5 +64,14 @@ export default function useSEO({ title, description, canonical, robots = 'index,
     if (canonical) setOG('og:url', canonical);
     setOG('og:title', title);
     setOG('og:description', description);
-  }, [title, description, canonical, robots]);
+    setOG('og:image', ogImage);
+    setOG('og:image:width', '1200');
+    setOG('og:image:height', '630');
+
+    // Twitter/X card
+    setTwitter('twitter:card', 'summary_large_image');
+    setTwitter('twitter:title', title);
+    setTwitter('twitter:description', description);
+    setTwitter('twitter:image', ogImage);
+  }, [title, description, canonical, robots, image]);
 }
