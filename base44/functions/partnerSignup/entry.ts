@@ -13,22 +13,24 @@ function generateRefCode(channelType, partnerName, location) {
 
   const prefix = prefixMap[channelType] || 'ref';
 
-  const skipWords = ['the', 'a', 'an'];
-  const nameParts = partnerName.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/);
-  const meaningfulWord = nameParts.find(w => !skipWords.includes(w)) || nameParts[0] || 'partner';
-  const namePart = meaningfulWord.slice(0, 10);
+  // Use ALL meaningful words from the business name (skip filler words)
+  const skipWords = new Set(['the', 'a', 'an', 'and', 'of', 'for', 'in', 'at', 'llc', 'inc', 'co']);
+  const nameParts = partnerName.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 0);
+  const meaningfulParts = nameParts.filter(w => !skipWords.has(w));
+  const wordsToUse = meaningfulParts.length > 0 ? meaningfulParts : nameParts;
 
-  let code = `${prefix}-${namePart}`;
+  // Build name slug: up to 3 words joined, max 18 chars total
+  const nameSlug = wordsToUse.slice(0, 3).join('-').slice(0, 18);
 
+  let code = `${prefix}-${nameSlug}`;
+
+  // Append location city (first word only) if provided
   if (location && location.trim()) {
-    const locPart = location.toLowerCase().replace(/[^a-z]/g, '').slice(0, 10);
-    if (locPart) code += `-${locPart}`;
+    const city = location.trim().toLowerCase().replace(/[^a-z]/g, '').slice(0, 8);
+    if (city) code += `-${city}`;
   }
 
-  // Strip any chars that aren't lowercase letters or hyphens
-  code = code.replace(/[^a-z-]/g, '').slice(0, 25);
-
-  return code;
+  return code.replace(/[^a-z-]/g, '').slice(0, 32);
 }
 
 async function getUniqueRefCode(base44, channelType, partnerName, location) {
@@ -39,13 +41,13 @@ async function getUniqueRefCode(base44, channelType, partnerName, location) {
 
   // Try appending -2, -3, etc.
   for (let i = 2; i <= 20; i++) {
-    const candidate = `${baseCode.slice(0, 22)}-${i}`;
+    const candidate = `${baseCode.slice(0, 28)}-${i}`;
     const dup = await base44.asServiceRole.entities.ReferralPartner.filter({ ref_code: candidate });
     if (dup.length === 0) return candidate;
   }
 
-  // Fallback: append timestamp
-  return `${baseCode.slice(0, 18)}-${Date.now().toString().slice(-4)}`;
+  // Fallback: append last 5 digits of timestamp
+  return `${baseCode.slice(0, 26)}-${Date.now().toString().slice(-5)}`;
 }
 
 async function generateQRCodes(base44, refCode) {
