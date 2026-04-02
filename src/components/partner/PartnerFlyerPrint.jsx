@@ -70,7 +70,7 @@ const FLYERS = {
   }
 };
 
-function buildFlyerHTML(f, c, qrImageUrl, referralUrl) {
+function buildFlyerHTML(f, c, qrImageUrl, referralUrl, partner) {
   const stepsHTML = f.steps.map(step => `
     <div style="display:flex;gap:12px;align-items:flex-start;">
       <div style="width:30px;height:30px;min-width:30px;border-radius:50%;background:${c.stepCircleBg};border:2px solid ${c.stepCircleBorder};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${c.primary};flex-shrink:0;line-height:30px;text-align:center;">
@@ -185,6 +185,7 @@ function buildFlyerHTML(f, c, qrImageUrl, referralUrl) {
       ${qrSection}
       <p style="font-size:15px;font-weight:800;color:${c.text};margin:0 0 3px;">Scan to get started</p>
       <p style="font-size:11px;color:${c.textMuted};margin:0 0 4px;">judgemydriving.com</p>
+      ${partner.partner_name ? `<p style="font-size:10.5px;color:${c.primary};font-weight:700;margin:4px 0 2px;">Recommended by ${partner.partner_name}</p>` : ''}
       ${referralUrl ? `<p style="font-size:9px;color:${c.sourceText};font-family:monospace;">${referralUrl}</p>` : ''}
     </div>
 
@@ -233,7 +234,7 @@ export async function printPartnerFlyer(partner, type) {
   // Convert QR image to data URL so it works in a new window without CORS issues
   const qrDataUrl = rawQrUrl ? await toDataUrl(rawQrUrl) : null;
 
-  const html = buildFlyerHTML(f, c, qrDataUrl || rawQrUrl, referralUrl);
+  const html = buildFlyerHTML(f, c, qrDataUrl || rawQrUrl, referralUrl, partner);
   const win = window.open('', '_blank', 'width=700,height=900');
   win.document.write(html);
   win.document.close();

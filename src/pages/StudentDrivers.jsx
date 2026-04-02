@@ -53,9 +53,15 @@ export default function StudentDrivers() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get('ref');
+  const [partnerName, setPartnerName] = useState('');
 
   useEffect(() => {
-    if (refCode) sessionStorage.setItem('jmd_ref_code', refCode);
+    if (refCode) {
+      sessionStorage.setItem('jmd_ref_code', refCode);
+      base44.functions.invoke('getPartnerByRefCode', { ref_code: refCode })
+        .then(res => { if (res.data?.partner?.partner_name) setPartnerName(res.data.partner.partner_name); })
+        .catch(() => {});
+    }
   }, [refCode]);
 
   const [selectedPlan, setSelectedPlan] = useState('individual');
@@ -118,7 +124,9 @@ export default function StudentDrivers() {
             className="h-28 w-auto mx-auto"
           />
           {refCode && (
-            <p className="text-zinc-500 text-xs mt-1">Referred by a partner</p>
+            <p className="text-zinc-500 text-xs mt-1">
+              {partnerName ? `Recommended by ${partnerName}` : 'Referred by a partner'}
+            </p>
           )}
         </div>
 
