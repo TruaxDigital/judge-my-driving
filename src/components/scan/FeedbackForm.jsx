@@ -58,17 +58,30 @@ export default function FeedbackForm({ sticker, onSubmitted }) {
     setBlockedMessage('');
     setCooldownMessage('');
 
-    const res = await base44.functions.invoke('submitFeedback', {
-      sticker_id: sticker.id,
-      sticker_code: sticker.unique_code,
-      rating,
-      comment: comment || undefined,
-      safety_flag: safetyFlag,
-      latitude: location?.latitude,
-      longitude: location?.longitude,
-      location_name: locationName || undefined,
-      is_preview: isPreview || undefined,
-    });
+    let res;
+    try {
+      res = await base44.functions.invoke('submitFeedback', {
+        sticker_id: sticker.id,
+        sticker_code: sticker.unique_code,
+        rating,
+        comment: comment || undefined,
+        safety_flag: safetyFlag,
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        location_name: locationName || undefined,
+        is_preview: isPreview || undefined,
+      });
+    } catch (err) {
+      setSubmitting(false);
+      // Axios throws on non-2xx — extract the error message from the response
+      const errData = err?.response?.data;
+      if (errData?.blocked) {
+        setBlockedMessage(errData.error || 'Your comment was not submitted due to harmful language.');
+      } else {
+        setCooldownMessage(errData?.error || 'Something went wrong. Please try again.');
+      }
+      return;
+    }
 
     setSubmitting(false);
 
