@@ -80,23 +80,27 @@ export default function PartnerSignup() {
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">You're in!</h1>
-            <p className="text-zinc-400 mt-2 text-sm">
-              Your partner account has been created. Check your email for your referral code and links.
+            <h1 className="text-2xl font-bold text-white">Thank you for joining us as a referral partner!</h1>
+            <p className="text-zinc-400 mt-3 text-sm leading-relaxed">
+              Check your inbox — we've sent your welcome email with your referral code and links.
             </p>
           </div>
-          <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-4 text-sm text-zinc-400 text-left space-y-1">
-            <p className="font-semibold text-zinc-300">Next steps:</p>
-            <p>1. Check your inbox for your welcome email with referral links.</p>
-            <p>2. Log in to your Partner Dashboard to track commissions.</p>
-            <p>3. Upload your W-9 in Account Settings before your first payout.</p>
+          <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-5 text-sm text-zinc-400 text-left space-y-3">
+            <p className="font-semibold text-zinc-200">Next steps:</p>
+            <div className="flex items-start gap-3">
+              <span className="flex items-center justify-center w-6 h-6 bg-primary/20 text-primary rounded-full text-xs font-bold shrink-0">1</span>
+              <p>Check your inbox for your welcome email with your referral code and QR codes.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex items-center justify-center w-6 h-6 bg-primary/20 text-primary rounded-full text-xs font-bold shrink-0">2</span>
+              <p>Create your account using <strong className="text-zinc-300">{form.contact_email}</strong> — look for an invitation email from Judge My Driving.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex items-center justify-center w-6 h-6 bg-primary/20 text-primary rounded-full text-xs font-bold shrink-0">3</span>
+              <p>Log in to your Partner Dashboard to track conversions and earnings.</p>
+            </div>
           </div>
-          <Button
-            className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900"
-            onClick={() => base44.auth.redirectToLogin(`${window.location.origin}/PartnerPortal`)}
-          >
-            Go to My Partner Dashboard →
-          </Button>
+          <p className="text-zinc-600 text-xs">Questions? <a href="mailto:hello@judgemydriving.com" className="text-zinc-400 hover:text-primary transition-colors">hello@judgemydriving.com</a></p>
         </div>
       </div>
     );
