@@ -26,9 +26,10 @@ export default function PartnerPortal() {
   const [w9Loading, setW9Loading] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { data: user, isLoading: userLoading, isError: userError } = useQuery({
     queryKey: ['me'],
     queryFn: () => base44.auth.me(),
+    retry: false,
   });
 
   const { data: partner, isLoading: partnerLoading } = useQuery({
@@ -38,6 +39,7 @@ export default function PartnerPortal() {
       return res.data?.partner || null;
     },
     enabled: !!user,
+    retry: false,
   });
 
   const handleW9Upload = async (e) => {
@@ -53,18 +55,18 @@ export default function PartnerPortal() {
     setW9Loading(false);
   };
 
+  // Not logged in — redirect to login immediately
+  if (userError || (!userLoading && !user)) {
+    base44.auth.redirectToLogin('/PartnerPortal');
+    return null;
+  }
+
   if (userLoading || partnerLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
-  }
-
-  // Not logged in — redirect to login, then come back here
-  if (!user) {
-    base44.auth.redirectToLogin('/PartnerPortal');
-    return null;
   }
 
   // Logged in but no ReferralPartner record — show inline setup
