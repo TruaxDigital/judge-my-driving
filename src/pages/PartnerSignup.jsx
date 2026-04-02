@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import useSEO from '@/hooks/useSEO';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +34,8 @@ export default function PartnerSignup() {
   const [step, setStep] = useState(1); // 1=form, 2=done
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [form, setForm] = useState({
     contact_name: '',
@@ -233,12 +236,27 @@ export default function PartnerSignup() {
             </div>
           )}
 
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="terms"
+              checked={agreedToTerms}
+              onCheckedChange={setAgreedToTerms}
+              className="mt-0.5 border-zinc-600 data-[state=checked]:bg-primary"
+            />
+            <label htmlFor="terms" className="text-sm text-zinc-400 cursor-pointer leading-relaxed">
+              I agree to the{' '}
+              <a href="/partner-terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                Partner Terms & Conditions
+              </a>
+            </label>
+          </div>
+
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
           <Button
             type="submit"
             className="w-full h-12 rounded-xl font-semibold bg-primary hover:bg-primary/90 text-zinc-900 text-base"
-            disabled={loading}
+            disabled={loading || !agreedToTerms}
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Partner Account →'}
           </Button>
