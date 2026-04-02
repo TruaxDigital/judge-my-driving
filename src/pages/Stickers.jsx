@@ -73,9 +73,8 @@ export default function Stickers() {
     }
     setAddonLoading(true);
     const res = await base44.functions.invoke('createCheckoutSession', { mode: 'upgrade' });
-    if (res.data?.success) {
-      alert('Your plan has been upgraded to Family! Your 2 additional stickers are being prepared.');
-      window.location.reload();
+    if (res.data?.url) {
+      window.location.href = res.data.url;
     } else {
       alert(res.data?.error || 'Could not process upgrade. Please try again.');
     }

@@ -85,31 +85,39 @@ Deno.serve(async (req) => {
       return Response.json({ url: session.url });
     }
 
-    // Upgrade individual → family (direct subscription update, no new checkout)
+    // Upgrade individual → family via Stripe Customer Portal (handles prorations automatically)
     if (mode === 'upgrade') {
-      const subId = user.stripe_subscription_id;
-      if (!subId) return Response.json({ error: 'No active subscription found.' }, { status: 400 });
+      const customerId = await getOrCreateCustomer(stripe, base44, user);
+      const origin = req.headers.get('origin') || 'https://app.judgemydriving.com';
 
-      const sub = await stripe.subscriptions.retrieve(subId);
-      const currentItemId = sub.items.data[0]?.id;
-      if (!currentItemId) return Response.json({ error: 'Could not find subscription item.' }, { status: 400 });
+      // Try a direct upgrade flow first; fall back to general portal if subscription ID is missing/invalid
+      let flowData = undefined;
+      if (user.stripe_subscription_id) {
+        try {
+          const sub = await stripe.subscriptions.retrieve(user.stripe_subscription_id);
+          const itemId = sub.items.data[0]?.id;
+          if (itemId) {
+            flowData = {
+              type: 'subscription_update_confirm',
+              subscription_update_confirm: {
+                subscription: user.stripe_subscription_id,
+                items: [{ id: itemId, price: PRICE_MAP['family'], quantity: 1 }],
+              },
+            };
+          }
+        } catch (e) {
+          console.warn(`Could not retrieve subscription ${user.stripe_subscription_id}, falling back to general portal: ${e.message}`);
+        }
+      }
 
-      const newPriceId = PRICE_MAP['family'];
-
-      await stripe.subscriptions.update(subId, {
-        items: [{ id: currentItemId, price: newPriceId }],
-        proration_behavior: 'always_invoice',
-        metadata: {
-          base44_app_id: Deno.env.get('BASE44_APP_ID'),
-          user_id: user.id,
-          user_email: user.email,
-          upgrade_to: 'family',
-          type: 'upgrade',
-        },
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${origin}/Stickers`,
+        ...(flowData ? { flow_data: flowData } : {}),
       });
 
-      console.log(`Upgraded user ${user.id} subscription ${subId} to family plan`);
-      return Response.json({ success: true });
+      console.log(`Redirecting user ${user.id} to portal for family upgrade`);
+      return Response.json({ url: portalSession.url });
     }
 
     // New subscription
