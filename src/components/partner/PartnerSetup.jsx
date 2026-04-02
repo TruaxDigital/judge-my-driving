@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ const PAYOUT_OPTIONS = [
 export default function PartnerSetup({ user, onComplete }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [checking, setChecking] = useState(true);
   const [form, setForm] = useState({
     partner_name: '',
     channel_type: '',
@@ -32,6 +33,18 @@ export default function PartnerSetup({ user, onComplete }) {
     payout_method: 'venmo',
     payout_details: '',
   });
+
+  // On mount, check if a partner record already exists (e.g. signed up via public form)
+  useEffect(() => {
+    base44.functions.invoke('getMyPartnerRecord', {}).then(res => {
+      if (res.data?.partner) {
+        // Already has a record — ensure is_partner is set and complete
+        base44.auth.updateMe({ is_partner: true }).then(() => onComplete());
+      } else {
+        setChecking(false);
+      }
+    }).catch(() => setChecking(false));
+  }, []);
 
   const payoutOption = PAYOUT_OPTIONS.find(p => p.value === form.payout_method);
 
@@ -80,6 +93,14 @@ export default function PartnerSetup({ user, onComplete }) {
 
     onComplete();
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">

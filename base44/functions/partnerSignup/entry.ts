@@ -122,9 +122,14 @@ Deno.serve(async (req) => {
         resolvedUserId = existingUser.id;
         console.log(`[partnerSignup] Found existing user ${contact_email} (id: ${resolvedUserId}), linking as partner`);
         // Update is_partner flag and payout details on the existing user record
+        // Only set role=partner if they have no stickers and no active subscription
+        const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: existingUser.id });
+        const roleUpdate = { is_partner: true };
+        if (stickers.length === 0 && !existingUser.subscription_status) {
+          roleUpdate.role = 'partner';
+        }
         await base44.asServiceRole.entities.User.update(existingUser.id, {
-          role: 'partner',
-          is_partner: true,
+          ...roleUpdate,
           payout_method: payout_method || existingUser.payout_method || '',
           payout_details: payout_details || existingUser.payout_details || '',
         });

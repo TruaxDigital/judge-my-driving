@@ -19,10 +19,19 @@ Deno.serve(async (req) => {
     // Fallback: match by contact_email (signed up via public form before logging in)
     records = await base44.asServiceRole.entities.ReferralPartner.filter({ contact_email: user.email });
     if (records.length > 0) {
-      // Link user_id and ensure role is set to partner
+      // Link user_id and set is_partner=true. Only set role=partner if they don't already have a meaningful role.
       const updated = await base44.asServiceRole.entities.ReferralPartner.update(records[0].id, { user_id: user.id });
-      await base44.asServiceRole.entities.User.update(user.id, { role: 'partner', is_partner: true });
-      console.log(`[getMyPartnerRecord] Linked partner record to user ${user.email} and set role=partner`);
+      const roleUpdate = { is_partner: true };
+      if (!user.role || user.role === 'user') {
+        // Only upgrade to partner role if they're a plain user with no stickers/subscription context
+        // Check if they have stickers
+        const stickers = await base44.asServiceRole.entities.Sticker.filter({ owner_id: user.id });
+        if (stickers.length === 0 && !user.subscription_status) {
+          roleUpdate.role = 'partner';
+        }
+      }
+      await base44.asServiceRole.entities.User.update(user.id, roleUpdate);
+      console.log(`[getMyPartnerRecord] Linked partner record to user ${user.email}, updates: ${JSON.stringify(roleUpdate)}`);
       return Response.json({ partner: { ...records[0], ...updated, user_id: user.id } });
     }
 
