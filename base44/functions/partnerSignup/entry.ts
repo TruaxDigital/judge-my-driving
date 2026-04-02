@@ -104,13 +104,17 @@ Deno.serve(async (req) => {
     // Generate QR codes
     const qrCodes = await generateQRCodes(base44, ref_code);
 
-    // If called from PartnerSetup (authenticated), user_id will be provided
-    // If called from public signup, user_id is null (will be linked via email later)
-    const linkedUserId = user_id || null;
-
     // Only invite/link if this is a public signup (no user_id provided)
     let resolvedUserId = user_id || null;
-    if (!user_id) {
+    if (user_id) {
+      // Authenticated path (PartnerSetup) — update is_partner + payout info on the user record
+      await base44.asServiceRole.entities.User.update(user_id, {
+        is_partner: true,
+        payout_method: payout_method || '',
+        payout_details: payout_details || '',
+      });
+      console.log(`[partnerSignup] Updated user ${user_id} with is_partner=true`);
+    } else {
       // Check if a user already exists with this email
       const existingUsers = await base44.asServiceRole.entities.User.filter({ email: contact_email });
       if (existingUsers.length > 0) {

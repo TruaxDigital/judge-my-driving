@@ -58,6 +58,13 @@ export default function PartnerSetup({ user, onComplete }) {
       return;
     }
 
+    // Ensure is_partner flag and payout info are saved on the user record
+    await base44.auth.updateMe({
+      is_partner: true,
+      payout_method: form.payout_method,
+      payout_details: form.payout_details,
+    });
+
     onComplete();
   };
 
