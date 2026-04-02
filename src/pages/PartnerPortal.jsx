@@ -100,9 +100,13 @@ export default function PartnerPortal() {
           <img
             src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
             alt="Judge My Driving"
-            className="h-14 w-auto mb-1"
+            className="h-14 w-auto mb-2"
           />
-          <p className="text-xs text-muted-foreground">Partner Portal</p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold tracking-widest uppercase text-primary">Partner</span>
+            <span className="text-xs text-muted-foreground">·</span>
+            <span className="text-xs text-muted-foreground">Portal</span>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV_ITEMS.map(item => (
@@ -122,6 +126,11 @@ export default function PartnerPortal() {
         <div className="p-4 border-t border-border space-y-2">
           <p className="text-xs text-muted-foreground text-center">Questions? hello@judgemydriving.com</p>
           <p className="text-xs text-muted-foreground text-center">Payouts processed quarterly. Min: $25.</p>
+          {user?.is_partner && (
+            <a href="/Dashboard" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
+              <LayoutDashboard className="w-5 h-5" /> My Account
+            </a>
+          )}
           <button onClick={() => base44.auth.logout()} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
             <LogOut className="w-5 h-5" /> Sign Out
           </button>
@@ -164,6 +173,12 @@ export default function PartnerPortal() {
               <span className="hidden sm:block">{item.label}</span>
             </button>
           ))}
+          {user?.is_partner && (
+            <a href="/Dashboard" className="flex-1 flex flex-col items-center py-3 gap-1 text-xs text-muted-foreground">
+              <LayoutDashboard className="w-5 h-5" />
+              <span className="hidden sm:block">My Account</span>
+            </a>
+          )}
         </div>
       </main>
     </div>

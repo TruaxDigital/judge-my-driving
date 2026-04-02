@@ -108,26 +108,35 @@ Deno.serve(async (req) => {
     // If called from public signup, user_id is null (will be linked via email later)
     const linkedUserId = user_id || null;
 
-    // Only invite if this is a public signup (no user_id provided)
+    // Only invite/link if this is a public signup (no user_id provided)
+    let resolvedUserId = user_id || null;
     if (!user_id) {
-      try {
-        await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
-        console.log(`[partnerSignup] Invited user ${contact_email} with partner role`);
-      } catch (inviteErr) {
-        // User may already exist — check and update their role if needed
-        const existingUsers = await base44.asServiceRole.entities.User.filter({ email: contact_email });
-        if (existingUsers.length > 0 && existingUsers[0].role !== 'partner') {
-          await base44.asServiceRole.auth.updateUserRole(existingUsers[0].id, 'partner');
-          console.log(`[partnerSignup] Updated existing user ${contact_email} to partner role`);
-        } else {
-          console.log(`[partnerSignup] User invite skipped for ${contact_email}: ${inviteErr.message}`);
+      // Check if a user already exists with this email
+      const existingUsers = await base44.asServiceRole.entities.User.filter({ email: contact_email });
+      if (existingUsers.length > 0) {
+        const existingUser = existingUsers[0];
+        resolvedUserId = existingUser.id;
+        console.log(`[partnerSignup] Found existing user ${contact_email} (id: ${resolvedUserId}), linking as partner`);
+        // Update is_partner flag and payout details on the existing user record
+        await base44.asServiceRole.entities.User.update(existingUser.id, {
+          is_partner: true,
+          payout_method: payout_method || existingUser.payout_method || '',
+          payout_details: payout_details || existingUser.payout_details || '',
+        });
+      } else {
+        // New user — invite them with partner role
+        try {
+          await base44.asServiceRole.users.inviteUser(contact_email, 'partner');
+          console.log(`[partnerSignup] Invited new user ${contact_email} with partner role`);
+        } catch (inviteErr) {
+          console.log(`[partnerSignup] User invite failed for ${contact_email}: ${inviteErr.message}`);
         }
       }
     }
 
     // Create partner record
     const partner = await base44.asServiceRole.entities.ReferralPartner.create({
-      user_id: linkedUserId,
+      user_id: resolvedUserId,
       partner_name,
       channel_type,
       location: location || '',

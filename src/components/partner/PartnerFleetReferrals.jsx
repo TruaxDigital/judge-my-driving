@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Send, Truck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Send, Truck, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, Shield, Star, FileText, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 
@@ -19,6 +20,31 @@ const STATUS_COLORS = {
   'Rejected': 'text-red-600 border-red-500/30 bg-red-500/5',
 };
 
+const FLEET_SIZE_OPTIONS = ['1-9 vehicles', '10-24 vehicles', '25-49 vehicles', '50+ vehicles'];
+
+const SALES_POINTS = [
+  {
+    icon: Star,
+    title: 'Community-powered feedback',
+    body: 'QR stickers on every vehicle let anyone on the road rate your drivers in real time. It\'s the one data source no internal tool can give you — external perception from the people who share the road with your fleet.',
+  },
+  {
+    icon: Shield,
+    title: 'Insurance-ready safety reports',
+    body: 'Professional Fleet plans generate exportable PDF reports: driver ratings, incident logs, corrective action records, fleet safety scores. Hand them to your broker at renewal to strengthen your negotiating position.',
+  },
+  {
+    icon: Wrench,
+    title: 'Zero hardware. 5-minute setup.',
+    body: 'Weatherproof vinyl bumper stickers with QR codes. Peel and stick on each vehicle. No wiring, no technician visits, no software installs. From $999/year for 10 vehicles.',
+  },
+  {
+    icon: FileText,
+    title: 'Corrective action tracking',
+    body: 'Safety concern reported? Get an alert. Open the dashboard, investigate, document your response. That timestamped paper trail is what insurance carriers and brokers look for.',
+  },
+];
+
 const EMPTY_FORM = {
   contact_name: '', company_name: '', contact_email: '',
   contact_phone: '', estimated_fleet_size: '', notes: '',
@@ -26,6 +52,7 @@ const EMPTY_FORM = {
 
 export default function PartnerFleetReferrals({ partner }) {
   const queryClient = useQueryClient();
+  const [salesKitOpen, setSalesKitOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -50,7 +77,7 @@ export default function PartnerFleetReferrals({ partner }) {
     setSubmitting(true);
     const res = await base44.functions.invoke('submitFleetReferral', {
       ...form,
-      estimated_fleet_size: form.estimated_fleet_size ? Number(form.estimated_fleet_size) : null,
+      estimated_fleet_size: form.estimated_fleet_size || null,
     });
     if (res.data?.success) {
       setForm(EMPTY_FORM);
@@ -110,7 +137,14 @@ export default function PartnerFleetReferrals({ partner }) {
               </div>
               <div className="space-y-1.5">
                 <Label>Estimated Fleet Size (optional)</Label>
-                <Input type="number" min="1" value={form.estimated_fleet_size} onChange={e => set('estimated_fleet_size', e.target.value)} placeholder="e.g. 25" />
+                <Select value={form.estimated_fleet_size} onValueChange={val => set('estimated_fleet_size', val)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select fleet size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FLEET_SIZE_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="space-y-1.5">
@@ -180,6 +214,51 @@ export default function PartnerFleetReferrals({ partner }) {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Fleet Sales Kit */}
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <button
+          onClick={() => setSalesKitOpen(o => !o)}
+          className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-primary" />
+            <div className="text-left">
+              <p className="font-semibold text-foreground text-sm">Fleet Sales Kit</p>
+              <p className="text-xs text-muted-foreground">Talking points to help you pitch JMD to fleet prospects</p>
+            </div>
+          </div>
+          {salesKitOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+        </button>
+        {salesKitOpen && (
+          <div className="border-t border-border px-6 py-5 space-y-4">
+            <p className="text-xs text-muted-foreground">
+              When talking to a fleet prospect, focus on these core value drivers. They care about insurance savings, driver accountability, and operational reputation. Use <a href="/fleet-drivers" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">judgemydriving.com/fleet-drivers</a> as your landing page.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {SALES_POINTS.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="bg-muted/30 rounded-xl p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                    <p className="font-semibold text-sm text-foreground">{title}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <p className="text-xs font-semibold text-foreground mb-1">The math that closes deals:</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A 10-vehicle fleet paying $25,000/yr in commercial auto insurance saves $1,250 with just a 5% premium reduction. JMD Starter Fleet is $999/yr. That's a <strong className="text-foreground">net-negative cost</strong> — JMD pays for itself if it helps at renewal. Use this framing with any prospect who mentions insurance.
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Full fleet landing page: <a href="/fleet-drivers" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">judgemydriving.com/fleet-drivers</a>
+              {' '}· Share this link with prospects to let JMD's sales page do the heavy lifting.
+            </p>
           </div>
         )}
       </div>

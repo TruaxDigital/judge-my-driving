@@ -27,8 +27,14 @@
       "description": "Phone number (optional)"
     },
     "estimated_fleet_size": {
-      "type": "number",
-      "description": "Estimated number of vehicles"
+      "type": "string",
+      "enum": [
+        "1-9 vehicles",
+        "10-24 vehicles",
+        "25-49 vehicles",
+        "50+ vehicles"
+      ],
+      "description": "Estimated fleet size range"
     },
     "notes": {
       "type": "string",
