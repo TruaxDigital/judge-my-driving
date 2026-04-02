@@ -4,7 +4,7 @@ import { useEffect } from 'react';
  * Sets page-level SEO metadata: title, description, robots, canonical, and Open Graph tags.
  * Call this at the top of any page component.
  */
-const DEFAULT_OG_IMAGE = 'https://media.base44.com/images/public/69b8646a9cc3aed112928d77/47292e0a5_generated_image.png';
+const DEFAULT_OG_IMAGE = 'https://media.base44.com/images/public/69b8646a9cc3aed112928d77/5b2b95b51_generated_image.png';
 
 export default function useSEO({ title, description, canonical, robots = 'index, follow', image }) {
   useEffect(() => {
