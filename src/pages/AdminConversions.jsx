@@ -56,6 +56,8 @@ export default function AdminConversions() {
     },
   });
 
+  const commissionAmount = form.subscription_type === 'fleet_referral' ? 100 : 10;
+
   const handleAdd = () => {
     const partner = partners.find(p => p.id === form.partner_id);
     if (!partner) return;
@@ -65,7 +67,7 @@ export default function AdminConversions() {
       customer_name: form.customer_name,
       customer_email: form.customer_email,
       subscription_type: form.subscription_type,
-      commission_amount: 10,
+      commission_amount: commissionAmount,
       commission_status: 'pending',
       conversion_date: form.conversion_date,
       notes: form.notes,
@@ -188,7 +190,7 @@ export default function AdminConversions() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Conversion</DialogTitle>
-            <DialogDescription>Manually log a referral conversion. Commission is fixed at $10.</DialogDescription>
+            <DialogDescription>Manually log a referral conversion.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1">
@@ -221,7 +223,7 @@ export default function AdminConversions() {
             </div>
             <div className="bg-muted rounded-xl px-4 py-2 text-sm flex items-center justify-between">
               <span className="text-muted-foreground">Commission</span>
-              <span className="font-bold text-foreground">$10.00 (fixed)</span>
+              <span className="font-bold text-foreground">${commissionAmount}.00 {form.subscription_type === 'fleet_referral' ? '(fleet)' : '(standard)'}</span>
             </div>
             <div className="space-y-1">
               <Label>Conversion Date</Label>
