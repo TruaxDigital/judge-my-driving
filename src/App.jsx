@@ -34,6 +34,7 @@ import AdminSales from './pages/AdminSales';
 import FleetDrivers from './pages/FleetDrivers';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import PartnerTerms from './pages/PartnerTerms';
 
 const PublicRoutes = () => {
   return (
@@ -58,6 +59,7 @@ const PUBLIC_ROUTES = [
   '/fleet-drivers',
   '/terms-of-service',
   '/privacy',
+  '/partner-terms',
 ];
 
 const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
@@ -76,6 +78,7 @@ const PublicPages = () => (
     <Route path="/fleet-drivers" element={<FleetDrivers />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
+    <Route path="/partner-terms" element={<PartnerTerms />} />
   </Routes>
 );
 
@@ -159,6 +162,7 @@ const AuthenticatedApp = () => {
       <Route path="/PartnerPortal" element={<PartnerPortal />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/partner-terms" element={<PartnerTerms />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
