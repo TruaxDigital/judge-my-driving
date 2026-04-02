@@ -183,8 +183,9 @@ export default function PartnerSignup() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-zinc-300 text-sm">Location (city or area)</Label>
+            <Label className="text-zinc-300 text-sm">Location (city or area) *</Label>
             <Input
+              required
               placeholder="e.g. Arlington, VA"
               value={form.location}
               onChange={e => handleChange('location', e.target.value)}
