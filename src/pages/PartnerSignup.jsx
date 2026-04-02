@@ -49,27 +49,30 @@ export default function PartnerSignup() {
     setError('');
     setLoading(true);
 
-    // Create partner record
-    const res = await base44.functions.invoke('partnerSignup', {
-      partner_name: form.partner_name,
-      channel_type: form.channel_type,
-      location: form.location,
-      contact_name: form.contact_name,
-      contact_email: form.contact_email,
-      contact_phone: form.contact_phone,
-      payout_method: form.payout_method,
-      payout_details: form.payout_details,
-    });
+    try {
+      const res = await base44.functions.invoke('partnerSignup', {
+        partner_name: form.partner_name,
+        channel_type: form.channel_type,
+        location: form.location,
+        contact_name: form.contact_name,
+        contact_email: form.contact_email,
+        contact_phone: form.contact_phone,
+        payout_method: form.payout_method,
+        payout_details: form.payout_details,
+      });
 
-    if (!res.data?.success) {
-      setError(res.data?.error || 'Failed to create partner profile.');
+      if (!res.data?.success) {
+        setError(res.data?.error || 'Failed to create partner profile.');
+        setLoading(false);
+        return;
+      }
+
       setLoading(false);
-      return;
+      setStep(2);
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
     }
-
-    setLoading(false);
-    // Small delay to ensure state updates, then redirect
-    setTimeout(() => setStep(2), 100);
   };
 
   if (step === 2) {
