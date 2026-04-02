@@ -144,6 +144,52 @@ Deno.serve(async (req) => {
 
     console.log(`[partnerSignup] Created partner ${partner_name} with ref_code ${ref_code}`);
 
+    // Sync to HubSpot as a contact with Client Tier = Partner
+    try {
+      const { accessToken } = await base44.asServiceRole.connectors.getConnection('hubspot');
+      const nameParts = contact_name.trim().split(/\s+/);
+      const firstname = nameParts[0] || '';
+      const lastname = nameParts.slice(1).join(' ') || '';
+
+      // Search for existing contact first
+      const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: contact_email }] }] }),
+      });
+      const searchData = await searchRes.json();
+
+      const contactProperties = {
+        email: contact_email,
+        firstname,
+        lastname,
+        phone: contact_phone || '',
+        company: partner_name,
+        client_tier: 'Partner',
+      };
+
+      if (searchData.results && searchData.results.length > 0) {
+        // Update existing contact
+        const contactId = searchData.results[0].id;
+        await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ properties: contactProperties }),
+        });
+        console.log(`[partnerSignup] Updated existing HubSpot contact for ${contact_email}`);
+      } else {
+        // Create new contact
+        await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ properties: contactProperties }),
+        });
+        console.log(`[partnerSignup] Created HubSpot contact for ${contact_email}`);
+      }
+    } catch (hubspotErr) {
+      console.error('[partnerSignup] HubSpot sync failed:', hubspotErr.message);
+    }
+
     // Only send welcome email if this is a public signup
     if (!user_id) {
       const teenLink = `https://app.judgemydriving.com/student-drivers?ref=${ref_code}`;
