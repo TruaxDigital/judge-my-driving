@@ -25,7 +25,10 @@ export default function AdminUsers() {
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['all-users'],
-    queryFn: () => base44.entities.User.list('-created_date', 200),
+    queryFn: async () => {
+      const res = await base44.functions.invoke('listAllUsers', {});
+      return res.data?.users || [];
+    },
     enabled: me?.role === 'admin',
   });
 
