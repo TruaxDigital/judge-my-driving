@@ -61,14 +61,15 @@ export default function DashboardLayout() {
         <div 
           className="lg:hidden fixed inset-0 z-40 bg-black/50"
           onClick={() => setMobileOpen(false)}
+          style={{ touchAction: 'manipulation' }}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 z-50 h-full w-64 bg-card border-r border-border flex flex-col transition-transform duration-300",
-        "lg:translate-x-0",
-        mobileOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed top-0 left-0 h-full w-64 bg-card border-r border-border flex flex-col transition-transform duration-300",
+        "lg:translate-x-0 lg:z-50",
+        mobileOpen ? "translate-x-0 z-50" : "-translate-x-full z-30"
       )}>
         <div className="p-6 border-b border-border space-y-3">
           <img

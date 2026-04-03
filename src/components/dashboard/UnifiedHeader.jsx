@@ -64,6 +64,7 @@ export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {
           onClick={onMenuToggle}
           className="flex items-center justify-center w-11 h-11 -mr-1 text-foreground rounded-lg"
           aria-label="Menu"
+          style={{ touchAction: 'manipulation' }}
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
