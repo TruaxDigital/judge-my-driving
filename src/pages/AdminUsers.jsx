@@ -6,13 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Search, Plus, Minus, CreditCard, Users } from 'lucide-react';
+import { Loader2, Search, Plus, Minus, CreditCard, Users, Activity, CreditCard as SubIcon, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import UserActivityDrawer from '@/components/admin/UserActivityDrawer';
+import InviteUserDialog from '@/components/admin/InviteUserDialog';
+import ManageSubscriptionDialog from '@/components/admin/ManageSubscriptionDialog';
 
 export default function AdminUsers() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
-  const [creditDialog, setCreditDialog] = useState(null); // { user }
+
+  // Dialog state
+  const [creditDialog, setCreditDialog] = useState(null);
+  const [activityUser, setActivityUser] = useState(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [subUser, setSubUser] = useState(null);
+
+  // Credit adjust state
   const [delta, setDelta] = useState(1);
   const [note, setNote] = useState('');
   const [createStickers, setCreateStickers] = useState(true);
@@ -77,12 +87,17 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Users className="w-6 h-6 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">User Management</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Manage sticker credits for users.</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Users className="w-6 h-6 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">User Management</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">{users.length} total users</p>
+          </div>
         </div>
+        <Button onClick={() => setInviteOpen(true)} className="rounded-xl gap-2">
+          <UserPlus className="w-4 h-4" /> Invite User
+        </Button>
       </div>
 
       <div className="relative max-w-sm">
@@ -135,15 +150,33 @@ export default function AdminUsers() {
                       {u.sticker_credits || 0}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-right">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-lg"
-                      onClick={() => { setCreditDialog({ user: u }); setDelta(1); setNote(''); setCreateStickers(true); }}
-                    >
-                      <CreditCard className="w-3.5 h-3.5 mr-1.5" /> Adjust Credits
-                    </Button>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="rounded-lg text-xs"
+                        onClick={() => setActivityUser(u)}
+                      >
+                        <Activity className="w-3.5 h-3.5 mr-1" /> Activity
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="rounded-lg text-xs"
+                        onClick={() => setSubUser(u)}
+                      >
+                        <SubIcon className="w-3.5 h-3.5 mr-1" /> Subscription
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-lg text-xs"
+                        onClick={() => { setCreditDialog({ user: u }); setDelta(1); setNote(''); setCreateStickers(true); }}
+                      >
+                        <CreditCard className="w-3.5 h-3.5 mr-1" /> Credits
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -188,7 +221,6 @@ export default function AdminUsers() {
                 </span>
               </div>
             </div>
-
             <div className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30">
               <input
                 type="checkbox"
@@ -201,7 +233,6 @@ export default function AdminUsers() {
                 Also create sticker records immediately (recommended for new credits)
               </label>
             </div>
-
             <div className="space-y-2">
               <Label>Note (optional)</Label>
               <Input
@@ -220,6 +251,25 @@ export default function AdminUsers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Activity Drawer */}
+      <UserActivityDrawer
+        user={activityUser}
+        open={!!activityUser}
+        onClose={() => setActivityUser(null)}
+      />
+
+      {/* Invite Dialog */}
+      <InviteUserDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
+
+      {/* Manage Subscription Dialog */}
+      {subUser && (
+        <ManageSubscriptionDialog
+          user={subUser}
+          open={!!subUser}
+          onClose={() => setSubUser(null)}
+        />
+      )}
     </div>
   );
 }
