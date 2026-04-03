@@ -100,5 +100,6 @@
       "format": "date-time",
       "description": "Timestamp of the last free replacement sticker request"
     }
-  }
+  },
+  "required": []
 }
