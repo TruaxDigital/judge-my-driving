@@ -13,22 +13,28 @@ import UnifiedHeader from './UnifiedHeader';
 import ThemeAwareLogo from '@/components/ThemeAwareLogo';
 import PartnerToggle from './PartnerToggle';
 
-const allNavItems = [
+// Nav items for regular users
+const userNavItems = [
   { path: '/Dashboard', label: 'Overview', icon: LayoutDashboard },
   { path: '/MapView', label: 'Map', icon: Map },
   { path: '/Stickers', label: 'Stickers', icon: Tag },
-  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise', 'enterprise_fleet'], roles: ['fleet_admin', 'admin'] },
+  { path: '/FleetDashboard', label: 'Fleet', icon: Truck, plans: ['starter_fleet', 'professional_fleet', 'enterprise', 'enterprise_fleet'], roles: ['fleet_admin'] },
   { path: '/Analytics', label: 'Analytics', icon: BarChart2, plans: ['starter_fleet', 'professional_fleet', 'enterprise_fleet'] },
   { path: '/Reporting', label: 'Reports', icon: FileText },
   { path: '/Leaderboard', label: 'Leaderboard', icon: Trophy },
-  { path: '/AdminUsers', label: 'Users', icon: Users, roles: ['admin'] },
-  { path: '/AdminPartners', label: 'Partners', icon: GitMerge, roles: ['admin'] },
-  { path: '/AdminConversions', label: 'Conversions', icon: BarChart2, roles: ['admin'] },
-  { path: '/AdminFleetReferrals', label: 'Fleet Referrals', icon: Truck, roles: ['admin'] },
-  { path: '/AdminPayoutReports', label: 'Payout Reports', icon: DollarSign, roles: ['admin'] },
-  { path: '/AdminStickers', label: 'Sticker Analytics', icon: Activity, roles: ['admin'] },
   { path: '/Support', label: 'Support', icon: HelpCircle },
   { path: '/Pricing', label: 'Plans', icon: CreditCard },
+  { path: '/Settings', label: 'Settings', icon: Settings },
+];
+
+// Nav items for admin users only
+const adminNavItems = [
+  { path: '/AdminUsers', label: 'Users', icon: Users },
+  { path: '/AdminPartners', label: 'Partners', icon: GitMerge },
+  { path: '/AdminConversions', label: 'Conversions', icon: BarChart2 },
+  { path: '/AdminFleetReferrals', label: 'Fleet Referrals', icon: Truck },
+  { path: '/AdminPayoutReports', label: 'Payout Reports', icon: DollarSign },
+  { path: '/AdminStickers', label: 'Sticker Analytics', icon: Activity },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
 
@@ -41,11 +47,14 @@ export default function DashboardLayout() {
     queryFn: () => base44.auth.me(),
   });
 
-  const navItems = allNavItems.filter(item => {
-    if (item.roles && !item.roles.includes(user?.role)) return false;
-    if (item.plans && !item.plans.includes(user?.plan_tier)) return false;
-    return true;
-  });
+  const isAdmin = user?.role === 'admin';
+  const navItems = isAdmin
+    ? adminNavItems
+    : userNavItems.filter(item => {
+        if (item.roles && !item.roles.includes(user?.role)) return false;
+        if (item.plans && !item.plans.includes(user?.plan_tier)) return false;
+        return true;
+      });
 
   const handleLogout = () => {
     base44.auth.logout();
