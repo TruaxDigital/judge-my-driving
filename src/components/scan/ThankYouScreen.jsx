@@ -16,7 +16,7 @@ const iconVariants = {
   animate: { scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 18, delay: 0.05 } },
 };
 
-export default function ThankYouScreen({ rating, safetyFlag }) {
+export default function ThankYouScreen({ rating, safetyFlag, sticker }) {
   if (rating >= 4) {
     return (
       <motion.div variants={containerVariants} initial="initial" animate="animate" className="text-center space-y-8 py-8">
@@ -28,7 +28,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <p className="text-zinc-400 text-lg">Thanks for the positive feedback.</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <SalesBox rating={rating} />
+          <SalesBox rating={rating} sticker={sticker} />
         </motion.div>
       </motion.div>
     );
@@ -45,7 +45,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
           <p className="text-zinc-400 text-lg">Your feedback has been submitted.</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <SalesBox discountCode="DRIVE20" rating={rating} />
+          <SalesBox discountCode="DRIVE20" rating={rating} sticker={sticker} />
         </motion.div>
       </motion.div>
     );
@@ -73,7 +73,7 @@ export default function ThankYouScreen({ rating, safetyFlag }) {
         </motion.div>
       )}
       <motion.div variants={itemVariants}>
-        <SalesBox rating={rating} />
+        <SalesBox rating={rating} sticker={sticker} />
       </motion.div>
     </motion.div>
   );

@@ -55,6 +55,14 @@ export default function ScanSticker() {
         setView('register');
       } else {
         setView('feedback');
+        // Fire scan tracking event (non-blocking)
+        base44.functions.invoke('recordStickerScan', {
+          event_type: 'scan',
+          sticker_id: s.id,
+          sticker_code: s.unique_code,
+          design_id: s.design_id || null,
+          owner_id: s.owner_id || null,
+        }).catch(() => {});
       }
       setLoading(false);
     };
@@ -130,7 +138,7 @@ export default function ScanSticker() {
 
           {view === 'thankyou' && (
             <motion.div key="thankyou" {...pageVariants}>
-              <ThankYouScreen rating={thankYouData.rating} safetyFlag={thankYouData.safetyFlag} />
+              <ThankYouScreen rating={thankYouData.rating} safetyFlag={thankYouData.safetyFlag} sticker={sticker} />
             </motion.div>
           )}
 

@@ -3,19 +3,36 @@ import { Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
-export default function SalesBox({ discountCode, rating }) {
+export default function SalesBox({ discountCode, rating, sticker }) {
   const href = discountCode
     ? `/get-started?discount=${discountCode}`
     : '/get-started';
 
   const handleClick = () => {
+    // Track CTA click with full sticker context for conversion analysis
     base44.analytics.track({
       eventName: 'post_feedback_purchase_click',
       properties: {
         discount_code: discountCode || null,
         rating: rating || null,
+        sticker_id: sticker?.id || null,
+        sticker_code: sticker?.unique_code || null,
+        design_id: sticker?.design_id || null,
       },
     });
+
+    // Also write a ScanEvent record for server-side K-factor / conversion tracking
+    if (sticker?.id) {
+      base44.functions.invoke('recordStickerScan', {
+        event_type: 'cta_click',
+        sticker_id: sticker.id,
+        sticker_code: sticker.unique_code,
+        design_id: sticker.design_id || null,
+        owner_id: sticker.owner_id || null,
+        rating_given: rating || null,
+        discount_code: discountCode || null,
+      }).catch(() => {});
+    }
   };
 
   return (

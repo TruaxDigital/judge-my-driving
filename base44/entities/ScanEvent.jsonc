@@ -1,0 +1,65 @@
+{
+  "name": "ScanEvent",
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "scan",
+        "cta_click"
+      ],
+      "description": "Whether this is a raw QR scan or a CTA button click"
+    },
+    "sticker_id": {
+      "type": "string",
+      "description": "ID of the sticker that was scanned"
+    },
+    "sticker_code": {
+      "type": "string",
+      "description": "Unique code of the sticker"
+    },
+    "design_id": {
+      "type": "string",
+      "description": "Design template ID of the sticker at time of scan"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User ID of the sticker owner at time of scan"
+    },
+    "rating_given": {
+      "type": "number",
+      "description": "Rating submitted in the same session (set on cta_click events)"
+    },
+    "discount_code": {
+      "type": "string",
+      "description": "Discount code shown on the CTA (cta_click events only)"
+    },
+    "week_key": {
+      "type": "string",
+      "description": "ISO week string e.g. 2026-W14 \u2014 used for K-factor weekly bucketing"
+    }
+  },
+  "required": [
+    "event_type",
+    "sticker_id",
+    "sticker_code"
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -100,6 +100,16 @@
       "type": "number",
       "default": 0
     },
+    "total_scans": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of times this sticker's QR code has been scanned"
+    },
+    "last_scan_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the most recent QR scan"
+    },
     "start_date": {
       "type": "string",
       "format": "date",
