@@ -19,6 +19,8 @@
         "dealership",
         "event",
         "influencer",
+        "advocate",
+        "nonprofit",
         "other"
       ],
       "description": "Type of partner channel"

@@ -12,7 +12,8 @@ import moment from 'moment';
 
 const CHANNEL_LABELS = {
   driving_school: 'Driving School', pta: 'PTA', insurance: 'Insurance',
-  dealership: 'Dealership', event: 'Event', influencer: 'Influencer', other: 'Other',
+  dealership: 'Dealership', event: 'Event', influencer: 'Influencer',
+  advocate: 'Advocate / Brand Ambassador', nonprofit: 'Non-Profit Organization', other: 'Other',
 };
 
 const STATUS_COLORS = {
