@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
-const GA4_PROPERTY_ID = '14307164108';
+const GA4_PROPERTY_ID = '531197101';
 
 Deno.serve(async (req) => {
   try {
