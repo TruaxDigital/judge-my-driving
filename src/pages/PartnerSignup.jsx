@@ -15,6 +15,8 @@ const CHANNEL_OPTIONS = [
   { value: 'dealership', label: 'Dealership' },
   { value: 'event', label: 'Event / Conference' },
   { value: 'influencer', label: 'Content Creator / Influencer' },
+  { value: 'advocate', label: 'Advocate / Brand Ambassador' },
+  { value: 'nonprofit', label: 'Non-Profit Organization' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -178,7 +180,7 @@ export default function PartnerSignup() {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-zinc-300 text-sm">Channel Type *</Label>
+            <Label className="text-zinc-300 text-sm">Partner Type *</Label>
             <select
               required
               value={form.channel_type}
