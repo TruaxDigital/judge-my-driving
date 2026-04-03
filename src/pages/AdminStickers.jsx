@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Loader2, QrCode, MousePointerClick, ShoppingCart, TrendingUp, Activity, Search
+  Loader2, QrCode, MousePointerClick, ShoppingCart, TrendingUp, Activity, Search, ArrowUpDown
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
+  LineChart, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import moment from 'moment';
@@ -32,17 +32,32 @@ function StatCard({ icon: Icon, label, value, sub, color = 'text-primary' }) {
   );
 }
 
+function SortableTh({ label, field, sortField, sortDir, onSort }) {
+  const active = sortField === field;
+  return (
+    <th
+      className="text-left px-4 py-3 text-muted-foreground font-medium text-xs cursor-pointer select-none hover:text-foreground transition-colors"
+      onClick={() => onSort(field)}
+    >
+      <span className="flex items-center gap-1">
+        {label}
+        <ArrowUpDown className={cn('w-3 h-3', active ? 'text-primary' : 'opacity-30')} />
+      </span>
+    </th>
+  );
+}
+
 export default function AdminStickers() {
   const [dateRange, setDateRange] = useState(30);
   const [search, setSearch] = useState('');
+  const [sortField, setSortField] = useState('scans');
+  const [sortDir, setSortDir] = useState('desc');
 
-  // Fetch all scan events
   const { data: scanEvents = [], isLoading: loadingScans } = useQuery({
     queryKey: ['admin-scan-events'],
     queryFn: () => base44.entities.ScanEvent.list('-created_date', 2000),
   });
 
-  // Fetch all stickers for enriching the table
   const { data: stickers = [], isLoading: loadingStickers } = useQuery({
     queryKey: ['admin-all-stickers'],
     queryFn: () => base44.entities.Sticker.list('-created_date', 2000),
@@ -50,7 +65,6 @@ export default function AdminStickers() {
 
   const isLoading = loadingScans || loadingStickers;
 
-  // Apply date range filter
   const cutoff = dateRange ? moment().subtract(dateRange, 'days').toISOString() : null;
   const filtered = useMemo(() => {
     if (!cutoff) return scanEvents;
@@ -60,46 +74,63 @@ export default function AdminStickers() {
   const scans = useMemo(() => filtered.filter(e => e.event_type === 'scan'), [filtered]);
   const ctaClicks = useMemo(() => filtered.filter(e => e.event_type === 'cta_click'), [filtered]);
 
-  // Top-line metrics
   const totalScans = scans.length;
   const totalCTAs = ctaClicks.length;
   const ctaRate = totalScans > 0 ? ((totalCTAs / totalScans) * 100).toFixed(1) : '0.0';
-
-  // Scans with a rating_given on the cta_click — rated before CTA
+  const uniqueStickersScanned = new Set(scans.map(e => e.sticker_code)).size;
   const ctasWithRating = ctaClicks.filter(e => e.rating_given != null);
   const avgRatingOnCTA = ctasWithRating.length > 0
     ? (ctasWithRating.reduce((s, e) => s + e.rating_given, 0) / ctasWithRating.length).toFixed(1)
     : '—';
 
-  // Unique sticker codes scanned
-  const uniqueStickersScanned = new Set(scans.map(e => e.sticker_code)).size;
-
-  // Design-level breakdown
-  const designBreakdown = useMemo(() => {
+  // ── Design performance table ───────────────────────────────────────────────
+  // "Sales" = how many registered stickers have that design_id (all-time proxy)
+  const designRows = useMemo(() => {
     const map = {};
+    // Count scans & CTA clicks from events (date-filtered)
     for (const e of filtered) {
       const key = e.design_id || 'default';
-      if (!map[key]) map[key] = { design_id: key, scans: 0, cta_clicks: 0 };
+      if (!map[key]) map[key] = { design_id: key, scans: 0, cta_clicks: 0, sticker_count: 0 };
       if (e.event_type === 'scan') map[key].scans++;
       if (e.event_type === 'cta_click') map[key].cta_clicks++;
     }
-    return Object.values(map)
-      .map(d => ({ ...d, cta_rate: d.scans > 0 ? ((d.cta_clicks / d.scans) * 100).toFixed(1) : '0.0' }))
-      .sort((a, b) => b.scans - a.scans);
-  }, [filtered]);
+    // Count stickers sold per design (all-time from sticker records, not date-filtered)
+    for (const s of stickers) {
+      const key = s.design_id || 'default';
+      if (!map[key]) map[key] = { design_id: key, scans: 0, cta_clicks: 0, sticker_count: 0 };
+      map[key].sticker_count++;
+    }
+    return Object.values(map).map(d => ({
+      ...d,
+      cta_rate: d.scans > 0 ? ((d.cta_clicks / d.scans) * 100).toFixed(1) : '0.0',
+      scans_per_sticker: d.sticker_count > 0 ? (d.scans / d.sticker_count).toFixed(1) : '0.0',
+    }));
+  }, [filtered, stickers]);
 
-  // Sticker-level table
+  const handleSort = (field) => {
+    if (sortField === field) setSortDir(d => d === 'desc' ? 'asc' : 'desc');
+    else { setSortField(field); setSortDir('desc'); }
+  };
+
+  const sortedDesignRows = useMemo(() => {
+    return [...designRows].sort((a, b) => {
+      const av = parseFloat(a[sortField]) || 0;
+      const bv = parseFloat(b[sortField]) || 0;
+      return sortDir === 'desc' ? bv - av : av - bv;
+    });
+  }, [designRows, sortField, sortDir]);
+
+  // ── Per-sticker table ──────────────────────────────────────────────────────
   const stickerRows = useMemo(() => {
     const map = {};
     for (const e of filtered) {
       const key = e.sticker_code;
       if (!map[key]) {
-        const stickerRecord = stickers.find(s => s.unique_code === key);
+        const rec = stickers.find(s => s.unique_code === key);
         map[key] = {
           code: key,
-          sticker_id: e.sticker_id,
-          label: stickerRecord?.driver_label || '—',
-          design_id: stickerRecord?.design_id || e.design_id || 'default',
+          label: rec?.driver_label || '—',
+          design_id: rec?.design_id || e.design_id || 'default',
           scans: 0,
           cta_clicks: 0,
           last_scan: null,
@@ -107,9 +138,7 @@ export default function AdminStickers() {
       }
       if (e.event_type === 'scan') {
         map[key].scans++;
-        if (!map[key].last_scan || e.created_date > map[key].last_scan) {
-          map[key].last_scan = e.created_date;
-        }
+        if (!map[key].last_scan || e.created_date > map[key].last_scan) map[key].last_scan = e.created_date;
       }
       if (e.event_type === 'cta_click') map[key].cta_clicks++;
     }
@@ -128,16 +157,15 @@ export default function AdminStickers() {
     );
   }, [stickerRows, search]);
 
-  // Scans over time chart
+  // ── Time series chart ──────────────────────────────────────────────────────
   const timeSeriesData = useMemo(() => {
     const buckets = [];
     const totalDays = dateRange || 90;
     if (totalDays <= 14) {
       for (let i = totalDays - 1; i >= 0; i--) {
         const day = moment().subtract(i, 'days');
-        const label = day.format('MMM D');
         buckets.push({
-          date: label,
+          date: day.format('MMM D'),
           scans: scans.filter(e => moment(e.created_date).isSame(day, 'day')).length,
           cta_clicks: ctaClicks.filter(e => moment(e.created_date).isSame(day, 'day')).length,
         });
@@ -173,7 +201,7 @@ export default function AdminStickers() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-32">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -182,7 +210,6 @@ export default function AdminStickers() {
           </h1>
           <p className="text-muted-foreground mt-1">Live scan data, CTA clicks, and conversion funnel.</p>
         </div>
-        {/* Date range */}
         <div className="flex items-center gap-2 flex-wrap">
           {DATE_RANGES.map(r => (
             <button
@@ -204,9 +231,9 @@ export default function AdminStickers() {
       {/* Top-line stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard icon={QrCode} label="Total Scans" value={totalScans.toLocaleString()} sub={`${uniqueStickersScanned} unique stickers`} />
-        <StatCard icon={MousePointerClick} label="CTA Clicks" value={totalCTAs.toLocaleString()} color="text-blue-500" sub="'Get Your Sticker' button" />
-        <StatCard icon={TrendingUp} label="Scan → CTA Rate" value={`${ctaRate}%`} color="text-green-500" sub="Clicks per scan" />
-        <StatCard icon={ShoppingCart} label="Avg Rating on CTA" value={avgRatingOnCTA} color="text-yellow-500" sub="Rating when CTA was clicked" />
+        <StatCard icon={MousePointerClick} label="CTA Clicks" value={totalCTAs.toLocaleString()} color="text-blue-500" sub="'Get Your Sticker' taps" />
+        <StatCard icon={TrendingUp} label="Scan → CTA Rate" value={`${ctaRate}%`} color="text-green-500" sub="Viral conversion rate" />
+        <StatCard icon={ShoppingCart} label="Avg Rating on CTA" value={avgRatingOnCTA} color="text-yellow-500" sub="Rating when CTA tapped" />
         <StatCard icon={Activity} label="Active Stickers" value={stickers.filter(s => s.status === 'active' || s.is_registered).length} sub="Registered & active" color="text-purple-500" />
       </div>
 
@@ -232,36 +259,73 @@ export default function AdminStickers() {
         </div>
       </div>
 
-      {/* Design breakdown bar chart */}
-      {designBreakdown.length > 0 && (
-        <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-          <h2 className="font-semibold text-foreground">Scans by Design</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={designBreakdown.slice(0, 12)} layout="vertical" barSize={14}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-              <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="design_id"
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-                width={130}
-                tickFormatter={v => v.replace(/_/g, ' ')}
-              />
-              <Tooltip
-                contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12 }}
-                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
-                formatter={(val, name) => [val, name === 'scans' ? 'Scans' : 'CTA Clicks']}
-              />
-              <Bar dataKey="scans" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="scans" />
-              <Bar dataKey="cta_clicks" fill="#3b82f6" radius={[0, 4, 4, 0]} name="cta_clicks" />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* ── Design Performance Table ─────────────────────────────────────────── */}
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h2 className="font-semibold text-foreground">Design Performance</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Stickers sold = all-time count. Scans & CTA rate = selected date range. Click column headers to sort.
+          </p>
         </div>
-      )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/30">
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium text-xs">Design</th>
+                <SortableTh label="Stickers Sold" field="sticker_count" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTh label="Scans" field="scans" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTh label="CTA Clicks" field="cta_clicks" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTh label="CTA Rate" field="cta_rate" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableTh label="Scans / Sticker" field="scans_per_sticker" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {sortedDesignRows.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground text-sm">No data yet.</td>
+                </tr>
+              ) : sortedDesignRows.map((d, i) => {
+                const ctaNum = parseFloat(d.cta_rate);
+                return (
+                  <tr key={d.design_id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {i === 0 && <span className="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">#{i + 1}</span>}
+                        {i === 1 && <span className="text-xs font-bold text-zinc-400 bg-zinc-500/10 px-1.5 py-0.5 rounded">#{i + 1}</span>}
+                        {i === 2 && <span className="text-xs font-bold text-yellow-600 bg-yellow-500/10 px-1.5 py-0.5 rounded">#{i + 1}</span>}
+                        {i > 2 && <span className="text-xs text-muted-foreground w-6">#{i + 1}</span>}
+                        <span className="capitalize font-medium text-foreground">{d.design_id.replace(/_/g, ' ')}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-foreground">{d.sticker_count}</td>
+                    <td className="px-4 py-3 text-foreground">{d.scans}</td>
+                    <td className="px-4 py-3 text-blue-500 font-semibold">{d.cta_clicks}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 bg-muted rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="h-1.5 rounded-full bg-green-500 transition-all"
+                            style={{ width: `${Math.min(ctaNum * 5, 100)}%` }}
+                          />
+                        </div>
+                        <span className={cn(
+                          'font-semibold text-xs',
+                          ctaNum >= 10 ? 'text-green-600' : ctaNum >= 3 ? 'text-yellow-600' : 'text-muted-foreground'
+                        )}>
+                          {d.cta_rate}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{d.scans_per_sticker}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {/* Per-sticker table */}
+      {/* ── Per-Sticker Breakdown ────────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="font-semibold text-foreground">Per-Sticker Breakdown</h2>
