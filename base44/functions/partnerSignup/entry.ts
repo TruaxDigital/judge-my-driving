@@ -136,13 +136,8 @@ Deno.serve(async (req) => {
           payout_details: payout_details || existingUser.payout_details || '',
         });
       } else {
-        // New user — invite them with partner role
-        try {
-          await base44.users.inviteUser(contact_email, 'user');
-          console.log(`[partnerSignup] Invited new user ${contact_email} with partner role`);
-        } catch (inviteErr) {
-          console.log(`[partnerSignup] User invite failed for ${contact_email}: ${inviteErr.message}`);
-        }
+        // New user — no invite needed, welcome email via Resend handles onboarding
+        console.log(`[partnerSignup] New user ${contact_email} — skipping platform invite, welcome email will be sent`);
       }
     }
 
