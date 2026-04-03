@@ -22,6 +22,7 @@ const ROUTE_LABELS = {
   '/AdminSales': 'Sales',
   '/AdminFleetReferrals': 'Fleet Referrals',
   '/PreviewScan': 'Reporter View',
+  '/AdminAnalytics': 'GA Traffic',
 };
 
 export default function UnifiedHeader({ mobileOpen, onMenuToggle }) {

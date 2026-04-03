@@ -37,6 +37,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import PartnerTerms from './pages/PartnerTerms';
 import AdminFleetReferrals from './pages/AdminFleetReferrals';
 import AdminStickers from './pages/AdminStickers';
+import AdminAnalytics from './pages/AdminAnalytics';
 
 const PublicRoutes = () => {
   return (
@@ -155,6 +156,7 @@ const AuthenticatedApp = () => {
         <Route path="/AdminSales" element={<AdminSales />} />
         <Route path="/AdminFleetReferrals" element={<AdminFleetReferrals />} />
         <Route path="/AdminStickers" element={<AdminStickers />} />
+        <Route path="/AdminAnalytics" element={<AdminAnalytics />} />
         <Route path="/Leaderboard" element={<Leaderboard />} />
       </Route>
       <Route path="/get-started" element={<GetStarted />} />

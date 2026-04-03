@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Map, Tag, Settings, 
-  LogOut, ChevronRight, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle, Users, GitMerge, DollarSign, Activity
+  LogOut, ChevronRight, BarChart2, FileText, Truck, CreditCard, Trophy, HelpCircle, Users, GitMerge, DollarSign, Activity, LineChart
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -35,6 +35,7 @@ const adminNavItems = [
   { path: '/AdminFleetReferrals', label: 'Fleet Referrals', icon: Truck },
   { path: '/AdminPayoutReports', label: 'Payout Reports', icon: DollarSign },
   { path: '/AdminStickers', label: 'Sticker Analytics', icon: Activity },
+  { path: '/AdminAnalytics', label: 'GA Traffic', icon: LineChart },
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
 
