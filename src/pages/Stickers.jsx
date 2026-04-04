@@ -85,9 +85,14 @@ export default function Stickers() {
     setClaimLoading(true);
     try {
       await base44.functions.invoke('provisionMyStickers', {});
-      queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
-      queryClient.invalidateQueries({ queryKey: ['me'] });
-      // Fetch fresh stickers to get the newly created one
+      // Optimistically decrement the credit count in the cache immediately
+      queryClient.setQueryData(['me'], (old) => old ? { ...old, sticker_credits: Math.max(0, (old.sticker_credits || 0) - 1) } : old);
+      // Refetch both to get accurate server state
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ['my-stickers'] }),
+        queryClient.refetchQueries({ queryKey: ['me'] }),
+      ]);
+      // Find the newly created unclaimed sticker to open the wizard
       const u = await base44.auth.me();
       const allStickers = await base44.entities.Sticker.filter({ owner_id: u.id }, '-created_date');
       const unclaimedNew = allStickers.filter(s => !s.printful_order_id && !s.design_id);
