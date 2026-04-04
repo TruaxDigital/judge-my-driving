@@ -90,6 +90,19 @@
     /* Prevent bounce scroll on iOS */
     overscroll-behavior-y: none;
   }
+
+  /* Prevent accidental text selection during touch on interactive elements */
+  button,
+  a,
+  nav,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  svg {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /* 44px minimum tap targets for touch inputs on mobile */

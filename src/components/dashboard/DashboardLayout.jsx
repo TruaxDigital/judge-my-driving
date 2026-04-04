@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Map, Tag, Settings, 
@@ -39,9 +39,16 @@ const adminNavItems = [
   { path: '/Settings', label: 'Settings', icon: Settings },
 ];
 
+// Tabs whose scroll position + content should be preserved when switching
+const PRESERVED_TABS = ['/Dashboard', '/Stickers', '/Settings', '/FleetDashboard'];
+
 export default function DashboardLayout() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Track scroll positions per tab
+  const scrollPositions = useRef({});
+  const mainRef = useRef(null);
+  const prevPath = useRef(location.pathname);
 
   const { data: user } = useQuery({
     queryKey: ['me'],
@@ -56,6 +63,22 @@ export default function DashboardLayout() {
         if (item.plans && !item.plans.includes(user?.plan_tier)) return false;
         return true;
       });
+
+  // Save scroll position when leaving a preserved tab, restore when entering one
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    const prev = prevPath.current;
+    if (PRESERVED_TABS.some(t => prev.startsWith(t))) {
+      scrollPositions.current[prev] = el.scrollTop;
+    }
+    prevPath.current = location.pathname;
+    if (PRESERVED_TABS.some(t => location.pathname.startsWith(t))) {
+      const saved = scrollPositions.current[location.pathname] || 0;
+      // Defer to let the new page render first
+      requestAnimationFrame(() => { el.scrollTop = saved; });
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     base44.auth.logout();
@@ -125,7 +148,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen overscroll-y-none">
+      <main ref={mainRef} className="lg:ml-64 pt-14 lg:pt-0 min-h-screen overscroll-y-none overflow-y-auto h-screen">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}

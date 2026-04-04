@@ -85,7 +85,18 @@ export default function FleetDashboard() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
-    onSuccess: () => {
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['my-stickers'] });
+      const previous = queryClient.getQueryData(['my-stickers']);
+      queryClient.setQueryData(['my-stickers'], (old = []) =>
+        old.map(s => s.id === id ? { ...s, ...data } : s)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(['my-stickers'], context.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       setEditDialog(null);
     },

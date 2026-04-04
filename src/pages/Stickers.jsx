@@ -122,20 +122,18 @@ export default function Stickers() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Sticker.update(id, data),
     onMutate: async ({ id, data }) => {
-      // Optimistic update for rename (driver_label)
-      if ('driver_label' in data) {
-        await queryClient.cancelQueries({ queryKey: ['my-stickers'] });
-        const previous = queryClient.getQueryData(['my-stickers']);
-        queryClient.setQueryData(['my-stickers'], (old = []) =>
-          old.map(s => s.id === id ? { ...s, ...data } : s)
-        );
-        return { previous };
-      }
+      // Optimistic update for all toggle fields + rename
+      await queryClient.cancelQueries({ queryKey: ['my-stickers'] });
+      const previous = queryClient.getQueryData(['my-stickers']);
+      queryClient.setQueryData(['my-stickers'], (old = []) =>
+        old.map(s => s.id === id ? { ...s, ...data } : s)
+      );
+      return { previous };
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(['my-stickers'], context.previous);
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['my-stickers'] });
       setEditDialog(null);
       setDesignDialog(null);
