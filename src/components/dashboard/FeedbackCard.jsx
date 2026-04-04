@@ -14,7 +14,7 @@ export default function FeedbackCard({ feedback, stickerLabel }) {
   const colors = ratingColors[ratingType];
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
+    <div className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow select-none">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0 space-y-3">
           <div className="flex items-center gap-3 flex-wrap">

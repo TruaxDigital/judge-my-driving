@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Loader2, RefreshCw, ExternalLink, Truck, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 
@@ -157,18 +158,22 @@ export default function AdminFleetReferrals() {
           onChange={e => setFilterPartner(e.target.value)}
           className="w-48"
         />
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-          <option value="all">All Statuses</option>
-          {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <select value={filterSync} onChange={e => setFilterSync(e.target.value)}
-          className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-          <option value="all">All Sync Statuses</option>
-          <option value="synced">Synced</option>
-          <option value="failed">Failed</option>
-          <option value="pending">Pending</option>
-        </select>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            {ALL_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterSync} onValueChange={setFilterSync}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="All Sync Statuses" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sync Statuses</SelectItem>
+            <SelectItem value="synced">Synced</SelectItem>
+            <SelectItem value="failed">Failed</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -271,10 +276,12 @@ export default function AdminFleetReferrals() {
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label>Status</Label>
-                  <select value={editForm.status} onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-                    {ALL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <Select value={editForm.status} onValueChange={v => setEditForm(f => ({ ...f, status: v }))}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {ALL_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   {editForm.status === 'Commission Approved' && selected.status !== 'Commission Approved' && selected.status !== 'Paid' && (
                     <p className="text-xs text-green-600 font-medium flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" /> This will add ${editForm.commission_amount || 100} to the partner's commission balance.
@@ -302,7 +309,7 @@ export default function AdminFleetReferrals() {
                 </div>
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="pb-safe">
               <Button variant="outline" onClick={() => setSelected(null)}>Cancel</Button>
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

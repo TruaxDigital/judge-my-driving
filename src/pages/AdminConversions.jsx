@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Loader2, Plus, CheckSquare } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 
@@ -123,18 +124,22 @@ export default function AdminConversions() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <select value={filterPartner} onChange={e => setFilterPartner(e.target.value)}
-          className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-          <option value="all">All Partners</option>
-          {partners.map(p => <option key={p.id} value={p.id}>{p.partner_name}</option>)}
-        </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-          <option value="all">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="paid">Paid</option>
-          <option value="canceled">Canceled</option>
-        </select>
+        <Select value={filterPartner} onValueChange={setFilterPartner}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="All Partners" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Partners</SelectItem>
+            {partners.map(p => <SelectItem key={p.id} value={p.id}>{p.partner_name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-36"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="canceled">Canceled</SelectItem>
+          </SelectContent>
+        </Select>
         <Input type="date" value={filterStart} onChange={e => setFilterStart(e.target.value)} className="w-auto" placeholder="Start date" />
         <Input type="date" value={filterEnd} onChange={e => setFilterEnd(e.target.value)} className="w-auto" placeholder="End date" />
       </div>
@@ -195,11 +200,12 @@ export default function AdminConversions() {
           <div className="space-y-4 py-2">
             <div className="space-y-1">
               <Label>Partner *</Label>
-              <select value={form.partner_id} onChange={e => setForm(p => ({ ...p, partner_id: e.target.value }))}
-                className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-                <option value="">Select partner...</option>
-                {partners.map(p => <option key={p.id} value={p.id}>{p.partner_name} ({p.ref_code})</option>)}
-              </select>
+              <Select value={form.partner_id} onValueChange={v => setForm(p => ({ ...p, partner_id: v }))}>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select partner..." /></SelectTrigger>
+                <SelectContent>
+                  {partners.map(p => <SelectItem key={p.id} value={p.id}>{p.partner_name} ({p.ref_code})</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             {[
               { key: 'customer_name', label: 'Customer Name', type: 'text', placeholder: 'Optional' },
@@ -234,7 +240,7 @@ export default function AdminConversions() {
               <Input placeholder="Optional" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="pb-safe">
             <Button variant="outline" onClick={() => setAddDialog(false)}>Cancel</Button>
             <Button onClick={handleAdd} disabled={!form.partner_id || createMutation.isPending}>
               {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

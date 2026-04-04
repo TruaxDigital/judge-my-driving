@@ -187,7 +187,7 @@ export default function RefundDialog({ user, open, onClose }) {
           </div>
         )}
 
-        <DialogFooter>
+        <DialogFooter className="pb-safe">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           {refundInfo?.eligible && (
             <Button

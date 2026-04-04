@@ -242,7 +242,7 @@ export default function AdminUsers() {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="pb-safe">
             <Button variant="outline" onClick={() => setCreditDialog(null)}>Cancel</Button>
             <Button onClick={handleAdjust} disabled={saving || delta === 0}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

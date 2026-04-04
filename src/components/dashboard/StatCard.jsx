@@ -5,7 +5,7 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 export default function StatCard({ title, value, icon: Icon, trend, trendLabel, className }) {
   return (
     <div className={cn(
-      "bg-card border border-border rounded-2xl p-6 relative overflow-hidden",
+      "bg-card border border-border rounded-2xl p-6 relative overflow-hidden select-none",
       className
     )}>
       <div className="flex items-start justify-between">

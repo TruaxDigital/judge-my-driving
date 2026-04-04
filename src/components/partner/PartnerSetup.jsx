@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 const CHANNEL_OPTIONS = [
@@ -123,17 +124,14 @@ export default function PartnerSetup({ user, onComplete }) {
 
           <div className="space-y-1">
             <Label>Channel Type *</Label>
-            <select
-              required
-              value={form.channel_type}
-              onChange={e => setForm(p => ({ ...p, channel_type: e.target.value }))}
-              className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground"
-            >
-              <option value="">Select type...</option>
-              {CHANNEL_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+            <Select value={form.channel_type} onValueChange={v => setForm(p => ({ ...p, channel_type: v }))}>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Select type..." /></SelectTrigger>
+              <SelectContent>
+                {CHANNEL_OPTIONS.map(o => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1">

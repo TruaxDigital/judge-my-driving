@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Loader2, Search, Download, Copy, Check, RefreshCw, Eye, FileText, Users, DollarSign, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import moment from 'moment';
 
@@ -286,18 +287,31 @@ export default function AdminPartners() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search by name or ref code" value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-56" />
         </div>
-        {[
-          { label: 'Status', value: filterStatus, onChange: setFilterStatus, options: ['all', 'active', 'paused', 'inactive'] },
-          { label: 'Channel', value: filterChannel, onChange: setFilterChannel, options: ['all', ...Object.keys(CHANNEL_LABELS)] },
-          { label: 'W-9', value: filterW9, onChange: setFilterW9, options: ['all', 'uploaded', 'missing'] },
-        ].map(({ label, value, onChange, options }) => (
-          <select key={label} value={value} onChange={e => onChange(e.target.value)}
-            className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground">
-            {options.map(o => (
-              <option key={o} value={o}>{o === 'all' ? `All ${label}s` : (CHANNEL_LABELS[o] || o.charAt(0).toUpperCase() + o.slice(1))}</option>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-36"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+          <SelectContent>
+            {['all', 'active', 'paused', 'inactive'].map(o => (
+              <SelectItem key={o} value={o}>{o === 'all' ? 'All Statuses' : o.charAt(0).toUpperCase() + o.slice(1)}</SelectItem>
             ))}
-          </select>
-        ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterChannel} onValueChange={setFilterChannel}>
+          <SelectTrigger className="w-40"><SelectValue placeholder="All Channels" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Channels</SelectItem>
+            {Object.keys(CHANNEL_LABELS).map(o => (
+              <SelectItem key={o} value={o}>{CHANNEL_LABELS[o]}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterW9} onValueChange={setFilterW9}>
+          <SelectTrigger className="w-32"><SelectValue placeholder="All W-9" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All W-9</SelectItem>
+            <SelectItem value="uploaded">Uploaded</SelectItem>
+            <SelectItem value="missing">Missing</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}

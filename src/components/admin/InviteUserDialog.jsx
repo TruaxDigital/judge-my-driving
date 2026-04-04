@@ -80,7 +80,7 @@ export default function InviteUserDialog({ open, onClose }) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="pb-safe">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={handleInvite} disabled={loading || !email.trim()}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

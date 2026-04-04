@@ -115,7 +115,7 @@ export default function ManageSubscriptionDialog({ user, open, onClose }) {
           )}
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col sm:flex-row gap-2 pb-safe">
           <Button
             variant="outline"
             className="text-red-600 border-red-200 hover:bg-red-50 sm:mr-auto"

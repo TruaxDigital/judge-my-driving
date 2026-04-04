@@ -54,7 +54,7 @@ export default function PartnerAdminCard() {
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 space-y-5">
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-5 select-none">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-foreground flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" /> Referral Partners
