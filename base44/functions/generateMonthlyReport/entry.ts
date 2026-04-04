@@ -215,7 +215,7 @@ async function generateAndSendReport(serviceBase44, ownerEmail, ownerName) {
           }).join('')}
 
           <p style="font-size: 13px; color: #888; margin-top: 24px;">You'll receive this report automatically on the 1st of each month. Log in to your dashboard for full details.</p>
-          <a href="https://judgemydriving.com" style="display: inline-block; background: #FACC15; color: #111; font-weight: 700; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; margin-top: 8px;">View Dashboard</a>
+          <a href="https://app.judgemydriving.com" style="display: inline-block; background: #FACC15; color: #111; font-weight: 700; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; margin-top: 8px;">View Dashboard</a>
         </div>
       </div>
     `,
