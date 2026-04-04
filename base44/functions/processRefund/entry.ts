@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe@14.21.0';
 
-const GOOGLE_REVIEW_URL = 'https://g.page/r/REPLACE_WITH_YOUR_GOOGLE_REVIEW_LINK/review';
+const GOOGLE_REVIEW_URL = 'https://g.page/r/CdfptZ6zKvY_EAI/review';
 
 const PLAN_PRICES = {
   individual: 49,
