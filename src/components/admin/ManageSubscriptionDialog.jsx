@@ -4,9 +4,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import RefundDialog from '@/components/admin/RefundDialog';
 
 const PLANS = [
   { value: 'individual', label: 'Individual', price: '$49/yr' },
@@ -26,6 +27,7 @@ export default function ManageSubscriptionDialog({ user, open, onClose }) {
   const [plan, setPlan] = useState(user?.plan_tier || '');
   const [status, setStatus] = useState(user?.subscription_status || 'active');
   const [saving, setSaving] = useState(false);
+  const [refundOpen, setRefundOpen] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
@@ -113,7 +115,14 @@ export default function ManageSubscriptionDialog({ user, open, onClose }) {
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            className="text-red-600 border-red-200 hover:bg-red-50 sm:mr-auto"
+            onClick={() => setRefundOpen(true)}
+          >
+            <RefreshCw className="w-4 h-4 mr-2" /> Process Refund...
+          </Button>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -121,6 +130,8 @@ export default function ManageSubscriptionDialog({ user, open, onClose }) {
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <RefundDialog user={user} open={refundOpen} onClose={() => { setRefundOpen(false); onClose(); }} />
     </Dialog>
   );
 }
