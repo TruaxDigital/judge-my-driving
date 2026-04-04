@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
   }
 
   const qrUrl = `https://app.judgemydriving.com/scan/${code}`;
-  await base44.entities.Sticker.create({
+  await base44.asServiceRole.entities.Sticker.create({
     unique_code: code,
     owner_id: user.id,
     owner_email: user.email,
