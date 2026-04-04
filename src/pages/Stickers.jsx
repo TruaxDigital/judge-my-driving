@@ -213,7 +213,7 @@ export default function Stickers() {
       </div>
 
       {/* Banner for claiming stickers with available credits — only show if no stickers provisioned yet */}
-      {(user?.sticker_credits || 0) > 0 && stickers.length === 0 && (
+      {(user?.sticker_credits || 0) > 0 && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 flex items-center justify-between gap-4">
           <div>
             <p className="font-semibold text-foreground text-sm">
