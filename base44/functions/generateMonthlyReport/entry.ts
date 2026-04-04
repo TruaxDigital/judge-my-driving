@@ -171,7 +171,7 @@ async function generateAndSendReport(serviceBase44, ownerEmail, ownerName) {
     body: `
       <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
         <div style="background: #FACC15; padding: 24px 32px; border-radius: 12px 12px 0 0;">
-          <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-black.svg" alt="Judge My Driving" style="height:50px;width:auto;display:block;margin-bottom:6px;" />
+          <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style="height:50px;width:auto;display:block;margin-bottom:6px;" />
           <p style="margin: 4px 0 0; font-size: 14px; color: #333;">Monthly Driving Report — ${monthLabel}</p>
         </div>
         <div style="background: #f9f9f9; padding: 32px; border-radius: 0 0 12px 12px; border: 1px solid #e5e5e5; border-top: none;">
