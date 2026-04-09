@@ -137,7 +137,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/Dashboard" replace />} />
+      <Route path="/" element={<Navigate to={user?.plan_tier ? "/Dashboard" : "/Pricing"} replace />} />
       <Route element={<DashboardLayout />}>
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/MapView" element={<MapView />} />
