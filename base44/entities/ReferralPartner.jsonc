@@ -87,6 +87,11 @@
     "senior_qr_url": {
       "type": "string",
       "description": "URL of generated senior driver QR code PNG"
+    },
+    "agent_messages_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the Partner Coach agent may send automated messages to this partner. Set false to opt out."
     }
   },
   "required": [

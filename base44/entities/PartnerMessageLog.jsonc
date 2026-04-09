@@ -1,0 +1,77 @@
+{
+  "name": "PartnerMessageLog",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID of the ReferralPartner"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": [
+        "re_engagement",
+        "milestone",
+        "coaching",
+        "payout_alert",
+        "welcome_boost"
+      ],
+      "description": "Type of message sent"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "email",
+        "sms",
+        "whatsapp"
+      ],
+      "default": "email"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "agent_reasoning": {
+      "type": "string",
+      "description": "Why the agent picked this partner/message"
+    },
+    "partner_responded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set true when partner replies \u2014 pauses agent messages for 14 days"
+    }
+  },
+  "required": [
+    "partner_id",
+    "message_type",
+    "channel",
+    "sent_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

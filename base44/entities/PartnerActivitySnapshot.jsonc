@@ -1,0 +1,86 @@
+{
+  "name": "PartnerActivitySnapshot",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID of the ReferralPartner"
+    },
+    "week_ending": {
+      "type": "string",
+      "format": "date",
+      "description": "End date of the week this snapshot covers"
+    },
+    "conversions_7d": {
+      "type": "number",
+      "default": 0
+    },
+    "conversions_30d": {
+      "type": "number",
+      "default": 0
+    },
+    "commission_earned_7d": {
+      "type": "number",
+      "default": 0,
+      "description": "Commission from paid conversions in last 7 days"
+    },
+    "commission_earned_lifetime": {
+      "type": "number",
+      "default": 0,
+      "description": "Total paid commissions all time"
+    },
+    "commission_pending": {
+      "type": "number",
+      "default": 0,
+      "description": "Sum of pending commission amounts"
+    },
+    "total_conversions_lifetime": {
+      "type": "number",
+      "default": 0
+    },
+    "last_conversion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "days_since_last_conversion": {
+      "type": "number",
+      "default": 999
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "cold",
+        "warm",
+        "hot",
+        "top"
+      ],
+      "description": "Engagement tier based on recent activity"
+    }
+  },
+  "required": [
+    "partner_id",
+    "week_ending"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
