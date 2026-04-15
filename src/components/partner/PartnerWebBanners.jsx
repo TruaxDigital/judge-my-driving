@@ -69,13 +69,17 @@ function generateBannerHtml(refCode, path, w, h, logoUrl) {
   }
 
   if (isSkyscraper) {
-    // 160x600 — table for reliable vertical centering, content in middle cell
+    // 160x600 — logo in top section, content in middle
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;width:160px;height:600px;">
   <table style="width:160px;height:600px;background:#0F0F0F;border-collapse:collapse;font-family:Arial,sans-serif;" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="vertical-align:middle;text-align:center;padding:0 18px;">
-        <img src="${LOGO_URL}" alt="Judge My Driving" style="height:34px;width:auto;display:inline-block;margin-bottom:14px;" /><br/>
-        <div style="width:36px;height:2px;background:#D4A017;border-radius:2px;display:inline-block;margin-bottom:14px;"></div><br/>
+      <td style="vertical-align:top;text-align:center;padding:28px 18px 0 18px;">
+        <img src="${LOGO_URL}" alt="Judge My Driving" style="height:34px;width:auto;display:inline-block;" />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align:middle;text-align:center;padding:0 18px 40px 18px;">
+        <div style="width:36px;height:2px;background:#D4A017;border-radius:2px;display:inline-block;margin-bottom:16px;"></div><br/>
         <div style="color:#FFFFFF;font-size:16px;font-weight:700;line-height:1.35;text-align:center;letter-spacing:-0.3px;margin:0 0 10px 0;">Real-Time Driver Feedback Starts Here</div>
         <div style="color:#888;font-size:11px;line-height:1.5;text-align:center;margin:0 0 18px 0;">See what other drivers say — and improve your score.</div>
         <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:block;background:#D4A017;color:#0F0F0F;font-size:12px;font-weight:700;padding:10px 0;border-radius:6px;text-decoration:none;text-align:center;">Get Started →</a>
