@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { printPartnerFlyer } from './PartnerFlyerPrint';
 import { base44 } from '@/api/base44Client';
+import PartnerWebBanners from './PartnerWebBanners';
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
@@ -159,6 +160,11 @@ export default function PartnerReferralTools({ partner }) {
           audience="senior"
           partner={partner}
         />
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-border pt-6">
+        <PartnerWebBanners partner={partner} />
       </div>
     </div>
   );
