@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check, Code2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const LOGO_URL = 'https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg';
+const LOGO_GITHUB_URL = 'https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg';
+
+// Fetch SVG and convert to base64 data URI so it works in injected HTML (avoids CSP issues)
+async function fetchLogoDataUri() {
+  const res = await fetch(LOGO_GITHUB_URL);
+  const svgText = await res.text();
+  const b64 = btoa(unescape(encodeURIComponent(svgText)));
+  return `data:image/svg+xml;base64,${b64}`;
+}
 
 const AUDIENCES = [
   {
@@ -34,10 +42,11 @@ const SIZES = [
   { id: 'skyscraper', label: 'Wide Skyscraper', dims: '160 × 600', w: 160, h: 600 },
 ];
 
-function generateBannerHtml(refCode, path, w, h) {
+function generateBannerHtml(refCode, path, w, h, logoUrl) {
   const url = `https://app.judgemydriving.com/${path}?ref=${refCode}`;
   const isLeaderboard = w > h && h < 150;
   const isSkyscraper = h > w;
+  const LOGO_URL = logoUrl || LOGO_GITHUB_URL;
 
   if (isLeaderboard) {
     // 728x90 — logo left of text block
@@ -113,12 +122,17 @@ function CopyCodeButton({ text }) {
 export default function PartnerWebBanners({ partner }) {
   const [selectedAudience, setSelectedAudience] = useState('teen');
   const [selectedSize, setSelectedSize] = useState('medium');
+  const [logoDataUri, setLogoDataUri] = useState(null);
+
+  useEffect(() => {
+    fetchLogoDataUri().then(setLogoDataUri).catch(() => setLogoDataUri(LOGO_GITHUB_URL));
+  }, []);
 
   if (!partner?.ref_code) return null;
 
   const audience = AUDIENCES.find(a => a.id === selectedAudience);
   const size = SIZES.find(s => s.id === selectedSize);
-  const html = generateBannerHtml(partner.ref_code, audience.path, size.w, size.h);
+  const html = generateBannerHtml(partner.ref_code, audience.path, size.w, size.h, logoDataUri || LOGO_GITHUB_URL);
 
   return (
     <div className="space-y-6">
