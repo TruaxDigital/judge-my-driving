@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Code2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const LOGO_URL = 'https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg';
+const LOGO_URL = 'https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg';
 
 const AUDIENCES = [
   {
