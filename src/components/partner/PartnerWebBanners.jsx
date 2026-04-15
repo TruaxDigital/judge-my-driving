@@ -40,14 +40,14 @@ function generateBannerHtml(refCode, path, w, h) {
   const isSkyscraper = h > w;
 
   if (isLeaderboard) {
-    // 728x90 — row layout: logo | divider | headline (2 lines) | btn
+    // 728x90 — row layout: logo | divider | headline+sub vertically centered | btn
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;width:728px;height:90px;">
   <div style="width:728px;height:90px;background:#0F0F0F;display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:0 24px;box-sizing:border-box;font-family:Arial,sans-serif;gap:16px;overflow:hidden;">
-    <img src="${LOGO_URL}" alt="Judge My Driving" style="height:38px;width:auto;flex-shrink:0;" />
+    <img src="${LOGO_URL}" alt="Judge My Driving" style="height:38px;width:auto;flex-shrink:0;display:block;" />
     <div style="width:1px;height:40px;background:#333;flex-shrink:0;"></div>
-    <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
-      <div style="color:#FFFFFF;font-size:15px;font-weight:700;line-height:1.2;letter-spacing:-0.2px;">Real-Time Driver Feedback Starts Here</div>
-      <div style="color:#888;font-size:11px;line-height:1.3;">See what drivers say — and improve your score.</div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px;align-self:stretch;padding:0;">
+      <div style="color:#FFFFFF;font-size:15px;font-weight:700;line-height:1.2;letter-spacing:-0.2px;margin:0;">Real-Time Driver Feedback Starts Here</div>
+      <div style="color:#888;font-size:11px;line-height:1.3;margin:0;">See what drivers say — and improve your score.</div>
     </div>
     <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#D4A017;color:#0F0F0F;font-size:13px;font-weight:700;padding:10px 18px;border-radius:6px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Get Started →</a>
   </div>
@@ -55,25 +55,25 @@ function generateBannerHtml(refCode, path, w, h) {
   }
 
   if (isSkyscraper) {
-    // 160x600 — column layout stacked tightly, logo bigger, headline wraps naturally
+    // 160x600 — column, vertically centered content, margins left/right
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;width:160px;height:600px;">
-  <div style="width:160px;height:600px;background:#0F0F0F;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 14px;box-sizing:border-box;font-family:Arial,sans-serif;gap:18px;overflow:hidden;">
+  <div style="width:160px;height:600px;background:#0F0F0F;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 18px;box-sizing:border-box;font-family:Arial,sans-serif;gap:16px;overflow:hidden;">
     <img src="${LOGO_URL}" alt="Judge My Driving" style="height:36px;width:auto;" />
-    <div style="width:40px;height:2px;background:#D4A017;border-radius:2px;"></div>
-    <div style="color:#FFFFFF;font-size:17px;font-weight:700;line-height:1.3;text-align:center;letter-spacing:-0.3px;">Real-Time Driver Feedback Starts Here</div>
-    <div style="color:#888;font-size:12px;line-height:1.5;text-align:center;">See what other drivers say — and improve your score.</div>
-    <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#D4A017;color:#0F0F0F;font-size:13px;font-weight:700;padding:11px 16px;border-radius:6px;text-decoration:none;text-align:center;width:100%;box-sizing:border-box;">Get Started →</a>
+    <div style="width:36px;height:2px;background:#D4A017;border-radius:2px;"></div>
+    <div style="color:#FFFFFF;font-size:16px;font-weight:700;line-height:1.35;text-align:center;letter-spacing:-0.3px;margin:0;">Real-Time Driver Feedback Starts Here</div>
+    <div style="color:#888;font-size:11px;line-height:1.5;text-align:center;margin:0;">See what other drivers say — and improve your score.</div>
+    <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#D4A017;color:#0F0F0F;font-size:12px;font-weight:700;padding:10px 0;border-radius:6px;text-decoration:none;text-align:center;width:100%;box-sizing:border-box;">Get Started →</a>
   </div>
 </a>`;
   }
 
-  // 300x250 — medium rectangle
+  // 300x250 — medium rectangle with left/right margins
   return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;width:300px;height:250px;">
-  <div style="width:300px;height:250px;background:#0F0F0F;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;box-sizing:border-box;font-family:Arial,sans-serif;gap:14px;overflow:hidden;">
+  <div style="width:300px;height:250px;background:#0F0F0F;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 32px;box-sizing:border-box;font-family:Arial,sans-serif;gap:14px;overflow:hidden;">
     <img src="${LOGO_URL}" alt="Judge My Driving" style="height:40px;width:auto;" />
     <div style="width:40px;height:2px;background:#D4A017;border-radius:2px;"></div>
-    <div style="color:#FFFFFF;font-size:19px;font-weight:700;line-height:1.25;text-align:center;letter-spacing:-0.3px;">Real-Time Driver Feedback Starts Here</div>
-    <div style="color:#888;font-size:12px;line-height:1.4;text-align:center;">See what other drivers say — and improve your score.</div>
+    <div style="color:#FFFFFF;font-size:18px;font-weight:700;line-height:1.25;text-align:center;letter-spacing:-0.3px;margin:0;">Real-Time Driver Feedback Starts Here</div>
+    <div style="color:#888;font-size:12px;line-height:1.4;text-align:center;margin:0;">See what other drivers say — and improve your score.</div>
     <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#D4A017;color:#0F0F0F;font-size:13px;font-weight:700;padding:11px 24px;border-radius:6px;text-decoration:none;white-space:nowrap;">Get Started →</a>
   </div>
 </a>`;
