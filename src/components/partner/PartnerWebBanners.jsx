@@ -53,8 +53,8 @@ function generateBannerHtml(refCode, path, w, h, logoUrl) {
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;width:728px;height:90px;">
   <table style="width:728px;height:90px;background:#0F0F0F;border-collapse:collapse;font-family:Arial,sans-serif;" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="padding:0 14px 0 24px;white-space:nowrap;vertical-align:middle;">
-        <img src="${LOGO_URL}" alt="Judge My Driving" style="height:36px;width:auto;display:block;" />
+      <td style="padding:0 14px 0 24px;white-space:nowrap;vertical-align:middle;width:180px;">
+        <img src="${LOGO_URL}" alt="Judge My Driving" style="height:36px;width:180px;display:block;" />
       </td>
       <td style="padding:0;vertical-align:middle;width:100%;">
         <div style="color:#FFFFFF;font-size:15px;font-weight:700;line-height:1.2;letter-spacing:-0.2px;margin:0 0 3px 0;">Real-Time Driver Feedback Starts Here</div>
