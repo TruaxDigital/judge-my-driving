@@ -109,7 +109,7 @@ export default function GSPricing() {
                 opacity: loading && loading !== 'individual' ? 0.6 : 1,
               }}
             >
-              {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get Individual for $49'}
+              {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $49/yr'}
             </button>
           </div>
 
@@ -168,7 +168,7 @@ export default function GSPricing() {
                 opacity: loading && loading !== 'family' ? 0.6 : 1,
               }}
             >
-              {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get Family for $99'}
+              {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $99/yr'}
             </button>
           </div>
         </div>
