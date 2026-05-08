@@ -1,5 +1,7 @@
-import React from 'react';
-import { Check, Lock, MapPin, RefreshCw, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Lock, MapPin, RefreshCw, Mail, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { isInIframe } from '@/lib/utils';
 
 const INDIVIDUAL_FEATURES = [
   '1 QR-coded bumper sticker',
@@ -28,6 +30,28 @@ const TRUST_CHIPS = [
 ];
 
 export default function GSPricing() {
+  const [loading, setLoading] = useState(null);
+
+  const handleCheckout = async (planId) => {
+    if (isInIframe()) {
+      alert('Checkout is only available from the published app. Please open the app directly.');
+      return;
+    }
+    const isAuthed = await base44.auth.isAuthenticated();
+    if (!isAuthed) {
+      base44.auth.redirectToLogin(`/get-started?plan=${planId}`);
+      return;
+    }
+    setLoading(planId);
+    const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
+    if (res.data?.url) {
+      window.location.href = res.data.url;
+    } else {
+      alert('Could not start checkout. Please try again.');
+    }
+    setLoading(null);
+  };
+
   return (
     <section style={{ backgroundColor: '#0F0F0F', padding: '96px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -73,17 +97,20 @@ export default function GSPricing() {
                 </div>
               ))}
             </div>
-            <a
-              href="/Pricing"
+            <button
+              onClick={() => handleCheckout('individual')}
+              disabled={!!loading}
               style={{
-                display: 'block', textAlign: 'center', backgroundColor: '#D4A017', color: '#0F0F0F',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
-                textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
-                marginTop: 'auto',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
+                opacity: loading && loading !== 'individual' ? 0.6 : 1,
               }}
             >
-              Get Individual for $49
-            </a>
+              {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get Individual for $49'}
+            </button>
           </div>
 
           {/* Family */}
@@ -129,17 +156,20 @@ export default function GSPricing() {
                 </div>
               ))}
             </div>
-            <a
-              href="/Pricing"
+            <button
+              onClick={() => handleCheckout('family')}
+              disabled={!!loading}
               style={{
-                display: 'block', textAlign: 'center', backgroundColor: '#D4A017', color: '#0F0F0F',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
-                textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
-                marginTop: 'auto',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
+                opacity: loading && loading !== 'family' ? 0.6 : 1,
               }}
             >
-              Get Family for $99
-            </a>
+              {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get Family for $99'}
+            </button>
           </div>
         </div>
 
@@ -167,6 +197,7 @@ export default function GSPricing() {
       </div>
 
       <style>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .gs-pricing-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;

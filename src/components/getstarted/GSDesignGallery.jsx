@@ -89,14 +89,7 @@ export default function GSDesignGallery() {
           </div>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <a
-            href="/Stickers"
-            style={{ color: '#D4A017', fontSize: 15, fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}
-          >
-            See all 15+ designs
-          </a>
-        </div>
+
       </div>
 
       <style>{`
