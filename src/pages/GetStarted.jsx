@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useSEO from '@/hooks/useSEO';
+import useStructuredData from '@/hooks/useStructuredData';
 import GSNav from '@/components/getstarted/GSNav';
 import GSHero from '@/components/getstarted/GSHero';
 import GSSocialProof from '@/components/getstarted/GSSocialProof';
@@ -29,6 +31,25 @@ function ScrollReveal({ children }) {
 }
 
 export default function GetStarted() {
+  useSEO({
+    title: 'Judge My Driving | QR Driver Feedback Stickers for Teens, Seniors & Fleets',
+    description: 'Turn your bumper into a real-time feedback tool. QR-coded stickers let anyone rate your driver instantly. Plans from $49/year. Ships free. 30-day money-back guarantee.',
+    canonical: 'https://app.judgemydriving.com/get-started',
+  });
+  useStructuredData({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'Judge My Driving QR Bumper Sticker',
+    description: 'QR-coded bumper stickers that let the public rate any driver in real time. Real-time email alerts, driver dashboard, and leaderboards.',
+    brand: { '@type': 'Brand', name: 'Judge My Driving' },
+    url: 'https://app.judgemydriving.com/get-started',
+    offers: [
+      { '@type': 'Offer', name: 'Individual Plan', price: '49.00', priceCurrency: 'USD', priceValidUntil: '2027-12-31', availability: 'https://schema.org/InStock', url: 'https://app.judgemydriving.com/get-started' },
+      { '@type': 'Offer', name: 'Family Plan', price: '99.00', priceCurrency: 'USD', priceValidUntil: '2027-12-31', availability: 'https://schema.org/InStock', url: 'https://app.judgemydriving.com/get-started' },
+    ],
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: '124' },
+  });
+
   const [heroVisible, setHeroVisible] = useState(true);
   const [pricingVisible, setPricingVisible] = useState(false);
   const heroRef = useRef(null);

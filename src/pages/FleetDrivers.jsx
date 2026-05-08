@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useSEO from '@/hooks/useSEO';
+import useStructuredData from '@/hooks/useStructuredData';
 import { base44 } from '@/api/base44Client';
 
 const mobileStyles = `
@@ -23,9 +24,19 @@ const INDUSTRY_OPTIONS = ['HVAC', 'Plumbing', 'Electrical', 'Landscaping', 'Deli
 
 export default function FleetDrivers() {
   useSEO({
-    title: 'Fleet Driver Feedback Stickers | Insurance-Ready Safety Reports',
-    description: 'QR-coded bumper stickers for your entire fleet. Real-time public ratings, corrective action tracking, and insurance-ready PDF reports. Plans from $999/yr.',
+    title: 'Fleet Driver Safety Stickers | Real-Time Feedback & Insurance Reports | Judge My Driving',
+    description: 'QR bumper stickers for your entire fleet. Real-time public driver ratings, corrective action tracking, and insurance-ready PDF safety reports. From $999/yr for 10 vehicles. No hardware.',
     canonical: 'https://app.judgemydriving.com/fleet-drivers',
+  });
+  useStructuredData({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'How does fleet driver feedback work?', acceptedAnswer: { '@type': 'Answer', text: 'QR-coded bumper stickers are placed on each vehicle. Anyone on the road can scan and rate your driver. Ratings, comments, and incident flags flow into your fleet dashboard in real time.' } },
+      { '@type': 'Question', name: 'Can JMD help lower fleet insurance premiums?', acceptedAnswer: { '@type': 'Answer', text: 'Professional Fleet and Enterprise plans generate exportable PDF safety reports with driver ratings, incident logs, and corrective action records. Documented safety programs strengthen your negotiating position at renewal.' } },
+      { '@type': 'Question', name: 'Does Judge My Driving replace GPS or dash cams?', acceptedAnswer: { '@type': 'Answer', text: 'No. JMD captures external public perception of your drivers — data no internal tool can provide. It works standalone or alongside GPS and dash cams.' } },
+      { '@type': 'Question', name: 'How much does fleet driver monitoring cost?', acceptedAnswer: { '@type': 'Answer', text: 'Starter Fleet is $999/year for 10 vehicles. Professional Fleet is $1,999/year for 25 vehicles with insurance-ready PDF reports and corrective action tracking. No hardware required.' } },
+    ],
   });
 
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', fleetSize: '', industry: '' });

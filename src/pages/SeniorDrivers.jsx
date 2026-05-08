@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useSEO from '@/hooks/useSEO';
+import useStructuredData from '@/hooks/useStructuredData';
 import SRNav from '@/components/seniordrivers/SRNav';
 import SRHero from '@/components/seniordrivers/SRHero';
 import SRStats from '@/components/seniordrivers/SRStats';
@@ -28,6 +30,22 @@ function ScrollReveal({ children }) {
 }
 
 export default function SeniorDrivers() {
+  useSEO({
+    title: 'Senior Driver Safety Stickers | Monitor Aging Parent Driving | Judge My Driving',
+    description: 'Know how your aging parent is driving without GPS or surveillance. Real-time public ratings sent to your inbox. No app, no tracker. $49/year with a 30-day guarantee.',
+    canonical: 'https://app.judgemydriving.com/senior-drivers',
+  });
+  useStructuredData({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'How do I monitor my elderly parent\'s driving without invading their privacy?', acceptedAnswer: { '@type': 'Answer', text: 'A QR bumper sticker lets other drivers on the road submit anonymous ratings. You get real-time email alerts. No GPS, no camera, no app on their phone.' } },
+      { '@type': 'Question', name: 'Will my parent feel spied on?', acceptedAnswer: { '@type': 'Answer', text: 'No tracker, no app, no GPS. The rating reflects what the public already sees on the road. The sticker is visible and the mechanic is transparent.' } },
+      { '@type': 'Question', name: 'Can I share the dashboard with siblings?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The Family plan includes a shared dashboard so multiple caregivers can monitor the same driver together.' } },
+      { '@type': 'Question', name: 'How much does the senior driver sticker cost?', acceptedAnswer: { '@type': 'Answer', text: 'The Individual plan is $49/year. The Family plan covers up to three drivers for $99/year. Both include a 30-day money-back guarantee.' } },
+    ],
+  });
+
   const [heroVisible, setHeroVisible] = useState(true);
   const [pricingVisible, setPricingVisible] = useState(false);
   const heroRef = useRef(null);

@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useSEO from '@/hooks/useSEO';
+import useStructuredData from '@/hooks/useStructuredData';
 import SDNav from '@/components/studentdrivers/SDNav';
 import SDHero from '@/components/studentdrivers/SDHero';
 import SDStats from '@/components/studentdrivers/SDStats';
@@ -28,6 +30,22 @@ function ScrollReveal({ children }) {
 }
 
 export default function StudentDrivers() {
+  useSEO({
+    title: 'Teen Driver Safety Stickers | Real-Time Feedback for New Drivers | Judge My Driving',
+    description: 'Give parents peace of mind the moment their teen hits the road. QR bumper stickers let other drivers send real-time ratings and comments straight to your inbox. $49/year.',
+    canonical: 'https://app.judgemydriving.com/student-drivers',
+  });
+  useStructuredData({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'How does the teen driver sticker work?', acceptedAnswer: { '@type': 'Answer', text: 'A QR code on the bumper sticker lets any driver scan and rate your teen in real time. You get an email alert for every rating with a timestamp and rough location.' } },
+      { '@type': 'Question', name: 'Will my teen know they are being rated?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — the sticker is visible on the bumper. Reviewers are anonymous, but your teen knows feedback may come in. That visibility itself improves behavior.' } },
+      { '@type': 'Question', name: 'How much does it cost?', acceptedAnswer: { '@type': 'Answer', text: 'Individual plan is $49/year for one sticker. Family plan is $99/year for three stickers. Both include a 30-day money-back guarantee.' } },
+      { '@type': 'Question', name: 'Is there an app my teen needs to install?', acceptedAnswer: { '@type': 'Answer', text: 'No app required. The QR code opens a mobile-optimized web page. No downloads, no accounts needed for the reviewer.' } },
+    ],
+  });
+
   const [heroVisible, setHeroVisible] = useState(true);
   const [pricingVisible, setPricingVisible] = useState(false);
   const heroRef = useRef(null);
