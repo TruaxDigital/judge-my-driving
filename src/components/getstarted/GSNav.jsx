@@ -43,9 +43,9 @@ export default function GSNav() {
         <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <a href="/get-started">
             <img
-              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
               alt="Judge My Driving"
-              style={{ height: 40, width: 'auto' }}
+              style={{ height: 48, width: 'auto' }}
             />
           </a>
 
@@ -95,7 +95,7 @@ export default function GSNav() {
           display: 'flex', flexDirection: 'column', padding: 24,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 48 }}>
-            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style={{ height: 40 }} />
+            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg" alt="Judge My Driving" style={{ height: 48 }} />
             <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer' }}>
               <X size={24} />
             </button>

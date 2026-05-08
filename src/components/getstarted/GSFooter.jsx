@@ -52,9 +52,9 @@ export default function GSFooter() {
           {/* Brand */}
           <div>
             <img
-              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
+              src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-dark.svg"
               alt="Judge My Driving"
-              style={{ height: 28, marginBottom: 16 }}
+              style={{ height: 36, marginBottom: 16 }}
             />
             <p style={{ color: '#7A7A7A', fontSize: 14, lineHeight: 1.6, maxWidth: 220 }}>
               Real-time public driver feedback. Made in the United States.
