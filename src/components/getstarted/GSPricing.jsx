@@ -47,6 +47,7 @@ export default function GSPricing() {
             border: '1px solid rgba(255,255,255,0.08)',
             padding: 40,
             boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.35)',
+            display: 'flex', flexDirection: 'column',
           }}>
             <div style={{ marginBottom: 24 }}>
               <div style={{
@@ -64,7 +65,7 @@ export default function GSPricing() {
                 Personal accountability for one driver, one vehicle.
               </p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32, flex: 1 }}>
               {INDIVIDUAL_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <Check size={16} color="#D4A017" strokeWidth={2} style={{ marginTop: 2, flexShrink: 0 }} />
@@ -73,11 +74,12 @@ export default function GSPricing() {
               ))}
             </div>
             <a
-              href="/checkout?plan=individual"
+              href="/Pricing"
               style={{
                 display: 'block', textAlign: 'center', backgroundColor: '#D4A017', color: '#0F0F0F',
                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
                 textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
+                marginTop: 'auto',
               }}
             >
               Get Individual for $49
@@ -90,8 +92,8 @@ export default function GSPricing() {
             border: '2px solid #D4A017',
             padding: 40,
             position: 'relative',
-            transform: 'translateY(-8px)',
             boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.5)',
+            display: 'flex', flexDirection: 'column',
           }}>
             {/* Most popular ribbon */}
             <div style={{
@@ -119,7 +121,7 @@ export default function GSPricing() {
                 Three stickers, one shared dashboard, every driver in the household covered.
               </p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32, flex: 1 }}>
               {FAMILY_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <Check size={16} color="#D4A017" strokeWidth={2} style={{ marginTop: 2, flexShrink: 0 }} />
@@ -128,11 +130,12 @@ export default function GSPricing() {
               ))}
             </div>
             <a
-              href="/checkout?plan=family"
+              href="/Pricing"
               style={{
                 display: 'block', textAlign: 'center', backgroundColor: '#D4A017', color: '#0F0F0F',
                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
                 textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
+                marginTop: 'auto',
               }}
             >
               Get Family for $99
@@ -170,6 +173,7 @@ export default function GSPricing() {
           gap: 24px;
           max-width: 1080px;
           margin: 0 auto;
+          align-items: stretch;
         }
         .gs-trust-chips {
           display: flex;
@@ -181,9 +185,6 @@ export default function GSPricing() {
         @media (max-width: 768px) {
           .gs-pricing-grid {
             grid-template-columns: 1fr;
-          }
-          .gs-pricing-grid > div:last-child {
-            transform: none !important;
           }
         }
       `}</style>

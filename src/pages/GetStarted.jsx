@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import GSNav from '@/components/getstarted/GSNav';
 import GSHero from '@/components/getstarted/GSHero';
 import GSSocialProof from '@/components/getstarted/GSSocialProof';
@@ -12,6 +12,21 @@ import GSFAQ from '@/components/getstarted/GSFAQ';
 import GSFinalCTA from '@/components/getstarted/GSFinalCTA';
 import GSFooter from '@/components/getstarted/GSFooter';
 import GSMobileBar from '@/components/getstarted/GSMobileBar';
+
+function ScrollReveal({ children }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el); } },
+      { threshold: 0.08 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return <div ref={ref} className="gs-reveal">{children}</div>;
+}
 
 export default function GetStarted() {
   const [heroVisible, setHeroVisible] = useState(true);
@@ -35,17 +50,31 @@ export default function GetStarted() {
 
   return (
     <div style={{ backgroundColor: '#0F0F0F', color: '#FFFFFF', fontFamily: 'Inter, system-ui, -apple-system, sans-serif', minHeight: '100vh' }}>
+      <style>{`
+        .gs-reveal {
+          opacity: 0;
+          transform: translateY(32px);
+          transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .gs-reveal.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .gs-reveal { opacity: 1; transform: none; transition: none; }
+        }
+      `}</style>
       <GSNav />
       <div ref={heroRef}><GSHero /></div>
-      <GSSocialProof />
-      <GSHowItWorks />
-      <GSDesignGallery />
-      <GSWhoItsFor />
-      <GSComparison />
-      <GSTestimonials />
-      <div ref={pricingRef} id="pricing"><GSPricing /></div>
-      <GSFAQ />
-      <GSFinalCTA />
+      <ScrollReveal><GSSocialProof /></ScrollReveal>
+      <ScrollReveal><GSHowItWorks /></ScrollReveal>
+      <ScrollReveal><GSDesignGallery /></ScrollReveal>
+      <ScrollReveal><GSWhoItsFor /></ScrollReveal>
+      <ScrollReveal><GSComparison /></ScrollReveal>
+      <ScrollReveal><GSTestimonials /></ScrollReveal>
+      <ScrollReveal><div ref={pricingRef} id="pricing"><GSPricing /></div></ScrollReveal>
+      <ScrollReveal><GSFAQ /></ScrollReveal>
+      <ScrollReveal><GSFinalCTA /></ScrollReveal>
       <GSFooter />
       <GSMobileBar heroVisible={heroVisible} pricingVisible={pricingVisible} />
     </div>

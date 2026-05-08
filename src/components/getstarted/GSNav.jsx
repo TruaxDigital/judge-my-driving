@@ -45,7 +45,7 @@ export default function GSNav() {
             <img
               src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg"
               alt="Judge My Driving"
-              style={{ height: 28, width: 'auto' }}
+              style={{ height: 40, width: 'auto' }}
             />
           </a>
 
@@ -95,7 +95,7 @@ export default function GSNav() {
           display: 'flex', flexDirection: 'column', padding: 24,
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 48 }}>
-            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style={{ height: 28 }} />
+            <img src="https://raw.githubusercontent.com/TruaxDigital/judge-my-driving/refs/heads/main/judge-my-driving-horizontal-logo-white.svg" alt="Judge My Driving" style={{ height: 40 }} />
             <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#FFFFFF', cursor: 'pointer' }}>
               <X size={24} />
             </button>

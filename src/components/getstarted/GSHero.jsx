@@ -78,35 +78,29 @@ export default function GSHero() {
             </div>
           </div>
 
-          {/* Right: Design stack */}
+          {/* Right: Design stack — vertical cascade */}
           <div
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               opacity: visible ? 1 : 0,
               transition: 'opacity 0.8s ease',
-              position: 'relative', minHeight: 360,
+              gap: 16,
+              overflow: 'hidden',
             }}
           >
             {HERO_DESIGNS.map((id, i) => {
-              const rotations = [-5, 3, -2];
-              const offsets = [
-                { top: 0, left: 0 },
-                { top: 40, left: 60 },
-                { top: 20, left: 120 },
-              ];
+              const rotations = [-3, 2, -1.5];
               return (
                 <div
                   key={id}
                   style={{
-                    position: 'absolute',
                     transform: `rotate(${rotations[i]}deg)`,
-                    top: offsets[i].top,
-                    left: `calc(${i * 30}% + ${offsets[i].left * 0}px)`,
-                    width: '55%',
+                    width: '90%',
                     zIndex: 3 - i,
-                    boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+                    boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
                     borderRadius: 12,
                     overflow: 'hidden',
+                    flexShrink: 0,
                   }}
                 >
                   <img
@@ -125,8 +119,9 @@ export default function GSHero() {
         .gs-hero-grid {
           display: grid;
           grid-template-columns: 58% 42%;
-          gap: 64px;
+          gap: 48px;
           align-items: center;
+          overflow: hidden;
         }
         .gs-trust-grid {
           display: grid;

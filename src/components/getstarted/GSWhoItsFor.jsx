@@ -25,7 +25,7 @@ const CARDS = [
   },
   {
     icon: Truck,
-    title: 'Small Fleets',
+    title: 'Commercial Fleets',
     body: 'Branded vehicles, real public ratings, insurance-ready PDF reports. From $999 a year for 10 trucks. No GPS hardware.',
     link: 'See fleet plans',
     href: '/fleet-drivers',

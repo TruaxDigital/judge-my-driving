@@ -10,10 +10,10 @@ export default function GSFinalCTA() {
     }}>
       <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center' }}>
         <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 700, lineHeight: 1.15, color: '#FFFFFF', margin: 0 }}>
-          Two minutes from now, your driver could be rated by a stranger.
+          You've been driving blind long enough.
         </h2>
         <p style={{ color: '#B8B8B8', fontSize: 16, lineHeight: 1.6, margin: 0 }}>
-          That is how fast this works. Order a sticker, peel it, stick it. The next scan goes straight to your inbox.
+          Order your sticker today. It ships in 3 to 5 days, takes 30 seconds to put on, and starts collecting real feedback from real people the moment it hits the road.
         </p>
         <a
           href="#pricing"
