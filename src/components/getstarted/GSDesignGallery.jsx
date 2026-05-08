@@ -20,6 +20,8 @@ const GALLERY_DESIGNS = [
 ];
 
 export default function GSDesignGallery() {
+  const [lightbox, setLightbox] = useState(null);
+
   return (
     <section id="designs" style={{ backgroundColor: '#1A1A1A', padding: '96px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -35,9 +37,57 @@ export default function GSDesignGallery() {
         {/* Desktop grid / mobile horizontal scroll */}
         <div className="gs-gallery-container">
           {GALLERY_DESIGNS.map(({ id, label }) => (
-            <DesignTile key={id} id={id} label={label} />
+            <DesignTile key={id} id={id} label={label} onClick={() => setLightbox({ id, label })} />
           ))}
         </div>
+
+        {/* Lightbox */}
+        {lightbox && (
+          <div
+            onClick={() => setLightbox(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 999,
+              backgroundColor: 'rgba(0,0,0,0.85)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 24,
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                backgroundColor: '#1A1A1A',
+                borderRadius: 16,
+                border: '1px solid rgba(255,255,255,0.12)',
+                overflow: 'hidden',
+                maxWidth: 560,
+                width: '100%',
+                boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
+              }}
+            >
+              <img
+                src={DESIGN_URLS[lightbox.id]}
+                alt={lightbox.label}
+                style={{ width: '100%', display: 'block' }}
+              />
+              <div style={{
+                padding: '16px 20px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: '#FFFFFF', margin: 0 }}>{lightbox.label}</p>
+                <button
+                  onClick={() => setLightbox(null)}
+                  style={{
+                    background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 8,
+                    color: '#B8B8B8', fontSize: 13, fontWeight: 600, padding: '6px 14px', cursor: 'pointer',
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div style={{ textAlign: 'center', marginTop: 40 }}>
           <a
@@ -79,13 +129,14 @@ export default function GSDesignGallery() {
   );
 }
 
-function DesignTile({ id, label }) {
+function DesignTile({ id, label, onClick }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
       className="gs-design-tile"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
       style={{
         borderRadius: 12,
         overflow: 'hidden',
