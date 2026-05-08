@@ -75,7 +75,6 @@ export default function SDPricing() {
             padding: 40, position: 'relative',
             boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.5)',
             display: 'flex', flexDirection: 'column',
-            transform: 'translateY(-8px)',
           }}>
             <div style={{ marginBottom: 24 }}>
               <div style={{
@@ -114,7 +113,7 @@ export default function SDPricing() {
             >
               {loading === 'individual'
                 ? <Loader2 size={18} style={{ animation: 'sd-spin 1s linear infinite' }} />
-                : 'Get Individual for $49'}
+                : 'Create Account & Subscribe — $49/yr'}
             </button>
           </div>
 
@@ -169,7 +168,7 @@ export default function SDPricing() {
             >
               {loading === 'family'
                 ? <Loader2 size={18} style={{ animation: 'sd-spin 1s linear infinite' }} />
-                : 'Get Family for $99'}
+                : 'Create Account & Subscribe — $99/yr'}
             </button>
           </div>
         </div>
@@ -203,7 +202,7 @@ export default function SDPricing() {
           gap: 24px;
           max-width: 900px;
           margin: 0 auto;
-          align-items: start;
+          align-items: stretch;
         }
         .sd-trust-chips {
           display: flex;
@@ -214,7 +213,6 @@ export default function SDPricing() {
         }
         @media (max-width: 768px) {
           .sd-pricing-grid { grid-template-columns: 1fr; }
-          .sd-pricing-grid > div:first-child { transform: translateY(0) !important; }
         }
       `}</style>
     </section>

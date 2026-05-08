@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DESIGN_URLS } from '@/components/stickers/StickerDesignPicker';
 
 const POINTS = [
@@ -33,18 +33,26 @@ export default function SDPsychology() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{
-              borderRadius: 16, overflow: 'hidden',
-              boxShadow: '0 0 60px rgba(212,160,23,0.12), 0 16px 48px rgba(0,0,0,0.6)',
-              maxWidth: 400, width: '100%',
-            }}>
-              <img
-                src={DESIGN_URLS['new_driver']}
-                alt="Got Feedback sticker design"
-                style={{ width: '100%', display: 'block' }}
-              />
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+            {[
+              { id: 'new_driver', rot: -3 },
+              { id: 'tell_my_mom', rot: 2 },
+              { id: 'tell_my_dad', rot: -1.5 },
+            ].map(({ id, rot }) => (
+              <div
+                key={id}
+                style={{
+                  transform: `rotate(${rot}deg)`,
+                  width: '90%',
+                  boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                }}
+              >
+                <img src={DESIGN_URLS[id]} alt={id.replace(/_/g, ' ')} style={{ width: '100%', display: 'block' }} />
+              </div>
+            ))}
           </div>
         </div>
       </div>

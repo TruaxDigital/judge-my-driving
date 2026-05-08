@@ -50,15 +50,18 @@ export default function StudentDrivers() {
       <style>{`
         .sd-reveal {
           opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.65s ease, transform 0.65s ease;
+          transform: translateY(40px);
+          transition: opacity 0.7s ease, transform 0.7s ease;
         }
         .sd-reveal.sd-visible {
           opacity: 1;
           transform: translateY(0);
         }
+        .sd-reveal-delay-1 { transition-delay: 0.1s; }
+        .sd-reveal-delay-2 { transition-delay: 0.2s; }
+        .sd-reveal-delay-3 { transition-delay: 0.3s; }
         @media (prefers-reduced-motion: reduce) {
-          .sd-reveal { opacity: 1; transform: none; transition: none; }
+          .sd-reveal, .sd-reveal-delay-1, .sd-reveal-delay-2, .sd-reveal-delay-3 { opacity: 1; transform: none; transition: none; }
         }
       `}</style>
 
