@@ -72,7 +72,8 @@ export default function SRFooter() {
           <p style={{ color: '#7A7A7A', fontSize: 13, margin: 0 }}>&copy; 2026 Judge My Driving. All rights reserved.</p>
           <div style={{ display: 'flex', gap: 16 }}>
             {[
-              { label: 'YouTube', href: 'https://share.google/ZfMVX3kxFr3vi7QEI' },
+              { label: 'YouTube', href: 'https://www.youtube.com/channel/UC2KHf1B0MvARyF9y8k3ghYQ' },
+              { label: 'Google', href: 'https://share.google/ZfMVX3kxFr3vi7QEI' },
               { label: 'TikTok', href: 'https://www.tiktok.com/@judgemydriving' },
               { label: 'Facebook', href: 'https://www.facebook.com/judgemydriving' },
               { label: 'X', href: 'https://x.com/JudgeMyDriving' },
