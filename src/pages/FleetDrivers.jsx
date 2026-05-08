@@ -545,9 +545,22 @@ export default function FleetDrivers() {
             © 2026 Judge My Driving, a product of Truax Marketing Solutions. Alexandria, VA.<br />
             <a href="mailto:hello@judgemydriving.com" style={{ color: '#B8860B', textDecoration: 'none' }}>hello@judgemydriving.com</a>
           </div>
-          <div style={{ display: 'flex', gap: 24 }}>
-            {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Dashboard', 'https://app.judgemydriving.com'], ['Contact', 'mailto:hello@judgemydriving.com']].map(([label, href]) => (
+          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+            {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', 'mailto:hello@judgemydriving.com']].map(([label, href]) => (
               <a key={label} href={href} style={{ fontSize: '0.76rem', color: '#4A4842', textDecoration: 'none' }}>{label}</a>
+            ))}
+            {[
+              { label: 'YouTube', href: 'https://share.google/ZfMVX3kxFr3vi7QEI' },
+              { label: 'TikTok', href: 'https://www.tiktok.com/@judgemydriving' },
+              { label: 'Facebook', href: 'https://www.facebook.com/judgemydriving' },
+              { label: 'X', href: 'https://x.com/JudgeMyDriving' },
+              { label: 'Instagram', href: 'https://www.instagram.com/judgemydriving' },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/company/judge-my-driving/' },
+            ].map(({ label, href }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.76rem', color: '#4A4842', textDecoration: 'none' }}
+                onMouseOver={e => e.currentTarget.style.color = '#D4A017'}
+                onMouseOut={e => e.currentTarget.style.color = '#4A4842'}
+              >{label}</a>
             ))}
           </div>
         </div>

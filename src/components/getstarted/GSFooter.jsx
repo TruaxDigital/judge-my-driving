@@ -80,11 +80,12 @@ export default function GSFooter() {
           </p>
           <div style={{ display: 'flex', gap: 16 }}>
             {[
-              { label: 'X', href: 'https://x.com' },
-              { label: 'Instagram', href: 'https://instagram.com' },
-              { label: 'LinkedIn', href: 'https://linkedin.com' },
-              { label: 'TikTok', href: 'https://tiktok.com' },
-              { label: 'Facebook', href: 'https://facebook.com' },
+              { label: 'YouTube', href: 'https://share.google/ZfMVX3kxFr3vi7QEI' },
+              { label: 'TikTok', href: 'https://www.tiktok.com/@judgemydriving' },
+              { label: 'Facebook', href: 'https://www.facebook.com/judgemydriving' },
+              { label: 'X', href: 'https://x.com/JudgeMyDriving' },
+              { label: 'Instagram', href: 'https://www.instagram.com/judgemydriving' },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/company/judge-my-driving/' },
             ].map(({ label, href }) => (
               <a
                 key={label}

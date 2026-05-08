@@ -73,14 +73,22 @@ export default function SDFooter() {
             &copy; 2026 Judge My Driving. All rights reserved.
           </p>
           <div style={{ display: 'flex', gap: 16 }}>
-            {['X', 'Instagram', 'LinkedIn', 'TikTok', 'Facebook'].map(label => (
-              <a key={label} href="#" style={{ color: '#7A7A7A', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}
+            {[
+              { label: 'YouTube', href: 'https://share.google/ZfMVX3kxFr3vi7QEI' },
+              { label: 'TikTok', href: 'https://www.tiktok.com/@judgemydriving' },
+              { label: 'Facebook', href: 'https://www.facebook.com/judgemydriving' },
+              { label: 'X', href: 'https://x.com/JudgeMyDriving' },
+              { label: 'Instagram', href: 'https://www.instagram.com/judgemydriving' },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/company/judge-my-driving/' },
+            ].map(({ label, href }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#7A7A7A', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = '#D4A017'}
                 onMouseOut={e => e.currentTarget.style.color = '#7A7A7A'}
               >
                 {label}
               </a>
             ))}
+
           </div>
         </div>
       </div>
