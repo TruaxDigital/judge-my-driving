@@ -34,8 +34,7 @@ function TestimonialCard({ t }) {
       display: 'flex', flexDirection: 'column', gap: 16,
     }}>
       <div style={{ display: 'flex', gap: 4 }}>
-        {[1,2,3,4].map(i => <Star key={i} size={16} color="#D4A017" fill="#D4A017" />)}
-        <Star size={16} color="#D4A017" fill="transparent" strokeWidth={1.75} />
+        {[1,2,3,4,5].map(i => <Star key={i} size={16} color="#D4A017" fill="#D4A017" />)}
       </div>
       <p style={{ color: '#FFFFFF', fontSize: 16, lineHeight: 1.65, fontStyle: 'italic', flex: 1, margin: 0 }}>
         "{t.quote}"
