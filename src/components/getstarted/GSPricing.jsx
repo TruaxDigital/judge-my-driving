@@ -98,19 +98,20 @@ export default function GSPricing() {
               ))}
             </div>
             <button
-              onClick={() => handleCheckout('individual')}
-              disabled={!!loading}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
-                fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
-                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
-                opacity: loading && loading !== 'individual' ? 0.6 : 1,
-              }}
-            >
-              {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $49/yr'}
-            </button>
+               onClick={() => handleCheckout('individual')}
+               disabled={!!loading}
+               style={{
+                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                 width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
+                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
+                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                 boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
+                 opacity: loading && loading !== 'individual' ? 0.6 : 1,
+               }}
+             >
+               {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $49/yr'}
+             </button>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
           </div>
 
           {/* Family */}
@@ -157,19 +158,20 @@ export default function GSPricing() {
               ))}
             </div>
             <button
-              onClick={() => handleCheckout('family')}
-              disabled={!!loading}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
-                fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
-                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
-                opacity: loading && loading !== 'family' ? 0.6 : 1,
-              }}
-            >
-              {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $99/yr'}
-            </button>
+               onClick={() => handleCheckout('family')}
+               disabled={!!loading}
+               style={{
+                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                 width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
+                 fontWeight: 700, fontSize: 16, padding: '14px 24px', borderRadius: 12,
+                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                 boxShadow: '0 8px 24px rgba(212,160,23,0.25)', marginTop: 'auto',
+                 opacity: loading && loading !== 'family' ? 0.6 : 1,
+               }}
+             >
+               {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $99/yr'}
+             </button>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
           </div>
         </div>
 

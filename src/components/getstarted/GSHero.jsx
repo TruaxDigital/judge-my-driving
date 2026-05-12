@@ -75,7 +75,8 @@ export default function GSHero() {
               >
                 Already have an account? Sign in
               </a>
-            </div>
+              <p style={{ fontSize: 13, color: '#8A8680', marginTop: 8, marginBottom: 0 }}>Prefer a faster way? Sign up with Google or Apple.</p>
+              </div>
           </div>
 
           {/* Right: Design stack — vertical cascade */}
