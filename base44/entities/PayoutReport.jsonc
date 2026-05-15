@@ -50,6 +50,11 @@
     "date_range_label": {
       "type": "string",
       "description": "Human-readable date range label"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description for this payout report"
     }
   },
   "required": [

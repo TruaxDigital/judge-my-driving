@@ -1,0 +1,43 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "FK to Users"
+    },
+    "sticker_id": {
+      "type": "string",
+      "description": "FK to Stickers"
+    },
+    "squarespace_order_id": {
+      "type": "string"
+    },
+    "printful_order_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "paid",
+        "printing",
+        "shipped",
+        "delivered"
+      ],
+      "default": "paid"
+    },
+    "shipping_address": {
+      "type": "string",
+      "description": "Full shipping address"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description for this order"
+    }
+  },
+  "required": [
+    "sticker_id",
+    "status"
+  ]
+}

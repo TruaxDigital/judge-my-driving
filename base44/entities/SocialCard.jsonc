@@ -32,6 +32,11 @@
       "type": "boolean",
       "default": false,
       "description": "Whether the driver has shared this card"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description for this social card"
     }
   },
   "required": [

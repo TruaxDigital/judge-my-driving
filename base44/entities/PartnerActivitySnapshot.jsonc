@@ -55,6 +55,11 @@
         "top"
       ],
       "description": "Engagement tier based on recent activity"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description for this activity snapshot"
     }
   },
   "required": [

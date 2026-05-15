@@ -123,6 +123,11 @@
     "stakeholder_emails": {
       "type": "string",
       "description": "Comma-separated emails for safety report recipients (fleet use)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description for this sticker"
     }
   },
   "required": [

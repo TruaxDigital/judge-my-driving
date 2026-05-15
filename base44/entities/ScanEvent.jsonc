@@ -37,6 +37,11 @@
     "week_key": {
       "type": "string",
       "description": "ISO week string e.g. 2026-W14 \u2014 used for K-factor weekly bucketing"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or description for this scan event"
     }
   },
   "required": [

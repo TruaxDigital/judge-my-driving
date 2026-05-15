@@ -26,6 +26,11 @@
       "type": "string",
       "format": "date-time",
       "description": "When this leaderboard was last calculated"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description for this leaderboard cache entry"
     }
   },
   "required": [

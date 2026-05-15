@@ -31,6 +31,11 @@
     "center_lon": {
       "type": "number",
       "description": "Center longitude for the metro (optional, for future use)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description for this metro area mapping"
     }
   },
   "required": [

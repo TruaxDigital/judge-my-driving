@@ -41,6 +41,11 @@
     "moderation_reason": {
       "type": "string",
       "description": "Brief reason why the comment was flagged by AI moderation"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional additional description or context for this feedback record"
     }
   },
   "required": [

@@ -21,6 +21,11 @@
         "Technical"
       ],
       "description": "Category for the FAQ"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional internal description or notes for this FAQ entry"
     }
   },
   "required": [
