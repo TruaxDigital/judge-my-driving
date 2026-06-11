@@ -12,7 +12,7 @@ export default function GSSocialProof() {
     <section style={{ backgroundColor: '#1A1A1A', padding: '80px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <p style={{ color: '#B8B8B8', fontSize: 18, textAlign: 'center', marginBottom: 48, lineHeight: 1.55 }}>
-          Used by parents, families, caregivers, and small fleets across the United States.
+          Built for parents, families, caregivers, and small fleets across the United States.
         </p>
         <div className="gs-stats-grid">
           {STATS.map(({ number, label }) => (

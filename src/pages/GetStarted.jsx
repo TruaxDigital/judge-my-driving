@@ -48,7 +48,7 @@ export default function GetStarted() {
       { '@type': 'Offer', name: 'Individual Plan', price: '49.00', priceCurrency: 'USD', priceValidUntil: '2027-12-31', availability: 'https://schema.org/InStock', url: 'https://app.judgemydriving.com/get-started' },
       { '@type': 'Offer', name: 'Family Plan', price: '99.00', priceCurrency: 'USD', priceValidUntil: '2027-12-31', availability: 'https://schema.org/InStock', url: 'https://app.judgemydriving.com/get-started' },
     ],
-    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: '124' },
+
   });
 
   const [heroVisible, setHeroVisible] = useState(true);
