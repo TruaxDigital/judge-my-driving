@@ -39,7 +39,15 @@ export default function GSPricing() {
     }
     const isAuthed = await base44.auth.isAuthenticated();
     if (!isAuthed) {
-      base44.auth.redirectToLogin(`/get-started?plan=${planId}`);
+      // Guest checkout: go straight to Stripe, no login required
+      setLoading(planId);
+      const res = await base44.functions.invoke('createGuestCheckoutSession', { plan_tier: planId });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        alert('Could not start checkout. Please try again.');
+        setLoading(null);
+      }
       return;
     }
     setLoading(planId);

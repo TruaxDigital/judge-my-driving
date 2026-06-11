@@ -39,6 +39,7 @@ import PartnerTerms from './pages/PartnerTerms';
 import AdminFleetReferrals from './pages/AdminFleetReferrals';
 import AdminStickers from './pages/AdminStickers';
 import AdminAnalytics from './pages/AdminAnalytics';
+import Claim from './pages/Claim';
 
 const PublicRoutes = () => {
   return (
@@ -64,6 +65,7 @@ const PUBLIC_ROUTES = [
   '/terms-of-service',
   '/privacy',
   '/partner-terms',
+  '/claim',
 ];
 
 const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
@@ -83,6 +85,7 @@ const PublicPages = () => (
     <Route path="/terms-of-service" element={<TermsOfService />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="/partner-terms" element={<PartnerTerms />} />
+    <Route path="/claim" element={<Claim />} />
   </Routes>
 );
 
@@ -177,6 +180,7 @@ const AuthenticatedApp = () => {
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/partner-terms" element={<PartnerTerms />} />
+      <Route path="/claim" element={<Claim />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

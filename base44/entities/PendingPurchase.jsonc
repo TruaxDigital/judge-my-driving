@@ -1,0 +1,71 @@
+{
+  "name": "PendingPurchase",
+  "type": "object",
+  "properties": {
+    "stripe_session_id": {
+      "type": "string",
+      "description": "Stripe Checkout Session ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe Customer ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe Subscription ID"
+    },
+    "buyer_email": {
+      "type": "string",
+      "description": "Email the guest used at Stripe checkout"
+    },
+    "plan_tier": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "family"
+      ],
+      "description": "Plan purchased"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "claimed"
+      ],
+      "default": "pending",
+      "description": "Whether this purchase has been claimed by a registered user"
+    },
+    "claimed_by_user_id": {
+      "type": "string",
+      "description": "User ID of the account that claimed this purchase"
+    }
+  },
+  "required": [
+    "stripe_session_id",
+    "buyer_email",
+    "plan_tier",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

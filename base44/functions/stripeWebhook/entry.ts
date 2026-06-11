@@ -66,6 +66,38 @@ Deno.serve(async (req) => {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const meta = session.metadata || {};
+
+      // --- GUEST SUBSCRIPTION BRANCH ---
+      if (meta.type === 'guest_subscription') {
+        const buyerEmail = session.customer_details?.email;
+        const planTier = meta.plan_tier;
+
+        if (!buyerEmail || !planTier) {
+          console.error('guest_subscription: missing buyer email or plan_tier', { buyerEmail, planTier });
+          return Response.json({ received: true });
+        }
+
+        // Idempotency: skip if already recorded
+        const existing = await base44.asServiceRole.entities.PendingPurchase.filter({ stripe_session_id: session.id });
+        if (existing.length > 0) {
+          console.log(`guest_subscription: PendingPurchase already exists for session ${session.id}, skipping`);
+          return Response.json({ received: true });
+        }
+
+        await base44.asServiceRole.entities.PendingPurchase.create({
+          stripe_session_id: session.id,
+          stripe_customer_id: session.customer || '',
+          stripe_subscription_id: session.subscription || '',
+          buyer_email: buyerEmail,
+          plan_tier: planTier,
+          status: 'pending',
+        });
+
+        console.log(`guest_subscription: PendingPurchase created for ${buyerEmail}, plan: ${planTier}`);
+        return Response.json({ received: true });
+      }
+      // --- END GUEST SUBSCRIPTION BRANCH ---
+
       const userId = meta.user_id;
       const userEmail = meta.user_email;
 
