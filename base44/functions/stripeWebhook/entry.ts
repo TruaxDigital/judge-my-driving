@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
           role: isFleetPlan ? 'fleet_admin' : 'user',
           stripe_subscription_id: subId,
           subscription_status: 'active',
-          sticker_credits: count,
+          sticker_credits: 0,
           subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),
           subscription_end_date: new Date(subscription.current_period_end * 1000).toISOString(),
         });

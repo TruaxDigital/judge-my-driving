@@ -91,12 +91,12 @@ Deno.serve(async (req) => {
         stripe_subscription_id: purchase.stripe_subscription_id,
         stripe_customer_id: purchase.stripe_customer_id,
         subscription_status: 'active',
-        sticker_credits: count,
+        sticker_credits: 0,
         ...(subscriptionStartDate ? { subscription_start_date: subscriptionStartDate } : {}),
         ...(subscriptionEndDate ? { subscription_end_date: subscriptionEndDate } : {}),
       });
 
-      // Create stickers
+      // Create stickers (they don't exist yet for guest purchases)
       await createStickers(base44, user.id, user.email, count);
 
       console.log(`Claimed purchase ${purchase.id} for user ${user.id}, plan: ${planTier}, ${count} stickers created`);
