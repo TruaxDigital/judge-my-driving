@@ -88,15 +88,27 @@ export default function SDHero() {
               const rotations = [-3, 2, -1.5];
               return (
                 <div key={id} style={{
-                  transform: `rotate(${rotations[i]}deg)`,
-                  width: '90%',
-                  zIndex: 3 - i,
-                  boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                  flexShrink: 0,
+                 transform: `rotate(${rotations[i]}deg)`,
+                 width: '90%',
+                 zIndex: 3 - i,
+                 boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                 borderRadius: 12,
+                 overflow: 'hidden',
+                 flexShrink: 0,
+                 position: 'relative',
                 }}>
-                  <img src={DESIGN_URLS[id]} alt={id.replace(/_/g, ' ')} style={{ width: '100%', display: 'block' }} />
+                 <img src={DESIGN_URLS[id]} alt={id.replace(/_/g, ' ')} style={{ width: '100%', display: 'block' }} />
+                 <img
+                   src="https://media.base44.com/images/public/69b8646a9cc3aed112928d77/c1261e10f_qr-code2.png"
+                   alt="QR code"
+                   style={{
+                     position: 'absolute',
+                     bottom: '6%',
+                     right: '5%',
+                     width: '28%',
+                     pointerEvents: 'none',
+                   }}
+                 />
                 </div>
               );
             })}

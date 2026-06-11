@@ -109,10 +109,11 @@ export default function SRPricing() {
                 Best for one driver
               </div>
               <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px' }}>Individual</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 56, fontWeight: 700, color: '#D4A017', lineHeight: 1 }}>$49</span>
                 <span style={{ fontSize: 14, color: '#7A7A7A' }}>/year</span>
               </div>
+              <p style={{ fontSize: 13, color: '#7A7A7A', margin: '0 0 10px' }}>$4.08/month, billed yearly</p>
               <p style={{ color: '#B8B8B8', fontSize: 15, margin: 0 }}>One sticker, one parent, one inbox.</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32, flex: 1 }}>
@@ -165,10 +166,11 @@ export default function SRPricing() {
                 For 2 to 3 drivers, or shared with siblings
               </div>
               <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px' }}>Family</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 56, fontWeight: 700, color: '#D4A017', lineHeight: 1 }}>$99</span>
                 <span style={{ fontSize: 14, color: '#7A7A7A' }}>/year</span>
               </div>
+              <p style={{ fontSize: 13, color: '#7A7A7A', margin: '0 0 10px' }}>$8.25/month, billed yearly</p>
               <p style={{ color: '#B8B8B8', fontSize: 15, margin: 0 }}>Three stickers, one shared dashboard. Built for both parents, or for siblings sharing the load.</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32, flex: 1 }}>
