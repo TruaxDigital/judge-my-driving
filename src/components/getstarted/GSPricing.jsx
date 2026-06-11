@@ -81,10 +81,11 @@ export default function GSPricing() {
                 For one driver
               </div>
               <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px' }}>Individual</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 56, fontWeight: 700, color: '#D4A017', lineHeight: 1 }}>$49</span>
                 <span style={{ fontSize: 14, color: '#7A7A7A' }}>/year</span>
               </div>
+              <p style={{ fontSize: 13, color: '#7A7A7A', margin: '0 0 10px' }}>$4.08/month, billed yearly</p>
               <p style={{ color: '#B8B8B8', fontSize: 15, margin: 0 }}>
                 Personal accountability for one driver, one vehicle.
               </p>
@@ -109,7 +110,7 @@ export default function GSPricing() {
                  opacity: loading && loading !== 'individual' ? 0.6 : 1,
                }}
              >
-               {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $49/yr'}
+               {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get My Sticker • $49/yr'}
              </button>
              <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
           </div>
@@ -141,10 +142,11 @@ export default function GSPricing() {
                 For 2 to 3 drivers
               </div>
               <h3 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px' }}>Family</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 56, fontWeight: 700, color: '#D4A017', lineHeight: 1 }}>$99</span>
                 <span style={{ fontSize: 14, color: '#7A7A7A' }}>/year</span>
               </div>
+              <p style={{ fontSize: 13, color: '#7A7A7A', margin: '0 0 10px' }}>$8.25/month, billed yearly</p>
               <p style={{ color: '#B8B8B8', fontSize: 15, margin: 0 }}>
                 Three stickers, one shared dashboard, every driver in the household covered.
               </p>
@@ -169,7 +171,7 @@ export default function GSPricing() {
                  opacity: loading && loading !== 'family' ? 0.6 : 1,
                }}
              >
-               {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Create Account & Subscribe — $99/yr'}
+               {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get My Stickers • $99/yr'}
              </button>
              <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
           </div>

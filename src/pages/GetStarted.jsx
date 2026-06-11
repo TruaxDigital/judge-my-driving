@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useSEO from '@/hooks/useSEO';
 import useStructuredData from '@/hooks/useStructuredData';
+import { base44 } from '@/api/base44Client';
 import GSNav from '@/components/getstarted/GSNav';
 import GSHero from '@/components/getstarted/GSHero';
 import GSSocialProof from '@/components/getstarted/GSSocialProof';
@@ -52,8 +53,12 @@ export default function GetStarted() {
 
   const [heroVisible, setHeroVisible] = useState(true);
   const [pricingVisible, setPricingVisible] = useState(false);
+  const [checkoutOverlay, setCheckoutOverlay] = useState(false);
+  const [resumeError, setResumeError] = useState(false);
   const heroRef = useRef(null);
   const pricingRef = useRef(null);
+
+  const VALID_PLANS = ['individual', 'family', 'starter_fleet', 'professional_fleet'];
 
   useEffect(() => {
     const heroObs = new IntersectionObserver(
@@ -69,8 +74,64 @@ export default function GetStarted() {
     return () => { heroObs.disconnect(); pricingObs.disconnect(); };
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const planId = params.get('plan');
+
+    if (!planId || !VALID_PLANS.includes(planId)) {
+      if (planId) {
+        // invalid value — scroll to pricing
+        setTimeout(() => document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }), 300);
+      }
+      return;
+    }
+
+    // Remove plan param from URL immediately so back-button won't re-trigger
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+
+    (async () => {
+      const isAuthed = await base44.auth.isAuthenticated();
+      if (!isAuthed) {
+        // Not logged in — just scroll to pricing
+        setTimeout(() => document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }), 300);
+        return;
+      }
+
+      // Authenticated with a valid plan — auto-resume checkout
+      setCheckoutOverlay(true);
+      try {
+        const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
+        if (res.data?.url) {
+          window.location.href = res.data.url;
+        } else {
+          throw new Error('No URL returned');
+        }
+      } catch {
+        setCheckoutOverlay(false);
+        setResumeError(true);
+        setTimeout(() => document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    })();
+  }, []);
+
   return (
     <div style={{ backgroundColor: '#0F0F0F', color: '#FFFFFF', fontFamily: 'Inter, system-ui, -apple-system, sans-serif', minHeight: '100vh' }}>
+      {checkoutOverlay && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          backgroundColor: '#0F0F0F',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20,
+        }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%',
+            border: '3px solid rgba(212,160,23,0.2)',
+            borderTopColor: '#D4A017',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <p style={{ color: '#D4A017', fontSize: 18, fontWeight: 600, margin: 0 }}>Taking you to secure checkout…</p>
+        </div>
+      )}
       <style>{`
         .gs-reveal {
           opacity: 0;
@@ -93,7 +154,21 @@ export default function GetStarted() {
       <ScrollReveal><GSWhoItsFor /></ScrollReveal>
       <ScrollReveal><GSComparison /></ScrollReveal>
       <ScrollReveal><GSTestimonials /></ScrollReveal>
-      <ScrollReveal><div ref={pricingRef} id="pricing"><GSPricing /></div></ScrollReveal>
+      <ScrollReveal>
+        <div ref={pricingRef} id="pricing">
+          {resumeError && (
+            <p style={{
+              textAlign: 'center', color: '#D4A017', fontSize: 14,
+              backgroundColor: 'rgba(212,160,23,0.08)',
+              border: '1px solid rgba(212,160,23,0.2)',
+              borderRadius: 8, padding: '10px 20px', margin: '0 24px',
+            }}>
+              Almost there. Pick your plan below to finish checkout.
+            </p>
+          )}
+          <GSPricing />
+        </div>
+      </ScrollReveal>
       <ScrollReveal><GSFAQ /></ScrollReveal>
       <ScrollReveal><GSFinalCTA /></ScrollReveal>
       <GSFooter />
