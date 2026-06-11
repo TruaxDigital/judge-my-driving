@@ -39,6 +39,9 @@ export default function GSPricing() {
       toast.error('Checkout is only available from the published app. Please open the app directly.');
       return;
     }
+    // Analytics
+    if (window.gtag) window.gtag('event', 'begin_checkout', { event_label: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
+    if (window.fbq) window.fbq('track', 'InitiateCheckout', { content_name: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
     setLoading(planId);
     try {
       const isAuthed = await base44.auth.isAuthenticated();
@@ -135,7 +138,7 @@ export default function GSPricing() {
              >
                {loading === 'individual' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get My Sticker • $49/yr'}
              </button>
-             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Order today, it ships within 3 to 5 days.</p>
           </div>
 
           {/* Family */}
@@ -196,7 +199,7 @@ export default function GSPricing() {
              >
                {loading === 'family' ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : 'Get My Stickers • $99/yr'}
              </button>
-             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Order today, it ships within 3 to 5 days.</p>
           </div>
         </div>
 

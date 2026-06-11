@@ -12,7 +12,7 @@ const CARDS = [
   {
     icon: HeartHandshake,
     title: 'Senior Drivers',
-    body: 'The conversation about Mom or Dad\'s driving is rough. The sticker does the watching for you, with no awkward sit-down required.',
+    body: 'The conversation about Mom or Dad\'s driving is rough. The sticker does the watching for you, with no awkward sit-down required. Bought by adult kids who worry. Worn without a fight.',
     link: 'Family',
     href: '#pricing',
   },

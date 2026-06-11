@@ -3,9 +3,9 @@ import { Check, X } from 'lucide-react';
 
 const ROWS = [
   { feature: 'Annual cost (1 vehicle)', jmd: '$49', gps: '$240 to $480', dash: '$360 to $720' },
+  { feature: 'Tells you how the public sees the driver', jmd: true, gps: false, dash: false },
   { feature: 'Hardware to install', jmd: 'None', gps: 'Per vehicle', dash: 'Per vehicle' },
   { feature: 'Setup time', jmd: '2 minutes', gps: '30 to 60 min', dash: '30 to 60 min' },
-  { feature: 'Tells you how the public sees the driver', jmd: true, gps: false, dash: false },
   { feature: 'Captures real-time public ratings', jmd: true, gps: false, dash: false },
   { feature: 'Driver privacy impact', jmd: 'Low', gps: 'High', dash: 'Very high' },
   { feature: 'Works without an app on the driver\'s phone', jmd: true, gps: false, dash: 'Sometimes' },

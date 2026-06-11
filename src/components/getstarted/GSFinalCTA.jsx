@@ -24,7 +24,7 @@ export default function GSFinalCTA() {
             textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
           }}
         >
-          Pick a plan
+          Get My Sticker
         </a>
         <p style={{ color: '#7A7A7A', fontSize: 14, margin: 0 }}>
           Or talk to a human at{' '}

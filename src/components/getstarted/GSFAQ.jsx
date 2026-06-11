@@ -27,8 +27,8 @@ const FAQS = [
     a: 'We print and ship orders in 3 to 5 business days inside the United States. You will get a tracking link by email.',
   },
   {
-    q: 'Can I add more vehicles later?',
-    a: 'Yes. Family plans add vehicles for $39 a year each. Fleet plans scale up to 50 trucks with custom pricing above that.',
+    q: 'Can I add more vehicles or change my sticker design later?',
+    a: 'Yes. Family plans add vehicles for $39 a year each. Fleet plans scale up to 50 trucks with custom pricing above that. You can switch your sticker design anytime from your dashboard for $19.',
   },
   {
     q: 'Do you sell my data?',

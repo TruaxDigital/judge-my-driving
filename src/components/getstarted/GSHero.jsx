@@ -37,7 +37,7 @@ export default function GSHero() {
             {/* H1 */}
             <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 700, lineHeight: 1.1, margin: 0 }}>
               Find out how they're really driving.{' '}
-              <span style={{ color: '#D4A017' }}>Before the call from the cops.</span>
+              <span style={{ color: '#D4A017' }}>Before you have to find out the hard way.</span>
             </h1>
 
             {/* Subhead */}
@@ -56,10 +56,15 @@ export default function GSHero() {
             </div>
 
             {/* CTA */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
               <a
                 href="#pricing"
-                onClick={e => { e.preventDefault(); document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }); }}
+                onClick={e => {
+                  e.preventDefault();
+                  document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' });
+                  if (window.gtag) window.gtag('event', 'begin_checkout', { event_label: 'hero_cta' });
+                  if (window.fbq) window.fbq('track', 'InitiateCheckout', { content_name: 'hero_cta' });
+                }}
                 className="gs-cta-pulse"
                 style={{
                   display: 'inline-block', backgroundColor: '#D4A017', color: '#0F0F0F',
@@ -67,16 +72,10 @@ export default function GSHero() {
                   textDecoration: 'none', boxShadow: '0 8px 24px rgba(212,160,23,0.25)',
                 }}
               >
-                See pricing
+                Get My Sticker
               </a>
-              <a href="/login" style={{ color: '#7A7A7A', fontSize: 14, textDecoration: 'none' }}
-                onMouseOver={e => e.target.style.color = '#B8B8B8'}
-                onMouseOut={e => e.target.style.color = '#7A7A7A'}
-              >
-                Already have an account? Sign in
-              </a>
-              <p style={{ fontSize: 13, color: '#8A8680', marginTop: 8, marginBottom: 0 }}>Prefer a faster way? Sign up with Google or Apple.</p>
-              </div>
+              <p style={{ fontSize: 13, color: '#7A7A7A', margin: 0 }}>From $49/year. Ships in 3 to 5 days.</p>
+            </div>
           </div>
 
           {/* Right: Design stack — vertical cascade */}

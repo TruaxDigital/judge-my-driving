@@ -17,17 +17,16 @@ export default function GSMobileBar({ heroVisible, pricingVisible }) {
       }}
       className="gs-mobile-bar"
     >
-      <span style={{ color: '#B8B8B8', fontSize: 14, fontWeight: 500 }}>From $49/yr</span>
       <a
         href="#pricing"
         onClick={e => { e.preventDefault(); document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }); }}
         style={{
-          backgroundColor: '#D4A017', color: '#0F0F0F',
-          fontWeight: 700, fontSize: 14, padding: '10px 20px', borderRadius: 10,
-          textDecoration: 'none',
+          display: 'block', width: '100%', backgroundColor: '#D4A017', color: '#0F0F0F',
+          fontWeight: 700, fontSize: 15, padding: '12px 20px', borderRadius: 10,
+          textDecoration: 'none', textAlign: 'center',
         }}
       >
-        See pricing
+        Get My Sticker • from $49/yr
       </a>
       <style>{`
         @media (min-width: 769px) { .gs-mobile-bar { display: none !important; } }

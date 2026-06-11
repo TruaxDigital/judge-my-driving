@@ -30,7 +30,7 @@ export default function GSDesignGallery() {
             Choose from 15+ designs
           </h2>
           <p style={{ color: '#B8B8B8', fontSize: 16, lineHeight: 1.6, maxWidth: 480, margin: '0 auto' }}>
-            Pick the personality that fits your driver. Switch designs anytime from your dashboard for $19.
+            Pick the personality that fits your driver. Switch designs anytime from your dashboard.
           </p>
         </div>
 
