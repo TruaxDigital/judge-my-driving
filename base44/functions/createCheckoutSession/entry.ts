@@ -1,6 +1,39 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 import Stripe from 'npm:stripe@14.21.0';
 
+async function hashEmail(email) {
+  const normalized = email.trim().toLowerCase();
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalized));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sendMetaInitiateCheckout(email, sessionId) {
+  try {
+    const pixelId = Deno.env.get('META_PIXEL_ID');
+    const token = Deno.env.get('META_CAPI_TOKEN');
+    if (!pixelId || !token) return;
+    const em = email ? await hashEmail(email) : undefined;
+    const payload = {
+      data: [{
+        event_name: 'InitiateCheckout',
+        event_time: Math.floor(Date.now() / 1000),
+        action_source: 'website',
+        event_id: sessionId,
+        user_data: { ...(em ? { em } : {}) },
+      }],
+    };
+    const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events?access_token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    console.log('META_CAPI InitiateCheckout:', JSON.stringify(json));
+  } catch (err) {
+    console.error('META_CAPI InitiateCheckout failed (non-fatal):', err.message);
+  }
+}
+
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 // Main subscription plan prices
@@ -159,6 +192,7 @@ Deno.serve(async (req) => {
       },
     });
 
+    await sendMetaInitiateCheckout(user.email, session.id);
     return Response.json({ url: session.url });
   } catch (err) {
     console.error('createCheckoutSession error:', err);

@@ -1,6 +1,40 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 import Stripe from 'npm:stripe@14.21.0';
 
+async function hashEmail(email) {
+  const normalized = email.trim().toLowerCase();
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalized));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sendMetaPurchase(email, sessionId, amountTotal) {
+  try {
+    const pixelId = Deno.env.get('META_PIXEL_ID');
+    const token = Deno.env.get('META_CAPI_TOKEN');
+    if (!pixelId || !token) { console.warn('META_CAPI: missing env vars, skipping'); return; }
+    const em = email ? await hashEmail(email) : undefined;
+    const payload = {
+      data: [{
+        event_name: 'Purchase',
+        event_time: Math.floor(Date.now() / 1000),
+        action_source: 'website',
+        event_id: sessionId,
+        user_data: { ...(em ? { em } : {}) },
+        custom_data: { currency: 'USD', value: (amountTotal || 0) / 100 },
+      }],
+    };
+    const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events?access_token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    console.log('META_CAPI Purchase:', JSON.stringify(json));
+  } catch (err) {
+    console.error('META_CAPI Purchase failed (non-fatal):', err.message);
+  }
+}
+
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 // How many stickers each plan gets on signup
@@ -94,6 +128,7 @@ Deno.serve(async (req) => {
         });
 
         console.log(`guest_subscription: PendingPurchase created for ${buyerEmail}, plan: ${planTier}`);
+        await sendMetaPurchase(buyerEmail, session.id, session.amount_total);
         return Response.json({ received: true });
       }
       // --- END GUEST SUBSCRIPTION BRANCH ---
@@ -205,6 +240,7 @@ Deno.serve(async (req) => {
             </ol>
           </div>`,
         });
+        await sendMetaPurchase(userEmail, session.id, session.amount_total);
         console.log(`New subscription for user ${userId}, plan: ${planTier}, ${count} stickers created`);
       }
 

@@ -1,5 +1,31 @@
 import Stripe from 'npm:stripe@14.21.0';
 
+async function sendMetaInitiateCheckout(sessionId) {
+  try {
+    const pixelId = Deno.env.get('META_PIXEL_ID');
+    const token = Deno.env.get('META_CAPI_TOKEN');
+    if (!pixelId || !token) return;
+    const payload = {
+      data: [{
+        event_name: 'InitiateCheckout',
+        event_time: Math.floor(Date.now() / 1000),
+        action_source: 'website',
+        event_id: sessionId,
+        user_data: {},
+      }],
+    };
+    const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events?access_token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    console.log('META_CAPI InitiateCheckout (guest):', JSON.stringify(json));
+  } catch (err) {
+    console.error('META_CAPI InitiateCheckout failed (non-fatal):', err.message);
+  }
+}
+
 const PRICE_MAP = {
   individual: 'price_1TEytxPRtZZpxDXapf6My9d1',
   family:     'price_1TEytwPRtZZpxDXaABsJ4zGy',
@@ -30,6 +56,7 @@ Deno.serve(async (req) => {
       },
     });
 
+    await sendMetaInitiateCheckout(session.id);
     return Response.json({ url: session.url });
   } catch (err) {
     console.error('createGuestCheckoutSession error:', err);
