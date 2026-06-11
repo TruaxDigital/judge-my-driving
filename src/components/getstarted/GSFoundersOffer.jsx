@@ -26,6 +26,9 @@ export default function GSFoundersOffer() {
             padding: '40px 40px',
             borderRight: '1px solid rgba(212,160,23,0.2)',
           }}>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: '#D4A017', textTransform: 'uppercase', margin: '0 0 16px' }}>
+              A note from the founder
+            </p>
             <p style={{ color: '#B8B8B8', fontSize: 15, lineHeight: 1.75, margin: 0 }}>
               I built Judge My Driving because I wanted a simple, honest way to know how my kid was doing on the road — without installing an app on their phone or making them feel watched. A bumper sticker felt right. Anyone who sees them drive can leave feedback in seconds. No accounts. No apps. Just real signal from real people. That is still what this is.
             </p>
