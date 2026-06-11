@@ -101,12 +101,25 @@ export default function GSHero() {
                     borderRadius: 12,
                     overflow: 'hidden',
                     flexShrink: 0,
+                    position: 'relative',
                   }}
                 >
                   <img
                     src={DESIGN_URLS[id]}
                     alt={id.replace(/_/g, ' ')}
                     style={{ width: '100%', display: 'block' }}
+                  />
+                  {/* QR overlay in the white box area of each sticker */}
+                  <img
+                    src="https://media.base44.com/images/public/69b8646a9cc3aed112928d77/34dfbe138_qr-code2.png"
+                    alt="QR code"
+                    style={{
+                      position: 'absolute',
+                      bottom: '6%',
+                      right: '5%',
+                      width: '28%',
+                      pointerEvents: 'none',
+                    }}
                   />
                 </div>
               );
