@@ -4,9 +4,10 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import ThemeAwareLogo from "@/components/ThemeAwareLogo";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,8 @@ export default function Login() {
 
   return (
     <AuthLayout
-      icon={LogIn}
+      icon={ThemeAwareLogo}
+      iconType="logo"
       title="Welcome back"
       subtitle="Log in to your account"
       footer={
