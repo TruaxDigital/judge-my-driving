@@ -99,6 +99,37 @@ Deno.serve(async (req) => {
       // Create stickers (they don't exist yet for guest purchases)
       await createStickers(base44, user.id, user.email, count);
 
+      // Create Sale record (was skipped during guest checkout since no user_id existed)
+      try {
+        await base44.asServiceRole.functions.invoke('createOrUpdateSale', {
+          user_id: user.id,
+          email: user.email,
+          full_name: user.full_name || '',
+          plan_tier: planTier,
+          subscription_amount: planTier === 'family' ? 99 : 49,
+          stripe_subscription_id: purchase.stripe_subscription_id || '',
+          stripe_customer_id: purchase.stripe_customer_id || '',
+          subscription_start_date: subscriptionStartDate || new Date().toISOString().split('T')[0],
+          subscription_end_date: subscriptionEndDate || '',
+        });
+        console.log(`Sale record created for claimed purchase, user ${user.id}, plan: ${planTier}`);
+      } catch (saleErr) {
+        console.error('Failed to create Sale record on claim:', saleErr.message);
+      }
+
+      // Sync to HubSpot
+      try {
+        await base44.asServiceRole.functions.invoke('syncToHubSpot', {
+          email: user.email,
+          full_name: user.full_name || '',
+          plan_tier: planTier,
+          last_purchase_date: new Date().toISOString().split('T')[0],
+          total_stickers: count,
+        });
+      } catch (hsErr) {
+        console.error('HubSpot sync failed on claim:', hsErr.message);
+      }
+
       console.log(`Claimed purchase ${purchase.id} for user ${user.id}, plan: ${planTier}, ${count} stickers created`);
     }
 
