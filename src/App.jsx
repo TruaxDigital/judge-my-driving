@@ -40,57 +40,15 @@ import AdminFleetReferrals from './pages/AdminFleetReferrals';
 import AdminStickers from './pages/AdminStickers';
 import AdminAnalytics from './pages/AdminAnalytics';
 import Claim from './pages/Claim';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
-const PublicRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/scan/:code" element={<ScanSticker />} />
-      <Route path="*" element={null} />
-    </Routes>
-  );
-};
-
-const PUBLIC_ROUTES = [
-  '/scan/',
-  '/get-started',
-  '/liability',
-  '/Pricing',
-  '/pricing',
-  '/driver-profile',
-  '/partner-signup',
-  '/student-drivers',
-  '/senior-drivers',
-  '/PartnerPortal',
-  '/fleet-drivers',
-  '/terms-of-service',
-  '/privacy',
-  '/partner-terms',
-  '/claim',
-];
-
-const isPublicPath = () => PUBLIC_ROUTES.some(p => window.location.pathname.startsWith(p));
-
-const PublicPages = () => (
-  <Routes>
-    <Route path="/scan/:code" element={<ScanSticker />} />
-    <Route path="/get-started" element={<GetStarted />} />
-    <Route path="/liability" element={<Liability />} />
-    <Route path="/Pricing" element={<Pricing />} />
-    <Route path="/driver-profile" element={<DriverProfile />} />
-    <Route path="/partner-signup" element={<PartnerSignup />} />
-    <Route path="/student-drivers" element={<StudentDrivers />} />
-    <Route path="/senior-drivers" element={<SeniorDrivers />} />
-    <Route path="/PartnerPortal" element={<PartnerPortal />} />
-    <Route path="/fleet-drivers" element={<FleetDrivers />} />
-    <Route path="/terms-of-service" element={<TermsOfService />} />
-    <Route path="/privacy" element={<PrivacyPolicy />} />
-    <Route path="/partner-terms" element={<PartnerTerms />} />
-    <Route path="/claim" element={<Claim />} />
-  </Routes>
-);
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
+  const { user, authError } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -100,87 +58,79 @@ const AuthenticatedApp = () => {
   }, [location]);
 
   // Subdomain routing
-  if (window.location.hostname === 'fleet.judgemydriving.com') {
-    return <FleetDrivers />;
-  }
-  if (window.location.hostname === 'teens.judgemydriving.com') {
-    return <StudentDrivers />;
-  }
-  if (window.location.hostname === 'seniors.judgemydriving.com') {
-    return <SeniorDrivers />;
+  if (window.location.hostname === 'fleet.judgemydriving.com') return <FleetDrivers />;
+  if (window.location.hostname === 'teens.judgemydriving.com') return <StudentDrivers />;
+  if (window.location.hostname === 'seniors.judgemydriving.com') return <SeniorDrivers />;
+
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
-  // Always render public routes immediately — no auth gate, no loading spinner, regardless of auth state
-  if (isPublicPath()) {
-    return <PublicPages />;
-  }
-
-  // Show loading spinner while checking app public settings or auth
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      if (isPublicPath()) return <PublicPages />;
-      navigateToLogin();
-      return null;
-    }
-  }
-
-  // Redirect partner role users to their portal
-  if (user?.role === 'partner') {
-    return (
-      <Routes>
+  // Redirect partner role to their portal (still gated behind ProtectedRoute below)
+  const partnerRoutes = user?.role === 'partner' ? (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/PartnerPortal" element={<PartnerPortal />} />
         <Route path="*" element={<Navigate to="/PartnerPortal" replace />} />
-      </Routes>
-    );
-  }
+      </Route>
+    </Routes>
+  ) : null;
 
-  // Render the main app
+  if (partnerRoutes) return partnerRoutes;
+
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={user?.plan_tier ? "/Dashboard" : "/Pricing"} replace />} />
-      <Route element={<DashboardLayout />}>
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/MapView" element={<MapView />} />
-        <Route path="/Stickers" element={<Stickers />} />
-        <Route path="/Settings" element={<Settings />} />
-        <Route path="/PreviewScan" element={<PreviewScan />} />
-        <Route path="/Analytics" element={<Analytics />} />
-        <Route path="/Reporting" element={<Reporting />} />
-        <Route path="/FleetDashboard" element={<FleetDashboard />} />
-        <Route path="/Pricing" element={<Pricing />} />
-        <Route path="/Support" element={<Support />} />
-        <Route path="/AdminUsers" element={<AdminUsers />} />
-        <Route path="/AdminPartners" element={<AdminPartners />} />
-        <Route path="/AdminConversions" element={<AdminConversions />} />
-        <Route path="/AdminPayoutReports" element={<AdminPayoutReports />} />
-        <Route path="/AdminSales" element={<AdminSales />} />
-        <Route path="/AdminFleetReferrals" element={<AdminFleetReferrals />} />
-        <Route path="/AdminStickers" element={<AdminStickers />} />
-        <Route path="/AdminAnalytics" element={<AdminAnalytics />} />
-        <Route path="/Leaderboard" element={<Leaderboard />} />
-      </Route>
+      {/* Auth pages — always public */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Public marketing / scan pages — no auth required */}
+      <Route path="/scan/:code" element={<ScanSticker />} />
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/liability" element={<Liability />} />
+      <Route path="/Pricing" element={<Pricing />} />
       <Route path="/driver-profile" element={<DriverProfile />} />
       <Route path="/partner-signup" element={<PartnerSignup />} />
       <Route path="/student-drivers" element={<StudentDrivers />} />
       <Route path="/senior-drivers" element={<SeniorDrivers />} />
       <Route path="/PartnerPortal" element={<PartnerPortal />} />
+      <Route path="/fleet-drivers" element={<FleetDrivers />} />
       <Route path="/terms-of-service" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/partner-terms" element={<PartnerTerms />} />
       <Route path="/claim" element={<Claim />} />
+
+      {/* Protected app routes */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/" element={<Navigate to={user?.plan_tier ? "/Dashboard" : "/Pricing"} replace />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/MapView" element={<MapView />} />
+          <Route path="/Stickers" element={<Stickers />} />
+          <Route path="/Settings" element={<Settings />} />
+          <Route path="/PreviewScan" element={<PreviewScan />} />
+          <Route path="/Analytics" element={<Analytics />} />
+          <Route path="/Reporting" element={<Reporting />} />
+          <Route path="/FleetDashboard" element={<FleetDashboard />} />
+          <Route path="/Support" element={<Support />} />
+          <Route path="/AdminUsers" element={<AdminUsers />} />
+          <Route path="/AdminPartners" element={<AdminPartners />} />
+          <Route path="/AdminConversions" element={<AdminConversions />} />
+          <Route path="/AdminPayoutReports" element={<AdminPayoutReports />} />
+          <Route path="/AdminSales" element={<AdminSales />} />
+          <Route path="/AdminFleetReferrals" element={<AdminFleetReferrals />} />
+          <Route path="/AdminStickers" element={<AdminStickers />} />
+          <Route path="/AdminAnalytics" element={<AdminAnalytics />} />
+          <Route path="/Leaderboard" element={<Leaderboard />} />
+        </Route>
+      </Route>
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
