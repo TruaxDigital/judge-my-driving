@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function GSFoundersOffer() {
+  const [showToast, setShowToast] = useState(false);
+
   const scrollToPricing = (e) => {
     e.preventDefault();
-    document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' });
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+    setTimeout(() => document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
   return (
     <section style={{ backgroundColor: '#0F0F0F', padding: '0 24px 48px' }}>
+      {/* Toast popup */}
+      <div style={{
+        position: 'fixed', bottom: 32, left: '50%', transform: `translateX(-50%) translateY(${showToast ? '0' : '20px'})`,
+        opacity: showToast ? 1 : 0, transition: 'opacity 0.3s ease, transform 0.3s ease',
+        zIndex: 9999, pointerEvents: 'none',
+        backgroundColor: '#1A1A1A', border: '2px solid #D4A017',
+        borderRadius: 12, padding: '14px 24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        display: 'flex', alignItems: 'center', gap: 12, whiteSpace: 'nowrap',
+      }}>
+        <span style={{ fontSize: 20 }}>🎉</span>
+        <span style={{ color: '#B8B8B8', fontSize: 15 }}>Use code</span>
+        <span style={{
+          color: '#0F0F0F', backgroundColor: '#D4A017',
+          fontWeight: 800, fontSize: 16, letterSpacing: '0.08em',
+          padding: '2px 10px', borderRadius: 6,
+        }}>MARY</span>
+        <span style={{ color: '#B8B8B8', fontSize: 15 }}>at checkout for your founders discount</span>
+      </div>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <div style={{
           display: 'grid',
