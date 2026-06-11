@@ -71,7 +71,6 @@ export default function SRHero() {
               >
                 See how it works ↓
               </a>
-              <p style={{ fontSize: 13, color: '#8A8680', marginTop: 8, marginBottom: 0 }}>Or sign up instantly with Google or Apple.</p>
             </div>
 
             <p style={{ color: '#7A7A7A', fontSize: 14, margin: 0 }}>Less than $1 a week. Cancel anytime.</p>

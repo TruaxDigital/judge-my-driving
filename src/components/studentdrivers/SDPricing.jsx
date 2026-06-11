@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Check, Lock, MapPin, RefreshCw, Mail, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { appParams } from '@/lib/app-params';
 import { isInIframe } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const INDIVIDUAL_FEATURES = [
   '1 QR-coded bumper sticker',
@@ -34,22 +36,44 @@ export default function SDPricing() {
 
   const handleCheckout = async (planId) => {
     if (isInIframe()) {
-      alert('Checkout is only available from the published app. Please open the app directly.');
+      toast.error('Checkout is only available from the published app. Please open the app directly.');
       return;
     }
-    const isAuthed = await base44.auth.isAuthenticated();
-    if (!isAuthed) {
-      base44.auth.redirectToLogin(`/student-drivers?plan=${planId}`);
-      return;
-    }
+    if (window.gtag) window.gtag('event', 'begin_checkout', { event_label: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
+    if (window.fbq) window.fbq('track', 'InitiateCheckout', { content_name: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
     setLoading(planId);
-    const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
-    if (res.data?.url) {
-      window.location.href = res.data.url;
-    } else {
-      alert('Could not start checkout. Please try again.');
+    try {
+      const isAuthed = await base44.auth.isAuthenticated();
+      if (!isAuthed) {
+        const baseUrl = appParams.appBaseUrl || '';
+        const appId = appParams.appId || '';
+        const fnUrl = `${baseUrl}/api/apps/${appId}/functions/createGuestCheckoutSession`;
+        const res = await fetch(fnUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_tier: planId }),
+        });
+        const data = await res.json();
+        if (data?.url) {
+          window.location.href = data.url;
+        } else {
+          toast.error(data?.error || 'Could not start checkout. Please try again.');
+          setLoading(null);
+        }
+        return;
+      }
+      const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error('Could not start checkout. Please try again.');
+        setLoading(null);
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      toast.error('Could not start checkout. Please try again.');
+      setLoading(null);
     }
-    setLoading(null);
   };
 
   return (
@@ -113,9 +137,9 @@ export default function SDPricing() {
              >
                {loading === 'individual'
                  ? <Loader2 size={18} style={{ animation: 'sd-spin 1s linear infinite' }} />
-                 : 'Create Account & Subscribe — $49/yr'}
+                 : 'Get My Sticker • $49/yr'}
              </button>
-             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Order today, it ships within 3 to 5 days.</p>
           </div>
 
           {/* Family */}
@@ -169,9 +193,9 @@ export default function SDPricing() {
              >
                {loading === 'family'
                  ? <Loader2 size={18} style={{ animation: 'sd-spin 1s linear infinite' }} />
-                 : 'Create Account & Subscribe — $99/yr'}
+                 : 'Get My Stickers • $99/yr'}
              </button>
-             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Or sign up instantly with Google or Apple</p>
+             <p style={{ fontSize: 13, color: '#7A7A7A', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>Order today, it ships within 3 to 5 days.</p>
           </div>
         </div>
 
