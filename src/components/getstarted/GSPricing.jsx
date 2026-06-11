@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Check, Lock, MapPin, RefreshCw, Mail, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { appParams } from '@/lib/app-params';
 import { isInIframe } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const INDIVIDUAL_FEATURES = [
   '1 QR-coded bumper sticker',
@@ -34,30 +36,43 @@ export default function GSPricing() {
 
   const handleCheckout = async (planId) => {
     if (isInIframe()) {
-      alert('Checkout is only available from the published app. Please open the app directly.');
-      return;
-    }
-    const isAuthed = await base44.auth.isAuthenticated();
-    if (!isAuthed) {
-      // Guest checkout: go straight to Stripe, no login required
-      setLoading(planId);
-      const res = await base44.functions.invoke('createGuestCheckoutSession', { plan_tier: planId });
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      } else {
-        alert('Could not start checkout. Please try again.');
-        setLoading(null);
-      }
+      toast.error('Checkout is only available from the published app. Please open the app directly.');
       return;
     }
     setLoading(planId);
-    const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
-    if (res.data?.url) {
-      window.location.href = res.data.url;
-    } else {
-      alert('Could not start checkout. Please try again.');
+    try {
+      const isAuthed = await base44.auth.isAuthenticated();
+      if (!isAuthed) {
+        // Guest checkout: call the function endpoint directly without SDK auth wrapper
+        const baseUrl = appParams.appBaseUrl || '';
+        const appId = appParams.appId || '';
+        const fnUrl = `${baseUrl}/api/apps/${appId}/functions/createGuestCheckoutSession`;
+        const res = await fetch(fnUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_tier: planId }),
+        });
+        const data = await res.json();
+        if (data?.url) {
+          window.location.href = data.url;
+        } else {
+          toast.error(data?.error || 'Could not start checkout. Please try again.');
+          setLoading(null);
+        }
+        return;
+      }
+      const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error('Could not start checkout. Please try again.');
+        setLoading(null);
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      toast.error('Could not start checkout. Please try again.');
+      setLoading(null);
     }
-    setLoading(null);
   };
 
   return (
