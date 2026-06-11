@@ -7,7 +7,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
         <div className="text-center mb-10">
           {iconType === 'logo' ? (
             <div className="mb-4">
-              <Icon className="h-12 w-auto mx-auto" />
+              <Icon className="h-18 w-auto mx-auto" />
             </div>
           ) : (
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
