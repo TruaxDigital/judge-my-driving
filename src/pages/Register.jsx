@@ -46,7 +46,10 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = "/";
+      // Respect the ?next= param so /claim can redirect back after registration
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
+      window.location.href = next || "/";
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {

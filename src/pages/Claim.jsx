@@ -32,7 +32,8 @@ export default function Claim() {
   }, []);
 
   const handleCreateAccount = () => {
-    base44.auth.redirectToLogin('/claim');
+    // Use register page with ?next=/claim so after OTP verification they land back here
+    window.location.href = '/register?next=/claim';
   };
 
   return (
@@ -101,7 +102,7 @@ export default function Claim() {
             </button>
             <p style={{ fontSize: 13, color: '#7A7A7A', marginTop: 16 }}>
               Already have an account?{' '}
-              <a href="/login" style={{ color: '#D4A017', textDecoration: 'none' }}>Sign in</a>
+              <a href="/login?next=/claim" style={{ color: '#D4A017', textDecoration: 'none' }}>Sign in</a>
             </p>
           </>
         )}

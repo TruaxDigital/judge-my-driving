@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import Stripe from 'npm:stripe@14.21.0';
 
 const PLAN_STICKER_COUNT = {
   individual: 1,
@@ -40,6 +41,8 @@ async function createStickers(base44, userId, userEmail, count) {
   }
 }
 
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -67,6 +70,19 @@ Deno.serve(async (req) => {
         claimed_by_user_id: user.id,
       });
 
+      // Fetch subscription dates from Stripe
+      let subscriptionStartDate = null;
+      let subscriptionEndDate = null;
+      if (purchase.stripe_subscription_id) {
+        try {
+          const sub = await stripe.subscriptions.retrieve(purchase.stripe_subscription_id);
+          subscriptionStartDate = new Date(sub.current_period_start * 1000).toISOString().split('T')[0];
+          subscriptionEndDate = new Date(sub.current_period_end * 1000).toISOString().split('T')[0];
+        } catch (stripeErr) {
+          console.error('Failed to retrieve Stripe subscription for dates:', stripeErr.message);
+        }
+      }
+
       // Update user record
       await base44.asServiceRole.entities.User.update(user.id, {
         plan_tier: planTier,
@@ -76,6 +92,8 @@ Deno.serve(async (req) => {
         stripe_customer_id: purchase.stripe_customer_id,
         subscription_status: 'active',
         sticker_credits: count,
+        ...(subscriptionStartDate ? { subscription_start_date: subscriptionStartDate } : {}),
+        ...(subscriptionEndDate ? { subscription_end_date: subscriptionEndDate } : {}),
       });
 
       // Create stickers
