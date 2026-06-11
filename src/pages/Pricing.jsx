@@ -82,12 +82,12 @@ export default function Pricing() {
   }, []);
 
   const handleSubscribe = async (planId) => {
-    if (!isAuthed) {
-      base44.auth.redirectToLogin(`/get-started?plan=${planId}`);
-      return;
-    }
     if (isInIframe()) {
       alert('Checkout is only available from the published app. Please open the app directly.');
+      return;
+    }
+    if (!isAuthed) {
+      window.location.href = `/checkout?plan=${planId.replace('_', '-')}`;
       return;
     }
     setLoading(planId);

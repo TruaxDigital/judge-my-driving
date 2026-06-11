@@ -27,8 +27,10 @@ async function sendMetaInitiateCheckout(sessionId) {
 }
 
 const PRICE_MAP = {
-  individual: 'price_1TEytxPRtZZpxDXapf6My9d1',
-  family:     'price_1TEytwPRtZZpxDXaABsJ4zGy',
+  individual:         'price_1TEytxPRtZZpxDXapf6My9d1',
+  family:             'price_1TEytwPRtZZpxDXaABsJ4zGy',
+  starter_fleet:      'price_1TEytwPRtZZpxDXavnYLui15',
+  professional_fleet: 'price_1TEytvPRtZZpxDXaUKUtslV0',
 };
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -36,25 +38,39 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
-    const { plan_tier } = body;
+    const { plan_tier, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref } = body;
 
     if (!plan_tier || !PRICE_MAP[plan_tier]) {
-      return Response.json({ error: 'Invalid plan_tier. Must be "individual" or "family".' }, { status: 400 });
+      return Response.json({ error: 'Invalid plan_tier.' }, { status: 400 });
     }
 
     const origin = req.headers.get('origin') || 'https://app.judgemydriving.com';
 
-    const session = await stripe.checkout.sessions.create({
+    const metadata = {
+      base44_app_id: Deno.env.get('BASE44_APP_ID'),
+      type: 'guest_subscription',
+      plan_tier,
+      ...(utm_source   ? { utm_source }   : {}),
+      ...(utm_medium   ? { utm_medium }   : {}),
+      ...(utm_campaign ? { utm_campaign } : {}),
+      ...(utm_content  ? { utm_content }  : {}),
+      ...(utm_term     ? { utm_term }     : {}),
+      ...(ref          ? { ref }          : {}),
+    };
+
+    const sessionParams = {
       mode: 'subscription',
       line_items: [{ price: PRICE_MAP[plan_tier], quantity: 1 }],
       success_url: `${origin}/claim?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/get-started#pricing`,
-      metadata: {
-        base44_app_id: Deno.env.get('BASE44_APP_ID'),
-        type: 'guest_subscription',
-        plan_tier,
-      },
-    });
+      metadata,
+    };
+
+    if (ref) {
+      sessionParams.client_reference_id = ref;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     await sendMetaInitiateCheckout(session.id);
     return Response.json({ url: session.url });
