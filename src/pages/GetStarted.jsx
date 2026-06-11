@@ -9,7 +9,6 @@ import GSHowItWorks from '@/components/getstarted/GSHowItWorks';
 import GSDesignGallery from '@/components/getstarted/GSDesignGallery';
 import GSWhoItsFor from '@/components/getstarted/GSWhoItsFor';
 import GSComparison from '@/components/getstarted/GSComparison';
-import GSTestimonials from '@/components/getstarted/GSTestimonials';
 import GSPricing from '@/components/getstarted/GSPricing';
 import GSFAQ from '@/components/getstarted/GSFAQ';
 import GSFinalCTA from '@/components/getstarted/GSFinalCTA';
@@ -154,7 +153,6 @@ export default function GetStarted() {
       <ScrollReveal><GSDesignGallery /></ScrollReveal>
       <ScrollReveal><GSWhoItsFor /></ScrollReveal>
       <ScrollReveal><GSComparison /></ScrollReveal>
-      <ScrollReveal><GSTestimonials /></ScrollReveal>
       <ScrollReveal><GSFoundersOffer /></ScrollReveal>
       <ScrollReveal>
         <div ref={pricingRef} id="pricing">
