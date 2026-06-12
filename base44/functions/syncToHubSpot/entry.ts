@@ -59,10 +59,13 @@ Deno.serve(async (req) => {
       email,
       firstname,
       lastname,
+      hs_marketing_contact_status: 'MARKETING_CONTACT',
     };
 
     if (plan_tier) {
       properties.jmd_buying_tier = PLAN_LABEL[plan_tier] || plan_tier;
+      // Contacts with a plan tier are customers
+      properties.lifecyclestage = 'customer';
     }
     if (last_purchase_date) {
       properties.jmd_last_purchase_date = last_purchase_date;

@@ -11,29 +11,87 @@ const HUBSPOT_PRODUCT_IDS = {
   replacement_sticker:  '303112121056',
 };
 
+const PLAN_LABEL = {
+  individual:         'Individual',
+  family:             'Family',
+  starter_fleet:      'Starter Fleet',
+  professional_fleet: 'Professional Fleet',
+};
+
+async function hubspotRequest(method, path, body, accessToken) {
+  const res = await fetch(`https://api.hubapi.com${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`HubSpot ${method} ${path} => ${res.status}: ${err}`);
+  }
+  return res.json();
+}
+
+function buildContactProperties(sale) {
+  const nameParts = (sale.full_name || '').trim().split(' ');
+  return {
+    email: sale.email,
+    firstname: nameParts[0] || '',
+    lastname: nameParts.slice(1).join(' ') || '',
+    lifecyclestage: sale.status === 'active' ? 'customer' : 'lead',
+    hs_marketing_contact_status: 'MARKETING_CONTACT',   // opt-in to marketing
+    jmd_buying_tier: PLAN_LABEL[sale.plan_tier] || sale.plan_tier || '',
+    jmd_last_purchase_date: sale.subscription_start_date || new Date().toISOString().split('T')[0],
+    ...(sale.stripe_customer_id      ? { jmd_stripe_customer_id: sale.stripe_customer_id }           : {}),
+    ...(sale.stripe_subscription_id  ? { jmd_stripe_subscription_id: sale.stripe_subscription_id }   : {}),
+  };
+}
+
+function buildDealProperties(sale) {
+  const planLabel = PLAN_LABEL[sale.plan_tier] || sale.plan_tier || '';
+  const name = sale.full_name || sale.email || 'Unknown';
+  return {
+    dealname: `${name} — ${planLabel} Plan`,
+    dealstage: sale.status === 'active' ? 'closedwon' : 'closedlost',
+    amount: String(sale.total_revenue || sale.subscription_amount || 0),
+    closedate: sale.subscription_start_date
+      ? new Date(sale.subscription_start_date).toISOString()
+      : new Date().toISOString(),
+    pipeline: 'default',
+    description: `Plan: ${planLabel} | Stripe customer: ${sale.stripe_customer_id || 'n/a'} | Sub: ${sale.stripe_subscription_id || 'n/a'}`,
+    ...(sale.stripe_customer_id      ? { jmd_stripe_customer_id: sale.stripe_customer_id }           : {}),
+    ...(sale.stripe_subscription_id  ? { jmd_stripe_subscription_id: sale.stripe_subscription_id }   : {}),
+  };
+}
+
 async function upsertLineItems(accessToken, dealId, sale) {
   // Delete existing line items on this deal first
-  const existingRes = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/line_items?associations.dealId=${dealId}&limit=50`,
-    { headers: { 'Authorization': `Bearer ${accessToken}` } }
-  );
-  if (existingRes.ok) {
-    const existing = await existingRes.json();
-    for (const item of (existing.results || [])) {
-      await fetch(`https://api.hubapi.com/crm/v3/objects/line_items/${item.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-      });
+  try {
+    const existingRes = await fetch(
+      `https://api.hubapi.com/crm/v3/objects/line_items?associations.dealId=${dealId}&limit=50`,
+      { headers: { 'Authorization': `Bearer ${accessToken}` } }
+    );
+    if (existingRes.ok) {
+      const existing = await existingRes.json();
+      for (const item of (existing.results || [])) {
+        await fetch(`https://api.hubapi.com/crm/v3/objects/line_items/${item.id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+      }
     }
+  } catch (e) {
+    console.error('Failed to clear line items:', e.message);
   }
 
   const lineItems = [];
 
-  // Main subscription
   const planProductId = HUBSPOT_PRODUCT_IDS[sale.plan_tier];
   if (planProductId) {
     lineItems.push({
-      name: sale.plan_tier.replace(/_/g, ' ') + ' Plan',
+      name: (PLAN_LABEL[sale.plan_tier] || sale.plan_tier) + ' Plan',
       hs_product_id: planProductId,
       quantity: 1,
       price: sale.subscription_amount || 0,
@@ -41,9 +99,8 @@ async function upsertLineItems(accessToken, dealId, sale) {
     });
   }
 
-  // Additional stickers
   if (sale.additional_stickers_sold > 0) {
-    const isFleet = sale.plan_tier.includes('fleet');
+    const isFleet = sale.plan_tier?.includes('fleet');
     const addonId = isFleet ? HUBSPOT_PRODUCT_IDS.addon_sticker_fleet : HUBSPOT_PRODUCT_IDS.addon_sticker_family;
     lineItems.push({
       name: 'Additional Sticker',
@@ -53,7 +110,6 @@ async function upsertLineItems(accessToken, dealId, sale) {
     });
   }
 
-  // Replacement stickers
   if (sale.replacement_stickers_sold > 0) {
     lineItems.push({
       name: 'Replacement Sticker',
@@ -93,118 +149,64 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'sale_id is required' }, { status: 400 });
     }
 
-    // Get the sale record
     const sales = await base44.asServiceRole.entities.Sale.filter({ id: sale_id });
     if (sales.length === 0) {
       return Response.json({ error: 'Sale not found' }, { status: 404 });
     }
-
     const sale = sales[0];
 
-    // Get HubSpot access token
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('hubspot');
 
-    // Sync or create contact (upsert by email)
+    // ── CONTACT ──────────────────────────────────────────────────────────────
     let contactId = sale.hubspot_contact_id;
+    const contactProps = buildContactProperties(sale);
+
     if (!contactId) {
-      // Search for existing contact by email first
-      const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: sale.email }] }],
-          limit: 1,
-        }),
-      });
-      const searchData = await searchRes.json();
+      // Search by email first
+      const searchData = await hubspotRequest('POST', '/crm/v3/objects/contacts/search', {
+        filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: sale.email }] }],
+        properties: ['email'],
+        limit: 1,
+      }, accessToken);
+
       if (searchData.results?.length > 0) {
         contactId = searchData.results[0].id;
-        console.log(`Found existing HubSpot contact ${contactId} for ${sale.email}`);
-        // Update lifecyclestage
-        await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ properties: { lifecyclestage: sale.status === 'active' ? 'customer' : 'lead' } }),
-        });
+        await hubspotRequest('PATCH', `/crm/v3/objects/contacts/${contactId}`, { properties: contactProps }, accessToken);
+        console.log(`Updated existing HubSpot contact ${contactId} for ${sale.email}`);
       } else {
-        const contactResponse = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            properties: {
-              email: sale.email,
-              firstname: sale.full_name?.split(' ')[0] || '',
-              lastname: sale.full_name?.split(' ').slice(1).join(' ') || '',
-              lifecyclestage: sale.status === 'active' ? 'customer' : 'lead',
-            },
-          }),
-        });
-        if (!contactResponse.ok) {
-          throw new Error(`Failed to create HubSpot contact: ${contactResponse.statusText}`);
-        }
-        const contactData = await contactResponse.json();
-        contactId = contactData.id;
-        console.log(`Created HubSpot contact ${contactId} for sale ${sale_id}`);
+        const created = await hubspotRequest('POST', '/crm/v3/objects/contacts', { properties: contactProps }, accessToken);
+        contactId = created.id;
+        console.log(`Created HubSpot contact ${contactId} for ${sale.email}`);
       }
+    } else {
+      // Always re-sync contact properties on every sale sync
+      await hubspotRequest('PATCH', `/crm/v3/objects/contacts/${contactId}`, { properties: contactProps }, accessToken);
+      console.log(`Re-synced HubSpot contact ${contactId}`);
     }
 
-    // Sync or create deal
+    // ── DEAL ─────────────────────────────────────────────────────────────────
     let dealId = sale.hubspot_deal_id;
+    const dealProps = buildDealProperties(sale);
+
     if (!dealId) {
-      const dealResponse = await fetch('https://api.hubapi.com/crm/v3/objects/deals', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          properties: {
-            dealname: `${sale.full_name} - ${sale.plan_tier.replace(/_/g, ' ')} Plan`,
-            dealstage: sale.status === 'active' ? 'closedwon' : 'closedlost',
-            amount: sale.total_revenue || sale.subscription_amount || 0,
-            closedate: new Date().toISOString(),
-            pipeline: 'default',
-          },
-          associations: [
-            {
-              to: { id: contactId },
-              types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }],
-            },
-          ],
-        }),
-      });
-
-      if (!dealResponse.ok) {
-        const errBody = await dealResponse.json();
-        console.error('Deal create error:', JSON.stringify(errBody));
-        throw new Error(`Failed to create HubSpot deal: ${dealResponse.statusText}`);
-      }
-
-      const dealData = await dealResponse.json();
+      const dealData = await hubspotRequest('POST', '/crm/v3/objects/deals', {
+        properties: dealProps,
+        associations: [{
+          to: { id: contactId },
+          types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }],
+        }],
+      }, accessToken);
       dealId = dealData.id;
-      console.log(`Created HubSpot deal ${dealId} for sale ${sale_id}`);
+      console.log(`Created HubSpot deal ${dealId} (closedwon) for sale ${sale_id}`);
     } else {
-      // Update existing deal
-      await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${dealId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          properties: {
-            amount: sale.total_revenue || sale.subscription_amount || 0,
-            dealstage: sale.status === 'active' ? 'closedwon' : 'closedlost',
-          },
-        }),
-      });
+      await hubspotRequest('PATCH', `/crm/v3/objects/deals/${dealId}`, { properties: dealProps }, accessToken);
       console.log(`Updated HubSpot deal ${dealId} for sale ${sale_id}`);
     }
 
-    // Sync line items to deal
+    // ── LINE ITEMS ────────────────────────────────────────────────────────────
     await upsertLineItems(accessToken, dealId, sale);
 
-    // Update sale record with HubSpot IDs
+    // ── SAVE IDs BACK ─────────────────────────────────────────────────────────
     await base44.asServiceRole.entities.Sale.update(sale_id, {
       hubspot_contact_id: contactId,
       hubspot_deal_id: dealId,
