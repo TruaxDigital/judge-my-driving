@@ -60,21 +60,26 @@ export default function RefundDialog({ user, open, onClose }) {
 
   const sale = sales[0];
   const activeStickers = stickers.filter(s => s.status !== 'deactivated').length;
-  const refundInfo = sale
-    ? calcLocalRefundInfo(sale.plan_tier, sale.subscription_start_date, activeStickers)
+
+  // If no Sale record exists, derive info from the User record instead
+  const effectivePlanTier = sale?.plan_tier || user?.plan_tier;
+  const effectiveStartDate = sale?.subscription_start_date || user?.subscription_start_date;
+  const refundInfo = effectivePlanTier
+    ? calcLocalRefundInfo(effectivePlanTier, effectiveStartDate, activeStickers)
     : null;
 
   const isLoading = loadingSale || loadingStickers;
 
   const handleRefund = async () => {
-    if (!sale || !refundInfo?.eligible) return;
+    if (!refundInfo?.eligible) return;
     setProcessing(true);
-    const res = await base44.functions.invoke('processRefund', {
+    const payload = {
       target_user_id: user.id,
-      sale_id: sale.id,
+      ...(sale ? { sale_id: sale.id } : { plan_tier: effectivePlanTier }),
       refund_amount_cents: Math.round(refundInfo.amount * 100),
       sticker_count: activeStickers,
-    });
+    };
+    const res = await base44.functions.invoke('processRefund', payload);
     setProcessing(false);
 
     if (res.data?.success) {
@@ -95,7 +100,10 @@ export default function RefundDialog({ user, open, onClose }) {
         <DialogHeader>
           <DialogTitle>Process Refund</DialogTitle>
           <DialogDescription>
-            {user?.full_name || user?.email} · {sale?.plan_tier?.replace(/_/g, ' ') || '—'}
+            {user?.full_name || user?.email} · {effectivePlanTier?.replace(/_/g, ' ') || '—'}
+            {!sale && effectivePlanTier && (
+              <span className="block text-amber-500 text-xs mt-0.5">No Sale record — using manual plan data</span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -103,15 +111,15 @@ export default function RefundDialog({ user, open, onClose }) {
           <div className="flex justify-center py-10">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
-        ) : !sale ? (
-          <div className="py-6 text-center text-muted-foreground text-sm">No sale record found for this user.</div>
+        ) : !refundInfo ? (
+          <div className="py-6 text-center text-muted-foreground text-sm">Could not determine plan details for this user.</div>
         ) : (
           <div className="space-y-4 py-2">
             {/* Policy summary */}
             <div className="bg-muted/50 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Plan price</span>
-                <span className="font-semibold">${PLAN_PRICES[sale.plan_tier] || '—'}</span>
+                <span className="font-semibold">${PLAN_PRICES[effectivePlanTier] || '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Days since start</span>

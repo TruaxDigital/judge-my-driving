@@ -55,23 +55,44 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { target_user_id, sale_id, refund_amount_cents, sticker_count, dry_run } = await req.json();
+    const { target_user_id, sale_id, plan_tier, refund_amount_cents, sticker_count, dry_run } = await req.json();
 
-    if (!target_user_id || !sale_id) {
-      return Response.json({ error: 'target_user_id and sale_id are required' }, { status: 400 });
+    if (!target_user_id) {
+      return Response.json({ error: 'target_user_id is required' }, { status: 400 });
     }
-
-    // Load sale
-    const sales = await base44.asServiceRole.entities.Sale.filter({ id: sale_id });
-    if (sales.length === 0) return Response.json({ error: 'Sale not found' }, { status: 404 });
-    const sale = sales[0];
 
     // Load target user
     const targetUsers = await base44.asServiceRole.entities.User.filter({ id: target_user_id });
     const targetUser = targetUsers[0];
 
+    // Determine plan info: prefer Sale record, fall back to User record + plan_tier param
+    let effectivePlanTier, effectiveStartDate, stripeSubId, stripeCustId, hubspotContactId, hubspotDealId;
+    let sale = null;
+
+    if (sale_id) {
+      const sales = await base44.asServiceRole.entities.Sale.filter({ id: sale_id });
+      if (sales.length === 0) return Response.json({ error: 'Sale not found' }, { status: 404 });
+      sale = sales[0];
+      effectivePlanTier = sale.plan_tier;
+      effectiveStartDate = sale.subscription_start_date;
+      stripeSubId = sale.stripe_subscription_id;
+      stripeCustId = sale.stripe_customer_id;
+      hubspotContactId = sale.hubspot_contact_id;
+      hubspotDealId = sale.hubspot_deal_id;
+    } else if (plan_tier) {
+      // No Sale record — derive from User record
+      effectivePlanTier = plan_tier;
+      effectiveStartDate = targetUser?.subscription_start_date;
+      stripeSubId = targetUser?.stripe_subscription_id;
+      stripeCustId = targetUser?.stripe_customer_id;
+      hubspotContactId = null;
+      hubspotDealId = null;
+    } else {
+      return Response.json({ error: 'Either sale_id or plan_tier is required' }, { status: 400 });
+    }
+
     // Calc refund info
-    const refundInfo = calcRefundAmount(sale.plan_tier, sale.subscription_start_date, sticker_count || 0);
+    const refundInfo = calcRefundAmount(effectivePlanTier, effectiveStartDate, sticker_count || 0);
 
     if (dry_run) {
       return Response.json({ success: true, refund_info: refundInfo });
@@ -87,15 +108,15 @@ Deno.serve(async (req) => {
 
     // 1. Issue Stripe refund (if there's a subscription / charge to refund)
     let stripeRefundId = null;
-    if (sale.stripe_subscription_id && amountCents > 0) {
+    if (stripeSubId && amountCents > 0) {
       try {
         // Cancel the subscription
-        await stripe.subscriptions.cancel(sale.stripe_subscription_id);
-        console.log(`[processRefund] Cancelled subscription ${sale.stripe_subscription_id}`);
+        await stripe.subscriptions.cancel(stripeSubId);
+        console.log(`[processRefund] Cancelled subscription ${stripeSubId}`);
 
         // Find most recent invoice/charge to refund
         const invoices = await stripe.invoices.list({
-          subscription: sale.stripe_subscription_id,
+          subscription: stripeSubId,
           limit: 5,
         });
 
@@ -125,11 +146,14 @@ Deno.serve(async (req) => {
     }
     console.log(`[processRefund] Deactivated ${deactivatedCount} stickers for user ${target_user_id}`);
 
-    // 3. Update Sale record
-    await base44.asServiceRole.entities.Sale.update(sale_id, {
-      status: 'canceled',
-      notes: `Refunded $${(amountCents / 100).toFixed(2)} on ${new Date().toISOString().slice(0, 10)}. Type: ${refundInfo.type}. ${sale.notes || ''}`.trim(),
-    });
+    // 3. Update Sale record (if one exists)
+    const refundNote = `Refunded $${(amountCents / 100).toFixed(2)} on ${new Date().toISOString().slice(0, 10)}. Type: ${refundInfo.type}.`;
+    if (sale) {
+      await base44.asServiceRole.entities.Sale.update(sale.id, {
+        status: 'canceled',
+        notes: `${refundNote} ${sale.notes || ''}`.trim(),
+      });
+    }
 
     // 4. Update User record
     await base44.asServiceRole.entities.User.update(target_user_id, {
@@ -137,10 +161,10 @@ Deno.serve(async (req) => {
     });
 
     // 5. Tag in HubSpot as "Churned - Refunded"
-    if (sale.hubspot_contact_id) {
+    if (hubspotContactId) {
       try {
         const { accessToken } = await base44.asServiceRole.connectors.getConnection('hubspot');
-        await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${sale.hubspot_contact_id}`, {
+        await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspotContactId}`, {
           method: 'PATCH',
           headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -152,21 +176,21 @@ Deno.serve(async (req) => {
           }),
         });
         // Also update the deal stage
-        if (sale.hubspot_deal_id) {
-          await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${sale.hubspot_deal_id}`, {
+        if (hubspotDealId) {
+          await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${hubspotDealId}`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ properties: { dealstage: 'closedlost' } }),
           });
         }
-        console.log(`[processRefund] HubSpot updated for contact ${sale.hubspot_contact_id}`);
+        console.log(`[processRefund] HubSpot updated for contact ${hubspotContactId}`);
       } catch (hsErr) {
         console.error('[processRefund] HubSpot update failed (non-blocking):', hsErr.message);
       }
     }
 
     // 6. Send "You're all set" email via Resend
-    const firstName = (targetUser?.full_name || sale.full_name || 'there').split(' ')[0];
+    const firstName = (targetUser?.full_name || sale?.full_name || 'there').split(' ')[0];
     const refundAmountDisplay = `$${(amountCents / 100).toFixed(2)}`;
 
     try {
@@ -178,7 +202,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           from: 'Judge My Driving <hello@judgemydriving.com>',
-          to: targetUser?.email || sale.email,
+          to: targetUser?.email || sale?.email,
           subject: "You're all set",
           html: `
             <div style="font-family: Inter, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a;">
@@ -201,7 +225,7 @@ Deno.serve(async (req) => {
         const errText = await emailRes.text();
         console.error('[processRefund] Email send failed:', errText);
       } else {
-        console.log(`[processRefund] Refund email sent to ${targetUser?.email || sale.email}`);
+        console.log(`[processRefund] Refund email sent to ${targetUser?.email || sale?.email}`);
       }
     } catch (emailErr) {
       console.error('[processRefund] Email error (non-blocking):', emailErr.message);
