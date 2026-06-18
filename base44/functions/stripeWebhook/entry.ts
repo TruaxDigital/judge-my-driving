@@ -7,20 +7,38 @@ async function hashEmail(email) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function sendMetaPurchase(email, sessionId, amountTotal) {
+async function sendMetaPurchase(email, session, req) {
   try {
     const pixelId = Deno.env.get('META_PIXEL_ID');
     const token = Deno.env.get('META_CAPI_TOKEN');
     if (!pixelId || !token) { console.warn('META_CAPI: missing env vars, skipping'); return; }
     const em = email ? await hashEmail(email) : undefined;
+
+    // Build user_data with all available fields
+    const userData = {};
+    if (em) userData.em = em;
+
+    // Client IP from request (Stripe sends cf-connecting-ip or x-forwarded-for)
+    const clientIp = req?.headers?.get('cf-connecting-ip')
+      || req?.headers?.get('x-forwarded-for')?.split(',')[0]?.trim();
+    if (clientIp) userData.client_ip_address = clientIp;
+
+    // Client user agent
+    const userAgent = req?.headers?.get('user-agent');
+    if (userAgent) userData.client_user_agent = userAgent;
+
     const payload = {
       data: [{
         event_name: 'Purchase',
-        event_time: Math.floor(Date.now() / 1000),
+        event_time: Math.floor(new Date(session.created * 1000).getTime() / 1000),
+        event_id: session.id,
         action_source: 'website',
-        event_id: sessionId,
-        user_data: { ...(em ? { em } : {}) },
-        custom_data: { currency: 'USD', value: (amountTotal || 0) / 100 },
+        event_source_url: 'https://app.judgemydriving.com/welcome',
+        user_data: userData,
+        custom_data: {
+          currency: session.currency || 'USD',
+          value: (session.amount_total || 0) / 100,
+        },
       }],
     };
     const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events?access_token=${token}`, {
@@ -128,7 +146,7 @@ Deno.serve(async (req) => {
         });
 
         console.log(`guest_subscription: PendingPurchase created for ${buyerEmail}, plan: ${planTier}`);
-        await sendMetaPurchase(buyerEmail, session.id, session.amount_total);
+        await sendMetaPurchase(buyerEmail, session, req);
         return Response.json({ received: true });
       }
       // --- END GUEST SUBSCRIPTION BRANCH ---
@@ -240,7 +258,7 @@ Deno.serve(async (req) => {
             </ol>
           </div>`,
         });
-        await sendMetaPurchase(userEmail, session.id, session.amount_total);
+        await sendMetaPurchase(userEmail, session, req);
         console.log(`New subscription for user ${userId}, plan: ${planTier}, ${count} stickers created`);
       }
 

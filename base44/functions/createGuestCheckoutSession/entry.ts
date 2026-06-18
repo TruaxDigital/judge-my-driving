@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     await sendMetaInitiateCheckout(session.id);
-    return Response.json({ url: session.url });
+    return Response.json({ url: session.url, session_id: session.id });
   } catch (err) {
     console.error('createGuestCheckoutSession error:', err);
     return Response.json({ error: err.message }, { status: 500 });

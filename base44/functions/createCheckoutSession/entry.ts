@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
           ref_code: ref_code || '',
         },
       });
-      return Response.json({ url: session.url });
+      return Response.json({ url: session.url, session_id: session.id });
     }
 
     // Replacement sticker ($19 one-time, same QR code)
@@ -179,7 +179,7 @@ Deno.serve(async (req) => {
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success_url || `${req.headers.get('origin')}/Stickers?sub_success=true`,
+      success_url: success_url || `${req.headers.get('origin')}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url || `${req.headers.get('origin')}/get-started`,
       ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       metadata: {
@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
     });
 
     await sendMetaInitiateCheckout(user.email, session.id);
-    return Response.json({ url: session.url });
+    return Response.json({ url: session.url, session_id: session.id });
   } catch (err) {
     console.error('createCheckoutSession error:', err);
     return Response.json({ error: err.message }, { status: 500 });

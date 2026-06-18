@@ -39,9 +39,9 @@ export default function GSPricing() {
       toast.error('Checkout is only available from the published app. Please open the app directly.');
       return;
     }
-    // Analytics
-    if (window.gtag) window.gtag('event', 'begin_checkout', { event_label: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
-    if (window.fbq) window.fbq('track', 'InitiateCheckout', { content_name: planId, value: planId === 'family' ? 99 : 49, currency: 'USD' });
+    const planName = planId === 'family' ? 'Family' : 'Individual';
+    const planPrice = planId === 'family' ? 99.00 : 49.00;
+    if (window.gtag) window.gtag('event', 'begin_checkout', { event_label: planId, value: planPrice, currency: 'USD' });
     setLoading(planId);
     try {
       const isAuthed = await base44.auth.isAuthenticated();
@@ -57,6 +57,13 @@ export default function GSPricing() {
         });
         const data = await res.json();
         if (data?.url) {
+          // Fire InitiateCheckout after session creation, before redirect
+          if (window.fbq && data.session_id) {
+            window.fbq('track', 'InitiateCheckout', {
+              value: planPrice, currency: 'USD',
+              content_name: planName, content_category: 'B2C',
+            }, { eventID: data.session_id });
+          }
           window.location.href = data.url;
         } else {
           toast.error(data?.error || 'Could not start checkout. Please try again.');
@@ -64,8 +71,23 @@ export default function GSPricing() {
         }
         return;
       }
+      // Advanced matching: pass known email and user id to pixel
+      try {
+        const user = await base44.auth.me();
+        if (window.fbq && user?.email) {
+          window.fbq('init', '1222567206332988', { em: user.email.toLowerCase(), external_id: user.id });
+        }
+      } catch (_) { /* ignore */ }
+
       const res = await base44.functions.invoke('createCheckoutSession', { plan_tier: planId, mode: 'subscription' });
       if (res.data?.url) {
+        // Fire InitiateCheckout after session creation, before redirect
+        if (window.fbq && res.data.session_id) {
+          window.fbq('track', 'InitiateCheckout', {
+            value: planPrice, currency: 'USD',
+            content_name: planName, content_category: 'B2C',
+          }, { eventID: res.data.session_id });
+        }
         window.location.href = res.data.url;
       } else {
         toast.error('Could not start checkout. Please try again.');

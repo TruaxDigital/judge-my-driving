@@ -40,6 +40,7 @@ import AdminFleetReferrals from './pages/AdminFleetReferrals';
 import AdminStickers from './pages/AdminStickers';
 import AdminAnalytics from './pages/AdminAnalytics';
 import Claim from './pages/Claim';
+import Welcome from './pages/Welcome';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -106,6 +107,7 @@ const AuthenticatedApp = () => {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/partner-terms" element={<PartnerTerms />} />
       <Route path="/claim" element={<Claim />} />
+      <Route path="/welcome" element={<Welcome />} />
       <Route path="/checkout" element={<Checkout />} />
 
       {/* Protected app routes */}
