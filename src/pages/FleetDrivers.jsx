@@ -72,6 +72,7 @@ export default function FleetDrivers() {
     });
     if (res.data?.success) {
       setSuccess(true);
+      if (window.fbq) window.fbq('track', 'Lead');
     } else {
       setError(res.data?.error || 'Something went wrong. Please try again.');
     }

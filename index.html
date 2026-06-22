@@ -52,7 +52,7 @@
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', '1222567206332988');
-  fbq('track', 'PageView');
+  // PageView is fired by App.jsx on route change (including initial load) to avoid double-firing
   </script>
   <!-- End Meta Pixel Code -->
   </head>

@@ -46,6 +46,12 @@ export default function Checkout() {
         });
         const data = await res.json();
         if (data?.url) {
+          if (window.fbq) {
+            window.fbq('track', 'InitiateCheckout', {
+              currency: 'USD',
+              content_category: 'B2C',
+            });
+          }
           window.location.href = data.url;
         } else {
           setError(data?.error || 'Could not start checkout. Please try again.');

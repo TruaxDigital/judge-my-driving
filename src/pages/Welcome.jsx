@@ -27,12 +27,17 @@ export default function Welcome() {
           setPlanName(plan);
 
           // Fire browser Purchase event (deduplicates with server CAPI via eventID)
-          if (window.fbq) {
-            window.fbq('track', 'Purchase', {
-              value,
-              currency: 'USD',
-              content_name: plan,
-            }, { eventID: sessionId });
+          // Guard: don't fire Purchase more than once per completed order (e.g. on refresh)
+          const purchaseKey = `meta_purchase_${sessionId}`;
+          if (!sessionStorage.getItem(purchaseKey)) {
+            sessionStorage.setItem(purchaseKey, '1');
+            if (window.fbq) {
+              window.fbq('track', 'Purchase', {
+                value,
+                currency: 'USD',
+                content_name: plan,
+              }, { eventID: sessionId });
+            }
           }
         }
       } catch (err) {

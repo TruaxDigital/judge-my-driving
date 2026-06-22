@@ -80,6 +80,7 @@ export default function EnterpriseContactForm({ open, onClose, planName }) {
     const res = await base44.functions.invoke('submitEnterpriseLead', form);
     if (res.data?.success) {
       setSuccess(true);
+      if (window.fbq) window.fbq('track', 'Lead');
     } else {
       setError(res.data?.error || 'Something went wrong. Please try again.');
     }
